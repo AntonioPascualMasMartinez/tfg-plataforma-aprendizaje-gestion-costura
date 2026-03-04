@@ -1,0 +1,189 @@
+<header
+  class="w-full fixed top-0 z-50 transition-all duration-300 border-b"
+  [ngClass]="{
+    'bg-surface/85 backdrop-blur-md py-3 shadow-sm border-border-main/20': isScrolled,
+    'bg-surface py-5 border-transparent': !isScrolled,
+  }"
+>
+  <div class="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
+    <a
+      routerLink="/"
+      class="flex items-center gap-2 focus-visible:outline-focus rounded-lg px-1 group"
+    >
+      <img
+        src="/logo/logo.png"
+        alt="Logo de Needly"
+        class="w-12 h-12 md:w-14 md:h-14 object-contain transition-transform duration-300 group-hover:scale-105"
+      />
+      <span class="font-display text-[22px] md:text-[24px] font-bold text-text-main tracking-tight">
+        Needly
+      </span>
+    </a>
+
+    <nav class="hidden md:flex items-center gap-8">
+      <a
+        href="/#encontrar"
+        class="relative text-[14px] font-medium text-text-main transition-colors focus-visible:outline-focus rounded py-1 group"
+      >
+        Encontrar
+        <span
+          class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 ease-out group-hover:w-full"
+        ></span>
+      </a>
+      <a
+        href="/#funcionamiento"
+        class="relative text-[14px] font-medium text-text-main transition-colors focus-visible:outline-focus rounded py-1 group"
+      >
+        Funcionamiento
+        <span
+          class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 ease-out group-hover:w-full"
+        ></span>
+      </a>
+      <a
+        href="/#biblioteca"
+        class="relative text-[14px] font-medium text-text-main transition-colors focus-visible:outline-focus rounded py-1 group"
+      >
+        Biblioteca
+        <span
+          class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 ease-out group-hover:w-full"
+        ></span>
+      </a>
+      <a
+        href="/#comunidad"
+        class="relative text-[14px] font-medium text-text-main transition-colors focus-visible:outline-focus rounded py-1 group"
+      >
+        Comunidad
+        <span
+          class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 ease-out group-hover:w-full"
+        ></span>
+      </a>
+    </nav>
+
+    <div class="flex items-center gap-4">
+      <button
+        (click)="toggleTheme()"
+        class="relative flex items-center justify-center p-2 rounded-full text-text-main hover:bg-black/5 dark:hover:bg-white/10 transition-colors focus-visible:outline-focus"
+        aria-label="Alternar modo oscuro"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-5 h-5 transition-all duration-500 absolute"
+          [ngClass]="isDarkMode ? 'opacity-0 rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z"
+          />
+        </svg>
+
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          stroke="currentColor"
+          class="w-6 h-6 transition-all duration-500"
+          [ngClass]="
+            isDarkMode ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50'
+          "
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z"
+          />
+        </svg>
+      </button>
+
+      <a
+        routerLink="/auth/login"
+        class="hidden sm:block text-[14px] font-semibold text-text-main hover:text-primary transition-colors duration-300 focus-visible:outline-focus rounded"
+      >
+        Iniciar sesión
+      </a>
+
+      <a
+        routerLink="/auth/register"
+        class="btn btn-primary hidden sm:inline-flex hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300"
+      >
+        Regístrate gratis
+      </a>
+
+      <button
+        class="md:hidden flex items-center justify-center p-2 text-text-main hover:text-primary transition-colors focus-visible:outline-focus rounded-lg"
+        (click)="toggleMobileMenu()"
+        aria-label="Alternar menú"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="2"
+          stroke="currentColor"
+          class="w-6 h-6 transition-transform duration-300"
+          [ngClass]="{ 'rotate-90': isMobileMenuOpen }"
+        >
+          @if (!isMobileMenuOpen) {
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          } @else {
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          }
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div
+    class="md:hidden absolute top-full left-0 w-full bg-surface/95 backdrop-blur-xl border-b border-border-main/20 shadow-xl overflow-hidden transition-all duration-300 ease-in-out origin-top"
+    [ngClass]="isMobileMenuOpen ? 'max-h-100 opacity-100' : 'max-h-0 opacity-0'"
+  >
+    <nav class="flex flex-col px-6 py-4 gap-4">
+      <a
+        href="/#encontrar"
+        (click)="closeMobileMenu()"
+        class="text-[16px] font-medium text-text-main hover:text-primary transition-colors focus-visible:outline-focus rounded p-2"
+        >Encontrar</a
+      >
+      <a
+        href="/#funcionamiento"
+        (click)="closeMobileMenu()"
+        class="text-[16px] font-medium text-text-main hover:text-primary transition-colors focus-visible:outline-focus rounded p-2"
+        >Funcionamiento</a
+      >
+      <a
+        href="/#biblioteca"
+        (click)="closeMobileMenu()"
+        class="text-[16px] font-medium text-text-main hover:text-primary transition-colors focus-visible:outline-focus rounded p-2"
+        >Biblioteca</a
+      >
+      <a
+        href="/#comunidad"
+        (click)="closeMobileMenu()"
+        class="text-[16px] font-medium text-text-main hover:text-primary transition-colors focus-visible:outline-focus rounded p-2"
+        >Comunidad</a
+      >
+
+      <hr class="border-border-main/20 my-2" />
+
+      <a
+        routerLink="/auth/login"
+        (click)="closeMobileMenu()"
+        class="text-[16px] font-semibold text-text-main hover:text-primary transition-colors focus-visible:outline-focus rounded p-2"
+      >
+        Iniciar sesión
+      </a>
+      <a
+        routerLink="/auth/register"
+        (click)="closeMobileMenu()"
+        class="btn btn-primary w-full text-center mt-2"
+      >
+        Regístrate gratis
+      </a>
+    </nav>
+  </div>
+</header>

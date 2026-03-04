@@ -1,0 +1,190 @@
+<div class="w-full max-w-4xl">
+  <header class="mb-8">
+    <h1 class="text-3xl md:text-4xl font-display font-bold text-text-main mb-2">Tu Perfil</h1>
+    <p class="text-muted text-base">
+      Gestiona tu información personal y tus preferencias como creador.
+    </p>
+  </header>
+
+  @if (isLoading) {
+    <div class="animate-pulse space-y-6">
+      <div class="h-32 bg-surface rounded-3xl border border-border-main/10"></div>
+      <div class="h-96 bg-surface rounded-3xl border border-border-main/10"></div>
+    </div>
+  } @else if (user) {
+    <div class="grid grid-cols-1 gap-8">
+      <section
+        class="bg-surface rounded-3xl border border-border-main/10 p-6 flex flex-col md:flex-row items-center gap-6 shadow-sm"
+      >
+        <div class="relative w-24 h-24 flex-shrink-0">
+          @if (user.avatar) {
+            <img
+              [src]="user.avatar"
+              alt="Avatar"
+              class="w-full h-full rounded-full object-cover border-2 border-primary/20"
+            />
+          } @else {
+            <div
+              class="w-full h-full rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-3xl uppercase"
+            >
+              {{ user.displayName.charAt(0) }}
+            </div>
+          }
+        </div>
+
+        <div class="text-center md:text-left flex-1">
+          <h2 class="text-2xl font-bold text-text-main">{{ user.displayName }}</h2>
+          <p class="text-muted mb-2">{{ user.email }}</p>
+          <div class="flex items-center justify-center md:justify-start gap-2">
+            <span
+              class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full uppercase tracking-wider"
+            >
+              {{ user.role }}
+            </span>
+            @if (user.googleId) {
+              <span
+                class="px-3 py-1 bg-surface-hover border border-border-main/10 text-text-main text-xs font-medium rounded-full flex items-center gap-1"
+              >
+                <svg class="w-3 h-3" viewBox="0 0 24 24">
+                  <path
+                    fill="currentColor"
+                    d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
+                  />
+                </svg>
+                Vinculado a Google
+              </span>
+            }
+          </div>
+        </div>
+      </section>
+
+      <section class="bg-surface rounded-3xl border border-border-main/10 p-6 md:p-8 shadow-sm">
+        <h3 class="text-xl font-bold text-text-main mb-6">Detalles de la cuenta</h3>
+
+        @if (successMessage) {
+          <div
+            class="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-500/20 text-green-600 flex items-center gap-3"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            {{ successMessage }}
+          </div>
+        }
+        @if (errorMessage) {
+          <div
+            class="mb-6 p-4 rounded-xl bg-danger/10 border border-danger/20 text-danger flex items-center gap-3"
+          >
+            <svg
+              class="w-5 h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            {{ errorMessage }}
+          </div>
+        }
+
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="space-y-6">
+          <div>
+            <label class="block text-sm font-medium text-text-main mb-2"
+              >Nombre público <span class="text-danger">*</span></label
+            >
+            <input
+              type="text"
+              formControlName="displayName"
+              class="w-full px-4 py-3 bg-bg border border-border-main/20 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-text-main"
+              placeholder="¿Cómo quieres que te llamen?"
+            />
+            @if (
+              profileForm.get('displayName')?.invalid && profileForm.get('displayName')?.touched
+            ) {
+              <p class="mt-1 text-sm text-danger">
+                El nombre es obligatorio (mínimo 3 caracteres).
+              </p>
+            }
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-text-main mb-2">Nivel de costura</label>
+            <select
+              formControlName="sewingLevel"
+              class="w-full px-4 py-3 bg-bg border border-border-main/20 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-text-main appearance-none"
+            >
+              <option [ngValue]="null">Selecciona tu nivel</option>
+              @for (level of sewingLevels; track level) {
+                <option [value]="level">{{ level }}</option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-text-main mb-2"
+              >Intereses (Separados por comas)</label
+            >
+            <input
+              type="text"
+              formControlName="interests"
+              class="w-full px-4 py-3 bg-bg border border-border-main/20 rounded-xl focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-colors text-text-main"
+              placeholder="Ej: Patrones, Bordado, Ropa vintage..."
+            />
+            <p class="mt-1 text-xs text-muted">
+              Añade palabras clave para personalizar tu experiencia en la comunidad.
+            </p>
+          </div>
+
+          <div class="pt-4 flex justify-end">
+            <button
+              type="submit"
+              [disabled]="profileForm.invalid || isSaving"
+              class="btn btn-primary px-8 py-3 w-full sm:w-auto flex justify-center items-center gap-2"
+            >
+              @if (isSaving) {
+                <svg
+                  class="animate-spin h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Guardando...
+              } @else {
+                Guardar cambios
+              }
+            </button>
+          </div>
+        </form>
+      </section>
+    </div>
+  }
+</div>

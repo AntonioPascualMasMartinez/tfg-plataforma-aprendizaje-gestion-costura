@@ -1,0 +1,28 @@
+<article
+  class="group rounded-3xl overflow-hidden border border-border-main/15 dark:border-white/5 bg-surface dark:bg-surface/60 shadow-[0_14px_28px_rgba(0,0,0,0.06)] dark:shadow-none hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_20px_40px_-15px_rgba(255,89,0,0.2)] hover:-translate-y-2 transition-all duration-300 cursor-pointer h-full"
+>
+  <div class="relative h-64 overflow-hidden">
+    <div
+      class="absolute inset-0 bg-black/0 group-hover:bg-black/10 dark:group-hover:bg-white/5 transition-colors duration-300 z-10"
+    ></div>
+
+    <img
+      [src]="imageUrl"
+      [alt]="'Proyecto ' + title"
+      class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+    />
+  </div>
+
+  <div
+    class="bg-transparent p-6 relative z-20 flex flex-col h-full border-t border-border-main/5 dark:border-white/5 rounded-b-3xl"
+  >
+    <h3
+      class="text-[20px] md:text-[22px] font-display font-semibold text-text-main mb-2 group-hover:text-primary transition-colors"
+    >
+      {{ title }}
+    </h3>
+    <p class="text-[13px] md:text-[14px] text-muted leading-relaxed">
+      {{ description }}
+    </p>
+  </div>
+</article>
