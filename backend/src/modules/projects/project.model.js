@@ -64,9 +64,8 @@ const projectSchema = new mongoose.Schema(
 projectSchema.plugin(mongoosePaginate);
 
 // Middleware de Mongoose: Excluir automáticamente los proyectos "borrados" de todas las consultas FIND
-projectSchema.pre(/^find/, function (next) {
+projectSchema.pre(/^find/, function () {
   this.where({ deletedAt: null });
-  next();
 });
 
 module.exports = mongoose.model('Project', projectSchema);
