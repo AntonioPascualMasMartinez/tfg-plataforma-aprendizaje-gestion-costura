@@ -1,0 +1,492 @@
+{
+  "info": {
+    "_postman_id": "a1b2c3d4-e5f6-7890-1234-56789abcdef0",
+    "name": "TFG Costura API",
+    "description": "Colección completa para probar los endpoints de la Plataforma para Aprendizaje y Gestión de Proyectos de Costura.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Auth (Identidad y Sesión)",
+      "item": [
+        {
+          "name": "Registro de Usuario",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"costurero@ejemplo.com\",\n  \"password\": \"secreta123\",\n  \"displayName\": \"Antonio Costura\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Inicio de Sesión (Auto-Token)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var jsonData = pm.response.json();",
+                  "if (jsonData.data && jsonData.data.accessToken) {",
+                  "    pm.collectionVariables.set(\"accessToken\", jsonData.data.accessToken);",
+                  "    console.log(\"Token guardado automáticamente en las variables de la colección.\");",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"costurero@ejemplo.com\",\n  \"password\": \"secreta123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Refrescar Sesión",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/refresh",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "refresh"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Cerrar Sesión",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/auth/logout",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "logout"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Users (Perfiles)",
+      "item": [
+        {
+          "name": "Obtener mi perfil",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar mi perfil",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"displayName\": \"Antonio Experto en Hilos\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Admin - Listar Usuarios",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/admin",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "admin"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Projects (Proyectos y Flujos)",
+      "item": [
+        {
+          "name": "Feed Público",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Proyecto",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Camisa de Verano\",\n  \"description\": \"Proyecto de camisa manga corta con lino\",\n  \"status\": \"Planificado\",\n  \"isPublic\": true,\n  \"materials\": [\n    { \"name\": \"Tela de Lino\", \"quantity\": \"2 metros\" },\n    { \"name\": \"Botones madera\", \"quantity\": \"6 unidades\" }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Detalle del Proyecto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "pegar_id_aqui"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Añadir Paso a Proyecto",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Corte de Patrones\",\n  \"description\": \"Extender la tela y cortar según las marcas.\",\n  \"mediaUrl\": \"https://res.cloudinary.com/ejemplo/image.jpg\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/:id/steps",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", ":id", "steps"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "pegar_id_aqui"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Eliminar Proyecto (Soft Delete)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "pegar_id_aqui"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Tutorials (Pedagogía)",
+      "item": [
+        {
+          "name": "Catálogo de Tutoriales",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tutorials",
+              "host": ["{{baseUrl}}"],
+              "path": ["tutorials"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Iniciar Tutorial (Clonar)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tutorials/:id/start",
+              "host": ["{{baseUrl}}"],
+              "path": ["tutorials", ":id", "start"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "pegar_id_aqui"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Actualizar Progreso",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentStep\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tutorials/:id/progress",
+              "host": ["{{baseUrl}}"],
+              "path": ["tutorials", ":id", "progress"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "pegar_id_aqui"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Community (Interacción)",
+      "item": [
+        {
+          "name": "Listar Comentarios de Proyecto",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/community/projects/:projectId/comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["community", "projects", ":projectId", "comments"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "pegar_id_aqui"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Añadir Comentario",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"¡Me encanta cómo te está quedando esta costura!\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/community/projects/:projectId/comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["community", "projects", ":projectId", "comments"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "pegar_id_aqui"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Dar Me Gusta a Proyecto (Atómico)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/community/projects/:projectId/like",
+              "host": ["{{baseUrl}}"],
+              "path": ["community", "projects", ":projectId", "like"],
+              "variable": [
+                {
+                  "key": "projectId",
+                  "value": "pegar_id_aqui"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Crear Reporte de Moderación",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"targetType\": \"Comment\",\n  \"targetId\": \"pegar_id_del_comentario_aqui\",\n  \"reason\": \"Contiene lenguaje inapropiado u ofende a la comunidad.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/community/reports",
+              "host": ["{{baseUrl}}"],
+              "path": ["community", "reports"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Admin - Cola de Moderación",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/community/admin/moderation",
+              "host": ["{{baseUrl}}"],
+              "path": ["community", "admin", "moderation"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Uploads (Firmas Cloudinary)",
+      "item": [
+        {
+          "name": "Obtener Firma Criptográfica",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/uploads/signature?folder=mis_proyectos",
+              "host": ["{{baseUrl}}"],
+              "path": ["uploads", "signature"],
+              "query": [
+                {
+                  "key": "folder",
+                  "value": "mis_proyectos"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{accessToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [""]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
