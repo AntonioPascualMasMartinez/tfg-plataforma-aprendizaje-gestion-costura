@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
+import { ChangeDetectorRef, Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthShell } from '../shell/auth-shell';
@@ -18,7 +18,7 @@ export class Register implements OnInit {
   private router = inject(Router);
   private socialAuthService = inject(SocialAuthService);
   private platformId = inject(PLATFORM_ID);
-
+  private cdr = inject(ChangeDetectorRef);
   // Control de las fases del registro (1: Básico, 2: Intereses, 3: Confirmación)
   currentStep = 1;
 
@@ -48,6 +48,8 @@ export class Register implements OnInit {
       this.socialAuthService.authState.subscribe((user) => {
         if (user && user.idToken) {
           this.isLoading = true;
+          this.cdr.detectChanges();
+
           this.authService.googleAuth({ idToken: user.idToken }).subscribe({
             next: (response) => {
               localStorage.setItem('accessToken', response.data.accessToken);
@@ -56,6 +58,7 @@ export class Register implements OnInit {
             error: (err) => {
               this.isLoading = false;
               this.errorMessage = err.error?.message || 'Error al iniciar sesión con Google.';
+              this.cdr.detectChanges(); // 3. Forzar actualización
             },
           });
         }
@@ -91,21 +94,22 @@ export class Register implements OnInit {
 
   onSubmit() {
     if (this.registerForm.invalid) return;
-
     this.isLoading = true;
     this.errorMessage = '';
 
     this.authService.register(this.registerForm.value).subscribe({
       next: () => {
-        // En lugar de redirigir, vamos a la fase 3 (Confirmación)
-        this.currentStep = 3;
+        this.currentStep = 3; // Mover a pantalla de éxito
+        this.cdr.detectChanges(); // 4. Forzar cambio de paso en el HTML
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = err.error?.message || 'Error al crear la cuenta. Intenta de nuevo.';
+        this.errorMessage = err.error?.message || 'Error al crear la cuenta.';
+        this.cdr.detectChanges(); // 5. Mostrar error
       },
       complete: () => {
         this.isLoading = false;
+        this.cdr.detectChanges(); // 6. Limpiar estado de carga
       },
     });
   }

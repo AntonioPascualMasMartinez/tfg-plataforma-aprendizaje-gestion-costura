@@ -60,16 +60,17 @@ export class Perfil implements OnInit {
       },
     });
   }
+  // En perfil.ts
+
   onSubmit() {
     if (this.profileForm.invalid) return;
 
     this.isSaving = true;
     this.successMessage = '';
     this.errorMessage = '';
+    this.cdr.detectChanges(); // Asegura que el botón cambie a "Guardando..." inmediatamente
 
     const formValue = this.profileForm.value;
-
-    // Convertimos el string separado por comas de vuelta a un array limpio
     const interestsArray = formValue.interests
       ? formValue.interests
           .split(',')
@@ -77,7 +78,6 @@ export class Perfil implements OnInit {
           .filter((i: string) => i.length > 0)
       : [];
 
-    // Preparamos el payload usando la interfaz exacta que definiste en user.model.ts
     const payload: UpdateProfilePayload = {
       displayName: formValue.displayName,
       sewingLevel: formValue.sewingLevel,
@@ -86,17 +86,22 @@ export class Perfil implements OnInit {
 
     this.userService.updateMe(payload).subscribe({
       next: (response) => {
-        this.user = response.data; // Actualizamos la info local
+        this.user = response.data;
         this.successMessage = '¡Tu perfil se ha actualizado correctamente!';
+        this.isSaving = false; // Detener estado de guardado
+        this.cdr.detectChanges(); // <--- IMPORTANTE: Forzar actualización de la vista
       },
       error: (err) => {
         this.errorMessage = err.error?.message || 'Hubo un error al actualizar tu perfil.';
-        console.error('Error al actualizar', err);
+        this.isSaving = false; // Detener estado de guardado
+        this.cdr.detectChanges(); // <--- IMPORTANTE: Forzar actualización de la vista
       },
       complete: () => {
-        this.isSaving = false;
         // Ocultamos el mensaje de éxito después de 3 segundos
-        setTimeout(() => (this.successMessage = ''), 3000);
+        setTimeout(() => {
+          this.successMessage = '';
+          this.cdr.detectChanges(); // Forzar limpieza del mensaje
+        }, 3000);
       },
     });
   }
