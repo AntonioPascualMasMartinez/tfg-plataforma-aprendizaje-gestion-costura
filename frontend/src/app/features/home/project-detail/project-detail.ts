@@ -7,6 +7,7 @@ import { UploadService } from '../../../core/services/upload.service';
 import { Project, AddStepPayload } from '../../../shared/models/project.model';
 
 type ViewMode = 'taller' | 'edicion';
+type TallerTab = 'materiales' | 'pasos';
 
 @Component({
   selector: 'app-project-detail',
@@ -25,8 +26,10 @@ export class ProjectDetail implements OnInit {
   isLoading = true;
   errorMessage = '';
 
-  // Control de Modos
-  viewMode: ViewMode = 'taller'; // Por defecto, modo seguimiento/taller
+  // Control de Modos y Pestañas
+  viewMode: ViewMode = 'taller';
+  tallerTab: TallerTab = 'pasos'; // Pestaña activa en el modo taller
+  activeStepIndex = 0; // Índice del paso actual en el carrusel
 
   // Formulario para añadir paso
   stepForm: FormGroup;
@@ -55,6 +58,10 @@ export class ProjectDetail implements OnInit {
       next: (res) => {
         this.project = res.data;
         this.isLoading = false;
+        // Si no hay pasos al cargar, enviamos al usuario a la pestaña de materiales por defecto
+        if (this.project?.steps.length === 0) {
+          this.tallerTab = 'materiales';
+        }
         this.cdr.detectChanges();
       },
       error: () => {
@@ -69,6 +76,29 @@ export class ProjectDetail implements OnInit {
     this.viewMode = mode;
   }
 
+  setTallerTab(tab: TallerTab) {
+    this.tallerTab = tab;
+  }
+
+  // Lógica del Carrusel de Pasos
+  get progressPercentage(): number {
+    if (!this.project || !this.project.steps || this.project.steps.length === 0) return 0;
+    return ((this.activeStepIndex + 1) / this.project.steps.length) * 100;
+  }
+
+  nextStep() {
+    if (this.project && this.activeStepIndex < this.project.steps.length - 1) {
+      this.activeStepIndex++;
+    }
+  }
+
+  prevStep() {
+    if (this.activeStepIndex > 0) {
+      this.activeStepIndex--;
+    }
+  }
+
+  // Lógica de Edición
   toggleAddStep() {
     this.isAddingStep = !this.isAddingStep;
     if (!this.isAddingStep) {
@@ -111,8 +141,10 @@ export class ProjectDetail implements OnInit {
 
     this.projectService.addStepToProject(this.project._id, payload).subscribe({
       next: (res) => {
-        this.project = res.data; // Actualiza el proyecto con el nuevo paso
-        this.toggleAddStep(); // Cierra y resetea el formulario
+        this.project = res.data;
+        this.toggleAddStep();
+        // Navegamos automáticamente al nuevo paso si estamos en modo taller
+        this.activeStepIndex = this.project!.steps.length - 1;
         this.cdr.detectChanges();
       },
       error: (err) => {

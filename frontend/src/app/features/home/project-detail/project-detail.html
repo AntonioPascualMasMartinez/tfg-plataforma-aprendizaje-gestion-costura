@@ -1,6 +1,6 @@
-<div class="w-full max-w-5xl mx-auto pb-12 pt-4">
+<div class="w-full max-w-5xl mx-auto pb-24 md:pb-12 pt-4">
   @if (isLoading) {
-    <div class="flex justify-center items-center py-20">
+    <div class="flex justify-center items-center py-32">
       <svg
         class="animate-spin h-10 w-10 text-primary"
         xmlns="http://www.w3.org/2000/svg"
@@ -23,11 +23,13 @@
       </svg>
     </div>
   } @else if (project) {
-    <header class="mb-8 flex flex-col md:flex-row md:items-start justify-between gap-6">
+    <header
+      class="mb-6 flex flex-col md:flex-row md:items-start justify-between gap-6 animate-in fade-in duration-300"
+    >
       <div>
         <a
           routerLink="/home/proyectos"
-          class="text-primary text-[13px] font-bold flex items-center gap-1 hover:underline mb-3"
+          class="text-primary text-[13px] font-bold flex items-center gap-1 hover:underline mb-3 w-fit"
         >
           <svg
             class="w-4 h-4"
@@ -40,29 +42,29 @@
           </svg>
           Volver a mis proyectos
         </a>
-        <div class="flex items-center gap-3 mb-2">
-          <h1 class="text-3xl md:text-[36px] font-display font-bold text-text-main">
+        <div class="flex items-center gap-3 mb-2 flex-wrap">
+          <h1 class="text-3xl md:text-[36px] font-display font-bold text-text-main leading-tight">
             {{ project.title }}
           </h1>
           <span
-            class="px-3 py-1 bg-surface border border-border-main/20 text-[12px] font-bold rounded-lg shadow-sm uppercase"
+            class="px-3 py-1 bg-surface border border-border-main/20 text-[11px] font-bold rounded-lg shadow-sm uppercase tracking-wide"
             >{{ project.status }}</span
           >
         </div>
         <p class="text-muted text-[15px] max-w-2xl">
-          {{ project.description || 'Sin descripción adicional.' }}
+          {{ project.description || 'Sin notas adicionales.' }}
         </p>
       </div>
 
       <div
-        class="flex bg-surface p-1.5 rounded-2xl border border-border-main/15 shadow-sm shrink-0"
+        class="flex bg-surface p-1.5 rounded-2xl border border-border-main/15 shadow-sm shrink-0 w-full md:w-auto"
       >
         <button
           (click)="setMode('taller')"
           [class.bg-primary]="viewMode === 'taller'"
           [class.text-white]="viewMode === 'taller'"
           [class.text-muted]="viewMode !== 'taller'"
-          class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[14px] font-bold transition-all"
+          class="flex-1 flex justify-center items-center gap-2 px-5 py-2.5 rounded-xl text-[14px] font-bold transition-all"
         >
           <svg
             class="w-5 h-5"
@@ -82,7 +84,7 @@
               d="M15 12.75V15a3 3 0 01-3 3h-1.5a3 3 0 01-3-3v-2.25"
             />
           </svg>
-          Modo Taller
+          Seguimiento
         </button>
         <button
           (click)="setMode('edicion')"
@@ -90,7 +92,7 @@
           [class.shadow-sm]="viewMode === 'edicion'"
           [class.text-text-main]="viewMode === 'edicion'"
           [class.text-muted]="viewMode !== 'edicion'"
-          class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[14px] font-bold transition-all"
+          class="flex-1 flex justify-center items-center gap-2 px-5 py-2.5 rounded-xl text-[14px] font-bold transition-all"
         >
           <svg
             class="w-5 h-5"
@@ -111,103 +113,247 @@
     </header>
 
     @if (viewMode === 'taller') {
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-300">
-        <div class="lg:col-span-1 space-y-6">
-          @if (project.inspirationImageUrl) {
-            <div
-              class="w-full aspect-4/5 rounded-3xl overflow-hidden shadow-md border border-border-main/10 relative group"
-            >
-              <img
-                [src]="project.inspirationImageUrl"
-                alt="Inspiración"
-                class="w-full h-full object-cover"
-              />
-            </div>
-          }
-          <div class="bg-surface rounded-3xl border border-border-main/15 p-6 shadow-sm">
-            <h3
-              class="text-[18px] font-display font-bold text-text-main mb-4 border-b border-border-main/10 pb-3"
-            >
-              Materiales
-            </h3>
-            <div class="space-y-3">
-              @for (mat of project.materials; track mat._id) {
-                <label class="flex items-start gap-3 cursor-pointer group">
-                  <input
-                    type="checkbox"
-                    class="mt-0.5 w-5 h-5 rounded border-border-main/30 text-primary focus:ring-primary accent-primary"
-                  />
-                  <div>
-                    <p
-                      class="text-[15px] font-bold text-text-main group-hover:text-primary transition-colors"
-                    >
-                      {{ mat.name }}
-                    </p>
-                    <p class="text-[13px] text-muted">{{ mat.quantity }}</p>
-                  </div>
-                </label>
-              }
-              @if (!project.materials.length) {
-                <p class="text-sm text-muted">No hay materiales registrados.</p>
-              }
-            </div>
-          </div>
+      <div class="animate-in fade-in duration-300">
+        <div class="flex border-b border-border-main/15 mb-6">
+          <button
+            (click)="setTallerTab('pasos')"
+            [class.border-primary]="tallerTab === 'pasos'"
+            [class.text-text-main]="tallerTab === 'pasos'"
+            [class.border-transparent]="tallerTab !== 'pasos'"
+            [class.text-muted]="tallerTab !== 'pasos'"
+            class="flex-1 md:flex-none px-6 py-3 font-bold text-[15px] border-b-2 transition-colors"
+          >
+            Paso a Paso
+          </button>
+          <button
+            (click)="setTallerTab('materiales')"
+            [class.border-primary]="tallerTab === 'materiales'"
+            [class.text-text-main]="tallerTab === 'materiales'"
+            [class.border-transparent]="tallerTab !== 'materiales'"
+            [class.text-muted]="tallerTab !== 'materiales'"
+            class="flex-1 md:flex-none px-6 py-3 font-bold text-[15px] border-b-2 transition-colors"
+          >
+            Materiales y Referencia
+          </button>
         </div>
 
-        <div class="lg:col-span-2 space-y-6">
-          <h2 class="text-[22px] font-display font-bold text-text-main mb-2">Paso a paso</h2>
-          @for (step of project.steps; track step._id) {
-            <div
-              class="bg-surface rounded-3xl border border-border-main/15 p-6 shadow-sm flex flex-col md:flex-row gap-6"
-            >
+        @if (tallerTab === 'materiales') {
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8 animate-in slide-in-from-bottom-4">
+            @if (project.inspirationImageUrl) {
               <div
-                class="shrink-0 w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center font-display font-bold text-xl"
+                class="w-full aspect-4/5 md:aspect-square rounded-3xl overflow-hidden shadow-md border border-border-main/10 relative"
               >
-                {{ step.order }}
+                <img
+                  [src]="project.inspirationImageUrl"
+                  alt="Inspiración"
+                  class="w-full h-full object-cover"
+                />
               </div>
-              <div class="flex-1">
-                <h4 class="text-[18px] font-bold text-text-main mb-2">{{ step.title }}</h4>
-                <p class="text-[15px] text-muted leading-relaxed mb-4">{{ step.description }}</p>
-                @if (step.mediaUrl) {
-                  <img
-                    [src]="step.mediaUrl"
-                    alt="Paso {{ step.order }}"
-                    class="w-full md:w-2/3 rounded-2xl border border-border-main/10 object-cover"
-                  />
+            }
+            <div class="bg-surface rounded-3xl border border-border-main/15 p-6 shadow-sm h-fit">
+              <h3
+                class="text-[18px] font-display font-bold text-text-main mb-4 border-b border-border-main/10 pb-3"
+              >
+                Checklist de Materiales
+              </h3>
+              <div class="space-y-4">
+                @for (mat of project.materials; track mat._id) {
+                  <label
+                    class="flex items-center gap-4 cursor-pointer group p-3 rounded-2xl hover:bg-surface-hover border border-transparent hover:border-border-main/10 transition-all"
+                  >
+                    <input
+                      type="checkbox"
+                      class="w-6 h-6 rounded-md border-border-main/30 text-primary focus:ring-primary accent-primary"
+                    />
+                    <div class="flex-1">
+                      <p
+                        class="text-[16px] font-bold text-text-main group-hover:text-primary transition-colors"
+                      >
+                        {{ mat.name }}
+                      </p>
+                      <p class="text-[14px] text-muted">{{ mat.quantity }}</p>
+                    </div>
+                  </label>
+                }
+                @if (!project.materials.length) {
+                  <p class="text-[15px] text-muted text-center py-6">
+                    No hay materiales registrados.
+                  </p>
                 }
               </div>
             </div>
-          }
-          @if (!project.steps.length) {
+          </div>
+        }
+
+        @if (tallerTab === 'pasos') {
+          @if (project.steps.length) {
+            <div class="mb-6">
+              <div class="flex justify-between items-center mb-2 text-[14px] font-bold text-muted">
+                <span>Paso {{ activeStepIndex + 1 }} de {{ project.steps.length }}</span>
+                <span>{{ progressPercentage | number: '1.0-0' }}% completado</span>
+              </div>
+              <div class="w-full h-2.5 bg-border-main/15 rounded-full overflow-hidden">
+                <div
+                  class="h-full bg-primary rounded-full transition-all duration-500 ease-out"
+                  [style.width.%]="progressPercentage"
+                ></div>
+              </div>
+            </div>
+
             <div
-              class="p-10 text-center bg-bg rounded-3xl border border-dashed border-border-main/30 text-muted"
+              class="bg-surface rounded-4xl border border-border-main/15 shadow-lg overflow-hidden flex flex-col min-h-[50vh] animate-in zoom-in-95 duration-300"
             >
-              Aún no has añadido pasos a este proyecto. Cambia al Modo Edición para empezar.
+              @if (project.steps[activeStepIndex].mediaUrl) {
+                <div class="w-full h-64 md:h-96 bg-bg relative">
+                  <img
+                    [src]="project.steps[activeStepIndex].mediaUrl"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+              }
+
+              <div class="p-6 md:p-10 flex-1 flex flex-col justify-center">
+                <div class="flex items-center gap-4 mb-4">
+                  <span
+                    class="w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center font-display font-bold text-2xl shrink-0"
+                  >
+                    {{ project.steps[activeStepIndex].order }}
+                  </span>
+                  <h2
+                    class="text-2xl md:text-3xl font-display font-bold text-text-main leading-tight"
+                  >
+                    {{ project.steps[activeStepIndex].title }}
+                  </h2>
+                </div>
+                <p
+                  class="text-[16px] md:text-[18px] text-text-main/80 leading-relaxed md:leading-loose"
+                >
+                  {{ project.steps[activeStepIndex].description }}
+                </p>
+              </div>
+
+              <div
+                class="p-4 md:p-6 bg-surface-hover/50 border-t border-border-main/10 flex items-center justify-between gap-4"
+              >
+                <button
+                  (click)="prevStep()"
+                  [disabled]="activeStepIndex === 0"
+                  class="flex-1 md:flex-none btn bg-bg border border-border-main/20 hover:border-text-main/20 text-text-main gap-2 py-3.5 disabled:opacity-30 disabled:cursor-not-allowed"
+                >
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M15.75 19.5L8.25 12l7.5-7.5"
+                    />
+                  </svg>
+                  Anterior
+                </button>
+                <button
+                  (click)="nextStep()"
+                  [disabled]="activeStepIndex === project.steps.length - 1"
+                  class="flex-1 md:flex-none btn btn-primary shadow-sm gap-2 py-3.5 disabled:opacity-30 disabled:cursor-not-allowed px-8"
+                >
+                  Siguiente
+                  <svg
+                    class="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          } @else {
+            <div
+              class="flex flex-col items-center justify-center py-20 text-center bg-surface rounded-4xl border border-dashed border-border-main/30 shadow-sm animate-in slide-in-from-bottom-4"
+            >
+              <div
+                class="w-16 h-16 bg-primary/5 rounded-full flex items-center justify-center text-primary mb-4"
+              >
+                <svg
+                  class="w-8 h-8"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+                  />
+                </svg>
+              </div>
+              <h3 class="text-xl font-display font-bold text-text-main mb-2">
+                No has definido los pasos
+              </h3>
+              <p class="text-[15px] text-muted max-w-sm mb-6">
+                Cambia al Modo Edición para redactar las instrucciones y subir las imágenes de tu
+                proceso.
+              </p>
+              <button (click)="setMode('edicion')" class="btn btn-secondary shadow-sm">
+                Ir a Edición
+              </button>
             </div>
           }
-        </div>
+        }
       </div>
     }
 
     @if (viewMode === 'edicion') {
-      <div class="space-y-8 animate-in fade-in duration-300">
-        <div class="bg-surface rounded-3xl border border-border-main/15 p-6 shadow-sm">
-          <div class="flex items-center justify-between mb-6 border-b border-border-main/10 pb-4">
-            <h3 class="text-xl font-display font-bold text-text-main">Secuencia de Pasos</h3>
+      <div class="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-300">
+        <div class="bg-surface rounded-4xl border border-border-main/15 p-6 md:p-8 shadow-sm">
+          <div
+            class="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 border-b border-border-main/10 pb-5 gap-4"
+          >
+            <div>
+              <h3 class="text-2xl font-display font-bold text-text-main">Secuencia del Proyecto</h3>
+              <p class="text-sm text-muted mt-1">Organiza cómo vas a confeccionar esta prenda.</p>
+            </div>
             <button
               (click)="toggleAddStep()"
-              class="btn btn-primary px-5 py-2.5 text-[14px] flex items-center gap-2"
+              [class.btn-primary]="!isAddingStep"
+              [class.bg-danger/10]="isAddingStep"
+              [class.text-danger]="isAddingStep"
+              class="btn px-5 py-2.5 text-[14px] flex items-center gap-2 transition-colors w-full sm:w-auto justify-center"
             >
-              <svg
-                class="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-              </svg>
-              {{ isAddingStep ? 'Cancelar paso' : 'Añadir paso' }}
+              @if (!isAddingStep) {
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                Añadir paso
+              } @else {
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Cancelar
+              }
             </button>
           </div>
 
@@ -215,42 +361,42 @@
             <form
               [formGroup]="stepForm"
               (ngSubmit)="onAddStep()"
-              class="bg-bg p-6 rounded-2xl border border-primary/20 mb-8 animate-in slide-in-from-top-4"
+              class="bg-bg p-6 rounded-2xl border-2 border-primary/20 mb-8 animate-in zoom-in-95 duration-200"
             >
-              <h4 class="font-bold text-text-main mb-4">Añadir nuevo paso</h4>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
                 <div>
                   <label class="block text-[13px] font-bold text-text-main mb-1.5"
-                    >Título del paso</label
+                    >Título de la tarea <span class="text-danger">*</span></label
                   >
                   <input
                     type="text"
                     formControlName="title"
-                    placeholder="Ej: Unir los hombros"
-                    class="w-full h-11 px-4 rounded-xl border border-border-main/20 bg-surface text-[14px] outline-none focus:border-primary"
+                    placeholder="Ej: Unir los hombros con costura francesa"
+                    class="w-full h-12 px-4 rounded-xl border border-border-main/20 bg-surface text-[14px] outline-none focus:border-primary font-medium"
                   />
                 </div>
                 <div>
                   <label class="block text-[13px] font-bold text-text-main mb-1.5"
-                    >Imagen explicativa (Opcional)</label
+                    >Foto del proceso (Opcional)</label
                   >
                   @if (!stepImagePreview) {
                     <input
                       type="file"
-                      accept="image/*"
+                      accept="image/png, image/jpeg, image/webp"
                       (change)="onStepImageSelected($event)"
-                      class="w-full h-11 px-4 py-2 rounded-xl border border-border-main/20 bg-surface text-[14px] text-muted file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-primary/10 file:text-primary file:font-bold hover:file:bg-primary/20 cursor-pointer"
+                      [disabled]="isUploadingStepImage"
+                      class="w-full h-12 px-4 py-2.5 rounded-xl border border-border-main/20 bg-surface text-[14px] text-muted file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-primary/10 file:text-primary file:font-bold hover:file:bg-primary/20 cursor-pointer disabled:opacity-50"
                     />
                   } @else {
-                    <div class="flex items-center gap-3">
+                    <div class="flex items-center gap-4 h-12">
                       <img
                         [src]="stepImagePreview"
-                        class="w-11 h-11 rounded-lg object-cover border border-border-main/20"
+                        class="w-12 h-12 rounded-lg object-cover border border-border-main/20 shadow-sm"
                       />
                       <button
                         type="button"
                         (click)="removeStepImage()"
-                        class="text-danger text-[13px] font-bold hover:underline"
+                        class="text-danger text-[13px] font-bold hover:bg-danger/10 px-3 py-1.5 rounded-lg transition-colors"
                       >
                         Eliminar imagen
                       </button>
@@ -259,29 +405,60 @@
                 </div>
                 <div class="md:col-span-2">
                   <label class="block text-[13px] font-bold text-text-main mb-1.5"
-                    >Descripción o técnica a usar</label
+                    >Explicación detallada <span class="text-danger">*</span></label
                   >
                   <textarea
                     formControlName="description"
-                    rows="3"
-                    class="w-full p-4 rounded-xl border border-border-main/20 bg-surface text-[14px] outline-none focus:border-primary resize-none"
+                    rows="4"
+                    placeholder="Describe los márgenes de costura, tipo de puntada, etc..."
+                    class="w-full p-4 rounded-xl border border-border-main/20 bg-surface text-[14px] outline-none focus:border-primary resize-none font-medium"
                   ></textarea>
                 </div>
               </div>
-              <div class="flex justify-end gap-3">
-                <button
-                  type="button"
-                  (click)="toggleAddStep()"
-                  class="btn text-muted font-bold hover:bg-danger/10 hover:text-danger px-5"
-                >
-                  Cancelar
-                </button>
+              <div class="flex justify-end">
                 <button
                   type="submit"
                   [disabled]="stepForm.invalid || isUploadingStepImage"
-                  class="btn btn-primary px-6 shadow-sm disabled:opacity-50"
+                  class="btn btn-primary px-8 shadow-sm disabled:opacity-50 flex items-center gap-2"
                 >
-                  Guardar paso
+                  @if (isUploadingStepImage) {
+                    <svg
+                      class="animate-spin h-5 w-5 text-white"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                      ></circle>
+                      <path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                    Subiendo imagen...
+                  } @else {
+                    <svg
+                      class="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M4.5 12.75l6 6 9-13.5"
+                      />
+                    </svg>
+                    Guardar paso
+                  }
                 </button>
               </div>
             </form>
@@ -290,37 +467,34 @@
           <div class="space-y-4">
             @for (step of project.steps; track step._id) {
               <div
-                class="flex items-center justify-between p-4 border border-border-main/10 rounded-2xl hover:border-primary/30 transition-colors"
+                class="flex flex-col sm:flex-row sm:items-center justify-between p-5 border border-border-main/15 rounded-2xl hover:border-primary/40 bg-bg transition-colors gap-4 group"
               >
-                <div class="flex items-center gap-4">
+                <div class="flex items-start sm:items-center gap-4">
                   <div
-                    class="w-8 h-8 bg-surface-hover rounded-lg flex items-center justify-center font-bold text-muted"
+                    class="w-10 h-10 bg-surface border border-border-main/20 rounded-xl flex items-center justify-center font-bold text-text-main shadow-sm shrink-0"
                   >
                     {{ step.order }}
                   </div>
                   <div>
-                    <h5 class="font-bold text-text-main">{{ step.title }}</h5>
-                    <p class="text-[13px] text-muted line-clamp-1">{{ step.description }}</p>
+                    <h5 class="font-bold text-text-main text-[16px]">{{ step.title }}</h5>
+                    <p class="text-[14px] text-muted line-clamp-1 mt-0.5">{{ step.description }}</p>
                   </div>
                 </div>
-                <button
-                  class="w-8 h-8 flex items-center justify-center text-muted hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                <div
+                  class="flex items-center gap-2 self-end sm:self-auto opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity"
                 >
-                  <svg
-                    class="w-4 h-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    stroke-width="2"
+                  <button
+                    class="px-3 py-1.5 bg-surface border border-border-main/20 text-[12px] font-bold text-text-main hover:text-primary hover:border-primary/30 rounded-lg transition-colors"
                   >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
-                    />
-                  </svg>
-                </button>
+                    Editar
+                  </button>
+                </div>
               </div>
+            }
+            @if (!project.steps.length && !isAddingStep) {
+              <p class="text-center text-muted text-[15px] py-6">
+                La lista está vacía. Haz clic en "Añadir paso" para comenzar.
+              </p>
             }
           </div>
         </div>
