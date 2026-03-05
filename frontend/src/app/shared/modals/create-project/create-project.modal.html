@@ -1,35 +1,41 @@
 <div
-  class="fixed inset-0 z-50 flex items-center justify-center bg-text-main/30 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+  class="fixed inset-0 z-50 flex items-center justify-center bg-text-main/40 backdrop-blur-sm p-4 animate-in fade-in duration-200"
 >
   <div
-    class="bg-surface w-full max-w-2xl rounded-3xl shadow-2xl border border-border-main/10 flex flex-col max-h-[90vh] animate-in slide-in-from-bottom-8 duration-300"
+    class="bg-surface w-full max-w-4xl rounded-[28px] shadow-2xl border border-border-main/10 flex flex-col max-h-[90vh] animate-in slide-in-from-bottom-8 duration-300"
   >
-    <header class="p-6 border-b border-border-main/10">
-      <div class="flex items-center justify-between mb-4">
+    <header class="px-6 py-5 border-b border-border-main/10 shrink-0">
+      <div class="flex items-center justify-between mb-3">
         <div>
-          <h2 class="text-2xl font-display font-bold text-text-main">Nuevo Proyecto</h2>
-          <p class="text-sm text-muted mt-1">
+          <h2 class="text-[22px] font-display font-bold text-text-main leading-none mb-1.5">
+            Nuevo Proyecto
+          </h2>
+          <p class="text-[13px] font-medium text-muted">
             Paso {{ currentStep }} de {{ totalSteps }}:
-            {{ currentStep === 1 ? 'Detalles del diseño' : 'Lista de materiales' }}
+            {{
+              currentStep === 1
+                ? 'Detalles y planificación del diseño'
+                : 'Lista de materiales a utilizar'
+            }}
           </p>
         </div>
         <button
           (click)="closeModal()"
-          class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-hover text-muted hover:text-text-main transition-colors focus-visible:ring-2 focus-visible:ring-primary outline-none"
+          class="w-9 h-9 flex items-center justify-center rounded-full bg-surface-hover/50 hover:bg-surface-hover text-muted hover:text-text-main transition-colors outline-none"
         >
           <svg
-            class="w-6 h-6"
+            class="w-5 h-5"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
-            stroke-width="2"
+            stroke-width="2.5"
           >
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
 
-      <div class="w-full bg-border-main/15 h-1.5 rounded-full overflow-hidden flex gap-1">
+      <div class="w-full bg-border-main/15 h-1.5 rounded-full overflow-hidden">
         <div
           class="h-full bg-primary rounded-full transition-all duration-500 ease-out"
           [class.w-1/2]="currentStep === 1"
@@ -38,18 +44,18 @@
       </div>
     </header>
 
-    <div class="p-6 overflow-y-auto custom-scrollbar flex-1">
-      <form [formGroup]="projectForm" id="projectForm" (ngSubmit)="onSubmit()" class="space-y-6">
+    <div class="p-6 overflow-y-auto custom-scrollbar flex-1 bg-surface/50">
+      <form [formGroup]="projectForm" id="projectForm" (ngSubmit)="onSubmit()" class="h-full">
         @if (errorMessage) {
           <div
-            class="p-4 rounded-xl bg-danger/10 border border-danger/20 text-danger text-sm font-medium flex items-center gap-3 animate-in fade-in slide-in-from-top-2"
+            class="mb-5 p-3.5 rounded-xl bg-danger/10 border border-danger/20 text-danger text-[13px] font-bold flex items-center gap-2.5 animate-in fade-in slide-in-from-top-2"
           >
             <svg
               class="w-5 h-5 shrink-0"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
-              stroke-width="2"
+              stroke-width="2.5"
             >
               <path
                 stroke-linecap="round"
@@ -63,349 +69,355 @@
 
         <div
           [class.hidden]="currentStep !== 1"
-          class="space-y-6 animate-in slide-in-from-right-4 duration-300"
+          class="animate-in slide-in-from-right-4 duration-300 h-full"
         >
-          <div>
-            <label for="title" class="block text-[15px] font-semibold text-text-main mb-2">
-              Título del proyecto <span class="text-danger">*</span>
-            </label>
-            <input
-              type="text"
-              id="title"
-              formControlName="title"
-              placeholder="Ej: Vestido de lino cruzado"
-              class="w-full h-12 px-4 rounded-xl border border-border-main/20 bg-bg text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted/60 font-medium"
-              [class.border-danger]="
-                projectForm.get('title')?.invalid && projectForm.get('title')?.touched
-              "
-            />
-            @if (projectForm.get('title')?.invalid && projectForm.get('title')?.touched) {
-              <p class="text-danger text-xs mt-2 font-medium">El título es obligatorio.</p>
-            }
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <div>
-              <label for="projectType" class="block text-[15px] font-semibold text-text-main mb-2">
-                Tipo de proyecto <span class="text-danger">*</span>
-              </label>
-              <div class="relative">
-                <select
-                  id="projectType"
-                  formControlName="projectType"
-                  class="w-full h-12 pl-4 pr-10 rounded-xl border border-border-main/20 bg-bg text-text-main font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 h-full">
+            <div class="md:col-span-7 space-y-4">
+              <div>
+                <label for="title" class="block text-[13px] font-bold text-text-main mb-1.5"
+                  >Título del proyecto <span class="text-danger">*</span></label
+                >
+                <input
+                  type="text"
+                  id="title"
+                  formControlName="title"
+                  placeholder="Ej: Vestido de lino cruzado"
+                  class="w-full h-11 px-4 rounded-xl border border-border-main/20 bg-surface text-[14px] text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium placeholder:text-muted/50"
                   [class.border-danger]="
-                    projectForm.get('projectType')?.invalid &&
-                    projectForm.get('projectType')?.touched
+                    projectForm.get('title')?.invalid && projectForm.get('title')?.touched
                   "
-                >
-                  <option value="" disabled selected>Selecciona una opción</option>
-                  <option value="Nuevo">Nuevo</option>
-                  <option value="Comenzado desde Tutorial">Comenzado desde Tutorial</option>
-                </select>
-                <div
-                  class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-muted"
-                >
-                  <svg
-                    class="w-5 h-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
-                    />
-                  </svg>
-                </div>
+                />
               </div>
-            </div>
 
-            <div>
-              <label for="category" class="block text-[15px] font-semibold text-text-main mb-2">
-                Categoría <span class="text-danger">*</span>
-              </label>
-              <input
-                type="text"
-                id="category"
-                formControlName="category"
-                placeholder="Ej: Ropa, Hogar, Accesorios"
-                class="w-full h-12 px-4 rounded-xl border border-border-main/20 bg-bg text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted/60 font-medium"
-                [class.border-danger]="
-                  projectForm.get('category')?.invalid && projectForm.get('category')?.touched
-                "
-              />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
-            <div>
-              <label for="difficulty" class="block text-[15px] font-semibold text-text-main mb-2">
-                Dificultad <span class="text-danger">*</span>
-              </label>
-              <div class="relative">
-                <select
-                  id="difficulty"
-                  formControlName="difficulty"
-                  class="w-full h-12 pl-4 pr-10 rounded-xl border border-border-main/20 bg-bg text-text-main font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
-                  [class.border-danger]="
-                    projectForm.get('difficulty')?.invalid && projectForm.get('difficulty')?.touched
-                  "
-                >
-                  <option value="" disabled selected>Nivel</option>
-                  <option value="Fácil">Fácil</option>
-                  <option value="Intermedio">Intermedio</option>
-                  <option value="Avanzado">Avanzado</option>
-                </select>
-                <div
-                  class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-muted"
-                >
-                  <svg
-                    class="w-5 h-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    stroke-width="2"
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label for="projectType" class="block text-[13px] font-bold text-text-main mb-1.5"
+                    >Tipo <span class="text-danger">*</span></label
                   >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <label for="status" class="block text-[15px] font-semibold text-text-main mb-2"
-                >Estado inicial</label
-              >
-              <div class="relative">
-                <select
-                  id="status"
-                  formControlName="status"
-                  class="w-full h-12 pl-4 pr-10 rounded-xl border border-border-main/20 bg-bg text-text-main font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
-                >
-                  <option value="Planificado">Planificado</option>
-                  <option value="En curso">En curso</option>
-                  <option value="Pausado">Pausado</option>
-                </select>
-                <div
-                  class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-muted"
-                >
-                  <svg
-                    class="w-5 h-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-[15px] font-semibold text-text-main mb-2">
-              Foto de Inspiración
-            </label>
-
-            @if (!imagePreview) {
-              <label
-                class="flex flex-col items-center justify-center w-full h-36 px-4 transition bg-bg border-2 border-border-main/30 border-dashed rounded-xl cursor-pointer hover:border-primary/50 hover:bg-surface focus:outline-none"
-                [class.opacity-50]="isUploadingImage"
-                [class.cursor-not-allowed]="isUploadingImage"
-              >
-                <div class="flex flex-col items-center space-y-2 text-center">
-                  @if (isUploadingImage) {
-                    <svg
-                      class="animate-spin h-8 w-8 text-primary"
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
+                  <div class="relative">
+                    <select
+                      id="projectType"
+                      formControlName="projectType"
+                      class="w-full h-11 pl-4 pr-10 rounded-xl border border-border-main/20 bg-surface text-[14px] text-text-main font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
+                      [class.border-danger]="
+                        projectForm.get('projectType')?.invalid &&
+                        projectForm.get('projectType')?.touched
+                      "
                     >
-                      <circle
-                        class="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        stroke-width="4"
-                      ></circle>
-                      <path
-                        class="opacity-75"
-                        fill="currentColor"
-                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                      ></path>
-                    </svg>
-                    <span class="text-sm font-medium text-text-main">Subiendo imagen...</span>
-                  } @else {
+                      <option value="" disabled selected>Seleccionar...</option>
+                      <option value="Nuevo">Nuevo</option>
+                      <option value="Comenzado desde Tutorial">Desde Tutorial</option>
+                    </select>
                     <div
-                      class="w-10 h-10 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-1"
+                      class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-muted"
                     >
                       <svg
-                        class="w-5 h-5"
+                        class="w-4 h-4"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
-                        stroke-width="2"
+                        stroke-width="2.5"
                       >
                         <path
                           stroke-linecap="round"
                           stroke-linejoin="round"
-                          d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+                          d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
                         />
                       </svg>
                     </div>
-                    <span class="text-[14px] font-medium text-text-main"
-                      >Haz clic para subir una imagen</span
-                    >
-                    <span class="text-xs text-muted">JPG, PNG o WEBP (Máx. 5MB)</span>
-                  }
+                  </div>
                 </div>
-                <input
-                  type="file"
-                  class="hidden"
-                  accept="image/png, image/jpeg, image/webp"
-                  (change)="onFileSelected($event)"
-                  [disabled]="isUploadingImage"
-                />
-              </label>
-            } @else {
-              <div
-                class="relative w-full h-48 rounded-xl border border-border-main/20 overflow-hidden group"
-              >
-                <img [src]="imagePreview" alt="Inspiración" class="w-full h-full object-cover" />
-                <div
-                  class="absolute inset-0 bg-text-main/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                >
-                  <button
-                    type="button"
-                    (click)="removeImage()"
-                    class="bg-danger text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 hover:bg-danger/90 transition-colors shadow-lg"
+
+                <div>
+                  <label for="category" class="block text-[13px] font-bold text-text-main mb-1.5"
+                    >Categoría <span class="text-danger">*</span></label
                   >
-                    <svg
-                      class="w-4 h-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      stroke-width="2"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                      />
-                    </svg>
-                    Eliminar imagen
-                  </button>
+                  <input
+                    type="text"
+                    id="category"
+                    formControlName="category"
+                    placeholder="Ej: Ropa"
+                    class="w-full h-11 px-4 rounded-xl border border-border-main/20 bg-surface text-[14px] text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium placeholder:text-muted/50"
+                    [class.border-danger]="
+                      projectForm.get('category')?.invalid && projectForm.get('category')?.touched
+                    "
+                  />
                 </div>
               </div>
-            }
-          </div>
 
-          <div>
-            <label for="description" class="block text-[15px] font-semibold text-text-main mb-2"
-              >Descripción</label
-            >
-            <textarea
-              id="description"
-              formControlName="description"
-              placeholder="Apunta tus ideas, inspiración, medidas específicas o detalles importantes del patrón..."
-              rows="3"
-              class="w-full p-4 rounded-xl border border-border-main/20 bg-bg text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none placeholder:text-muted/60"
-            ></textarea>
-          </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label for="difficulty" class="block text-[13px] font-bold text-text-main mb-1.5"
+                    >Dificultad <span class="text-danger">*</span></label
+                  >
+                  <div class="relative">
+                    <select
+                      id="difficulty"
+                      formControlName="difficulty"
+                      class="w-full h-11 pl-4 pr-10 rounded-xl border border-border-main/20 bg-surface text-[14px] text-text-main font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
+                      [class.border-danger]="
+                        projectForm.get('difficulty')?.invalid &&
+                        projectForm.get('difficulty')?.touched
+                      "
+                    >
+                      <option value="" disabled selected>Nivel...</option>
+                      <option value="Fácil">Fácil</option>
+                      <option value="Intermedio">Intermedio</option>
+                      <option value="Avanzado">Avanzado</option>
+                    </select>
+                    <div
+                      class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-muted"
+                    >
+                      <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
 
-          <div>
-            <label class="block text-[15px] font-semibold text-text-main mb-2">Visibilidad</label>
-            <label
-              class="flex items-center gap-3 h-12 px-4 rounded-xl border border-border-main/20 bg-bg cursor-pointer hover:border-primary/50 transition-colors group w-fit"
-            >
-              <input
-                type="checkbox"
-                formControlName="isPublic"
-                class="w-5 h-5 rounded border-border-main/30 text-primary focus:ring-primary cursor-pointer accent-primary"
-              />
-              <span
-                class="text-[14px] text-text-main font-medium group-hover:text-primary transition-colors"
-              >
-                Compartir en la comunidad
-              </span>
-            </label>
+                <div>
+                  <label for="status" class="block text-[13px] font-bold text-text-main mb-1.5"
+                    >Estado inicial</label
+                  >
+                  <div class="relative">
+                    <select
+                      id="status"
+                      formControlName="status"
+                      class="w-full h-11 pl-4 pr-10 rounded-xl border border-border-main/20 bg-surface text-[14px] text-text-main font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
+                    >
+                      <option value="Planificado">Planificado</option>
+                      <option value="En curso">En curso</option>
+                      <option value="Pausado">Pausado</option>
+                    </select>
+                    <div
+                      class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-muted"
+                    >
+                      <svg
+                        class="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                        />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="pt-2">
+                <label
+                  class="flex items-center gap-3 h-11 px-4 rounded-xl border border-border-main/20 bg-surface cursor-pointer hover:border-primary/50 transition-colors group w-full sm:w-fit"
+                >
+                  <input
+                    type="checkbox"
+                    formControlName="isPublic"
+                    class="w-4 h-4 rounded border-border-main/30 text-primary focus:ring-primary cursor-pointer accent-primary"
+                  />
+                  <span
+                    class="text-[13px] text-text-main font-bold group-hover:text-primary transition-colors"
+                    >Proyecto público para la comunidad</span
+                  >
+                </label>
+              </div>
+            </div>
+
+            <div class="md:col-span-5 flex flex-col gap-4">
+              <div class="flex-1 flex flex-col min-h-40">
+                <label class="block text-[13px] font-bold text-text-main mb-1.5"
+                  >Foto de Inspiración</label
+                >
+
+                @if (!imagePreview) {
+                  <label
+                    class="flex-1 flex flex-col items-center justify-center w-full px-4 transition bg-surface border-2 border-border-main/20 border-dashed rounded-xl cursor-pointer hover:border-primary/40 hover:bg-surface-hover focus:outline-none"
+                    [class.opacity-50]="isUploadingImage"
+                    [class.cursor-not-allowed]="isUploadingImage"
+                  >
+                    <div class="flex flex-col items-center text-center">
+                      @if (isUploadingImage) {
+                        <svg
+                          class="animate-spin h-7 w-7 text-primary mb-2"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            class="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            stroke-width="4"
+                          ></circle>
+                          <path
+                            class="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          ></path>
+                        </svg>
+                        <span class="text-[13px] font-bold text-text-main">Subiendo...</span>
+                      } @else {
+                        <div
+                          class="w-10 h-10 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-2"
+                        >
+                          <svg
+                            class="w-5 h-5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            stroke-width="2"
+                          >
+                            <path
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                              d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+                            />
+                          </svg>
+                        </div>
+                        <span class="text-[13px] font-bold text-text-main">Añadir imagen</span>
+                        <span class="text-[11px] font-medium text-muted mt-0.5"
+                          >JPG, PNG o WEBP</span
+                        >
+                      }
+                    </div>
+                    <input
+                      type="file"
+                      class="hidden"
+                      accept="image/png, image/jpeg, image/webp"
+                      (change)="onFileSelected($event)"
+                      [disabled]="isUploadingImage"
+                    />
+                  </label>
+                } @else {
+                  <div
+                    class="flex-1 relative w-full rounded-xl border border-border-main/20 overflow-hidden group"
+                  >
+                    <img
+                      [src]="imagePreview"
+                      alt="Inspiración"
+                      class="w-full h-full object-cover absolute inset-0"
+                    />
+                    <div
+                      class="absolute inset-0 bg-text-main/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm"
+                    >
+                      <button
+                        type="button"
+                        (click)="removeImage()"
+                        class="bg-danger text-white px-3 py-1.5 rounded-lg text-[13px] font-bold flex items-center gap-1.5 hover:bg-danger/90 transition-colors shadow-lg"
+                      >
+                        <svg
+                          class="w-4 h-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          stroke-width="2.5"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                          />
+                        </svg>
+                        Cambiar
+                      </button>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <div>
+                <label for="description" class="block text-[13px] font-bold text-text-main mb-1.5"
+                  >Descripción o Notas</label
+                >
+                <textarea
+                  id="description"
+                  formControlName="description"
+                  placeholder="Medidas, ideas..."
+                  rows="2"
+                  class="w-full p-3.5 text-[14px] rounded-xl border border-border-main/20 bg-surface text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none placeholder:text-muted/50 font-medium"
+                ></textarea>
+              </div>
+            </div>
           </div>
         </div>
 
         <div
           [class.hidden]="currentStep !== 2"
-          class="space-y-6 animate-in slide-in-from-right-4 duration-300"
+          class="animate-in slide-in-from-right-4 duration-300"
         >
-          <div class="flex items-center justify-between mb-2">
+          <div class="flex items-center justify-between mb-4">
             <div>
-              <h3 class="text-lg font-bold text-text-main">Lista de Materiales</h3>
-              <p class="text-sm text-muted">
-                Añade las telas, hilos o fornituras que vas a necesitar.
+              <h3 class="text-[16px] font-bold text-text-main">Lista de Materiales</h3>
+              <p class="text-[13px] font-medium text-muted mt-0.5">
+                Añade telas, hilos o fornituras.
               </p>
             </div>
             <button
               type="button"
               (click)="addMaterial()"
-              class="text-primary text-sm font-bold flex items-center gap-1.5 hover:bg-primary/5 px-3 py-1.5 rounded-lg transition-colors"
+              class="text-primary text-[13px] font-bold flex items-center gap-1.5 bg-primary/10 hover:bg-primary/20 px-3.5 py-2 rounded-xl transition-colors"
             >
               <svg
-                class="w-5 h-5"
+                class="w-4 h-4"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
-                stroke-width="2"
+                stroke-width="2.5"
               >
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
-              Añadir
+              Añadir material
             </button>
           </div>
 
-          <div formArrayName="materials" class="space-y-3">
+          <div formArrayName="materials" class="space-y-2.5">
             @for (material of materials.controls; track $index) {
               <div
                 [formGroupName]="$index"
-                class="flex items-start gap-3 bg-bg p-4 rounded-xl border border-border-main/15 shadow-sm group"
+                class="flex items-center gap-2.5 bg-surface p-2.5 rounded-xl border border-border-main/15 shadow-sm group"
               >
-                <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                   <input
                     type="text"
                     formControlName="name"
-                    placeholder="Ej: Hilo de algodón Gütterman"
-                    class="w-full h-11 px-4 text-[14px] rounded-lg border border-border-main/20 bg-surface outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                    placeholder="Ej: Hilo de algodón"
+                    class="w-full h-10 px-3.5 text-[13px] rounded-lg border border-border-main/20 bg-bg outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all font-medium"
                   />
                   <input
                     type="text"
                     formControlName="quantity"
-                    placeholder="Cantidad (Ej: 1 bobina)"
-                    class="w-full h-11 px-4 text-[14px] rounded-lg border border-border-main/20 bg-surface outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                    placeholder="Ej: 1 bobina"
+                    class="w-full h-10 px-3.5 text-[13px] rounded-lg border border-border-main/20 bg-bg outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all font-medium"
                   />
                 </div>
                 <button
                   type="button"
                   (click)="removeMaterial($index)"
-                  class="w-11 h-11 shrink-0 flex items-center justify-center rounded-lg border border-transparent text-muted hover:bg-danger/10 hover:text-danger hover:border-danger/20 transition-all"
+                  class="w-10 h-10 shrink-0 flex items-center justify-center rounded-lg text-muted hover:bg-danger/10 hover:text-danger transition-all outline-none"
                   title="Eliminar material"
                 >
                   <svg
-                    class="w-5 h-5"
+                    class="w-4 h-4"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
-                    stroke-width="2"
+                    stroke-width="2.5"
                   >
                     <path
                       stroke-linecap="round"
@@ -419,14 +431,14 @@
 
             @if (materials.length === 0) {
               <div
-                class="flex flex-col items-center justify-center py-10 bg-bg rounded-2xl border border-dashed border-border-main/30 text-center cursor-pointer hover:bg-surface-hover hover:border-primary/30 transition-all"
+                class="flex flex-col items-center justify-center py-8 bg-surface rounded-2xl border border-dashed border-border-main/30 text-center cursor-pointer hover:bg-surface-hover hover:border-primary/30 transition-all"
                 (click)="addMaterial()"
               >
                 <div
-                  class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-3"
+                  class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-2.5"
                 >
                   <svg
-                    class="w-6 h-6"
+                    class="w-5 h-5"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -444,8 +456,10 @@
                     />
                   </svg>
                 </div>
-                <h4 class="font-bold text-text-main text-[15px] mb-1">Sin materiales asignados</h4>
-                <p class="text-sm text-muted">Haz clic aquí para añadir el primero</p>
+                <h4 class="font-bold text-text-main text-[14px] mb-0.5">Lista vacía</h4>
+                <p class="text-[12px] font-medium text-muted">
+                  Haz clic para añadir el primer material
+                </p>
               </div>
             }
           </div>
@@ -454,13 +468,13 @@
     </div>
 
     <footer
-      class="p-6 border-t border-border-main/10 bg-surface rounded-b-3xl flex items-center justify-between gap-3"
+      class="px-6 py-4 border-t border-border-main/10 bg-bg rounded-b-[28px] flex items-center justify-between shrink-0"
     >
       @if (currentStep === 1) {
         <button
           type="button"
           (click)="closeModal()"
-          class="btn btn-secondary px-6 font-bold hover:bg-danger/5 hover:text-danger hover:border-danger/20 transition-colors"
+          class="px-5 py-2.5 rounded-xl text-[14px] font-bold text-muted hover:bg-danger/10 hover:text-danger transition-colors outline-none"
         >
           Cancelar
         </button>
@@ -468,7 +482,7 @@
         <button
           type="button"
           (click)="previousStep()"
-          class="btn btn-secondary px-6 font-bold flex items-center gap-2"
+          class="px-5 py-2.5 rounded-xl text-[14px] font-bold text-text-main bg-surface border border-border-main/20 hover:bg-surface-hover flex items-center gap-2 transition-colors outline-none"
         >
           <svg
             class="w-4 h-4"
@@ -491,7 +505,7 @@
         <button
           type="button"
           (click)="nextStep()"
-          class="btn btn-primary px-8 font-bold flex items-center gap-2 min-w-35"
+          class="btn btn-primary px-6 py-2.5 text-[14px] font-bold flex items-center gap-2 shadow-sm"
         >
           Siguiente
           <svg
@@ -513,11 +527,11 @@
           type="submit"
           form="projectForm"
           [disabled]="projectForm.invalid || isLoading"
-          class="btn btn-primary px-8 font-bold flex items-center justify-center min-w-40 shadow-md hover:shadow-lg transition-all"
+          class="btn btn-primary px-6 py-2.5 text-[14px] font-bold flex items-center justify-center min-w-36 shadow-md hover:shadow-lg transition-all"
         >
           @if (isLoading) {
             <svg
-              class="animate-spin h-5 w-5 text-white"
+              class="animate-spin h-4 w-4 text-white mr-2"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -536,10 +550,10 @@
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
-            <span class="ml-2">Guardando...</span>
+            Guardando...
           } @else {
             <svg
-              class="w-5 h-5 mr-2"
+              class="w-4 h-4 mr-1.5"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
