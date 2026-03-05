@@ -67,4 +67,25 @@ export class ProjectService {
   addStepToProject(id: string, stepData: AddStepPayload): Observable<ApiResponse<Project>> {
     return this.http.post<ApiResponse<Project>>(`${this.apiUrl}/${id}/steps`, stepData);
   }
+
+  // GET /api/v1/projects/me (Obtener proyectos del usuario logueado)
+  getMyProjects(
+    page: number = 1,
+    limit: number = 20,
+    status: string = 'Todos',
+    sortBy: string = 'nuevo',
+  ): Observable<ApiResponse<PaginatedResult<Project>>> {
+    let params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
+
+    if (status !== 'Todos') {
+      params = params.set('status', status);
+    }
+
+    if (sortBy) {
+      params = params.set('sortBy', sortBy);
+    }
+
+    // Llamamos al nuevo endpoint protegido
+    return this.http.get<ApiResponse<PaginatedResult<Project>>>(`${this.apiUrl}/me`, { params });
+  }
 }

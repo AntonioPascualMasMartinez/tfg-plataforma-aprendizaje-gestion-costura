@@ -83,6 +83,33 @@ class ProjectService {
 
     return true;
   }
+
+  /* RNF19: Listar mis proyectos con filtros y paginación */
+  static async getMyProjects(userId, page = 1, limit = 10, status = 'Todos', sortBy = 'nuevo') {
+    // 1. Filtro base: Solo los proyectos del usuario
+    const query = { ownerId: userId };
+    
+    // 2. Filtro opcional por estado
+    if (status !== 'Todos') {
+      query.status = status;
+    }
+
+    // 3. Opciones de ordenación
+    const sortOptions = {};
+    if (sortBy === 'nombre') {
+      sortOptions.title = 1; // A-Z
+    } else {
+      sortOptions.createdAt = -1; // Más recientes primero
+    }
+
+    const options = {
+      page: parseInt(page, 10),
+      limit: parseInt(limit, 10),
+      sort: sortOptions,
+    };
+
+    return await Project.paginate(query, options);
+  }
 }
 
 module.exports = ProjectService;

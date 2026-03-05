@@ -14,6 +14,7 @@ router.get('/:id', ProjectController.getDetails);
 // ==========================================
 router.use(authenticate); // Todo lo que esté debajo requerirá token JWT
 
+router.get('/me', ProjectController.getMyProjects);
 router.post('/', ProjectController.create);
 router.put('/:id', ProjectController.update);
 router.delete('/:id', ProjectController.delete); // Borrado Lógico
