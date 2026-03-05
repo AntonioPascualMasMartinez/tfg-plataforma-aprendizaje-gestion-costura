@@ -1,0 +1,330 @@
+<div class="w-full max-w-5xl mx-auto pb-12 pt-4">
+  @if (isLoading) {
+    <div class="flex justify-center items-center py-20">
+      <svg
+        class="animate-spin h-10 w-10 text-primary"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          class="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          stroke-width="4"
+        ></circle>
+        <path
+          class="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+        ></path>
+      </svg>
+    </div>
+  } @else if (project) {
+    <header class="mb-8 flex flex-col md:flex-row md:items-start justify-between gap-6">
+      <div>
+        <a
+          routerLink="/home/proyectos"
+          class="text-primary text-[13px] font-bold flex items-center gap-1 hover:underline mb-3"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+          Volver a mis proyectos
+        </a>
+        <div class="flex items-center gap-3 mb-2">
+          <h1 class="text-3xl md:text-[36px] font-display font-bold text-text-main">
+            {{ project.title }}
+          </h1>
+          <span
+            class="px-3 py-1 bg-surface border border-border-main/20 text-[12px] font-bold rounded-lg shadow-sm uppercase"
+            >{{ project.status }}</span
+          >
+        </div>
+        <p class="text-muted text-[15px] max-w-2xl">
+          {{ project.description || 'Sin descripción adicional.' }}
+        </p>
+      </div>
+
+      <div
+        class="flex bg-surface p-1.5 rounded-2xl border border-border-main/15 shadow-sm shrink-0"
+      >
+        <button
+          (click)="setMode('taller')"
+          [class.bg-primary]="viewMode === 'taller'"
+          [class.text-white]="viewMode === 'taller'"
+          [class.text-muted]="viewMode !== 'taller'"
+          class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[14px] font-bold transition-all"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M14.121 7.629A3 3 0 009.005 9.15l2.474 5.772a.75.75 0 001.376-.084l2.128-4.966a3 3 0 00-.862-2.243z"
+            />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M15 12.75V15a3 3 0 01-3 3h-1.5a3 3 0 01-3-3v-2.25"
+            />
+          </svg>
+          Modo Taller
+        </button>
+        <button
+          (click)="setMode('edicion')"
+          [class.bg-bg]="viewMode === 'edicion'"
+          [class.shadow-sm]="viewMode === 'edicion'"
+          [class.text-text-main]="viewMode === 'edicion'"
+          [class.text-muted]="viewMode !== 'edicion'"
+          class="flex items-center gap-2 px-5 py-2.5 rounded-xl text-[14px] font-bold transition-all"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+            />
+          </svg>
+          Edición
+        </button>
+      </div>
+    </header>
+
+    @if (viewMode === 'taller') {
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 animate-in fade-in duration-300">
+        <div class="lg:col-span-1 space-y-6">
+          @if (project.inspirationImageUrl) {
+            <div
+              class="w-full aspect-4/5 rounded-3xl overflow-hidden shadow-md border border-border-main/10 relative group"
+            >
+              <img
+                [src]="project.inspirationImageUrl"
+                alt="Inspiración"
+                class="w-full h-full object-cover"
+              />
+            </div>
+          }
+          <div class="bg-surface rounded-3xl border border-border-main/15 p-6 shadow-sm">
+            <h3
+              class="text-[18px] font-display font-bold text-text-main mb-4 border-b border-border-main/10 pb-3"
+            >
+              Materiales
+            </h3>
+            <div class="space-y-3">
+              @for (mat of project.materials; track mat._id) {
+                <label class="flex items-start gap-3 cursor-pointer group">
+                  <input
+                    type="checkbox"
+                    class="mt-0.5 w-5 h-5 rounded border-border-main/30 text-primary focus:ring-primary accent-primary"
+                  />
+                  <div>
+                    <p
+                      class="text-[15px] font-bold text-text-main group-hover:text-primary transition-colors"
+                    >
+                      {{ mat.name }}
+                    </p>
+                    <p class="text-[13px] text-muted">{{ mat.quantity }}</p>
+                  </div>
+                </label>
+              }
+              @if (!project.materials.length) {
+                <p class="text-sm text-muted">No hay materiales registrados.</p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-2 space-y-6">
+          <h2 class="text-[22px] font-display font-bold text-text-main mb-2">Paso a paso</h2>
+          @for (step of project.steps; track step._id) {
+            <div
+              class="bg-surface rounded-3xl border border-border-main/15 p-6 shadow-sm flex flex-col md:flex-row gap-6"
+            >
+              <div
+                class="shrink-0 w-12 h-12 bg-primary/10 text-primary rounded-2xl flex items-center justify-center font-display font-bold text-xl"
+              >
+                {{ step.order }}
+              </div>
+              <div class="flex-1">
+                <h4 class="text-[18px] font-bold text-text-main mb-2">{{ step.title }}</h4>
+                <p class="text-[15px] text-muted leading-relaxed mb-4">{{ step.description }}</p>
+                @if (step.mediaUrl) {
+                  <img
+                    [src]="step.mediaUrl"
+                    alt="Paso {{ step.order }}"
+                    class="w-full md:w-2/3 rounded-2xl border border-border-main/10 object-cover"
+                  />
+                }
+              </div>
+            </div>
+          }
+          @if (!project.steps.length) {
+            <div
+              class="p-10 text-center bg-bg rounded-3xl border border-dashed border-border-main/30 text-muted"
+            >
+              Aún no has añadido pasos a este proyecto. Cambia al Modo Edición para empezar.
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    @if (viewMode === 'edicion') {
+      <div class="space-y-8 animate-in fade-in duration-300">
+        <div class="bg-surface rounded-3xl border border-border-main/15 p-6 shadow-sm">
+          <div class="flex items-center justify-between mb-6 border-b border-border-main/10 pb-4">
+            <h3 class="text-xl font-display font-bold text-text-main">Secuencia de Pasos</h3>
+            <button
+              (click)="toggleAddStep()"
+              class="btn btn-primary px-5 py-2.5 text-[14px] flex items-center gap-2"
+            >
+              <svg
+                class="w-4 h-4"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              {{ isAddingStep ? 'Cancelar paso' : 'Añadir paso' }}
+            </button>
+          </div>
+
+          @if (isAddingStep) {
+            <form
+              [formGroup]="stepForm"
+              (ngSubmit)="onAddStep()"
+              class="bg-bg p-6 rounded-2xl border border-primary/20 mb-8 animate-in slide-in-from-top-4"
+            >
+              <h4 class="font-bold text-text-main mb-4">Añadir nuevo paso</h4>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+                <div>
+                  <label class="block text-[13px] font-bold text-text-main mb-1.5"
+                    >Título del paso</label
+                  >
+                  <input
+                    type="text"
+                    formControlName="title"
+                    placeholder="Ej: Unir los hombros"
+                    class="w-full h-11 px-4 rounded-xl border border-border-main/20 bg-surface text-[14px] outline-none focus:border-primary"
+                  />
+                </div>
+                <div>
+                  <label class="block text-[13px] font-bold text-text-main mb-1.5"
+                    >Imagen explicativa (Opcional)</label
+                  >
+                  @if (!stepImagePreview) {
+                    <input
+                      type="file"
+                      accept="image/*"
+                      (change)="onStepImageSelected($event)"
+                      class="w-full h-11 px-4 py-2 rounded-xl border border-border-main/20 bg-surface text-[14px] text-muted file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:bg-primary/10 file:text-primary file:font-bold hover:file:bg-primary/20 cursor-pointer"
+                    />
+                  } @else {
+                    <div class="flex items-center gap-3">
+                      <img
+                        [src]="stepImagePreview"
+                        class="w-11 h-11 rounded-lg object-cover border border-border-main/20"
+                      />
+                      <button
+                        type="button"
+                        (click)="removeStepImage()"
+                        class="text-danger text-[13px] font-bold hover:underline"
+                      >
+                        Eliminar imagen
+                      </button>
+                    </div>
+                  }
+                </div>
+                <div class="md:col-span-2">
+                  <label class="block text-[13px] font-bold text-text-main mb-1.5"
+                    >Descripción o técnica a usar</label
+                  >
+                  <textarea
+                    formControlName="description"
+                    rows="3"
+                    class="w-full p-4 rounded-xl border border-border-main/20 bg-surface text-[14px] outline-none focus:border-primary resize-none"
+                  ></textarea>
+                </div>
+              </div>
+              <div class="flex justify-end gap-3">
+                <button
+                  type="button"
+                  (click)="toggleAddStep()"
+                  class="btn text-muted font-bold hover:bg-danger/10 hover:text-danger px-5"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  [disabled]="stepForm.invalid || isUploadingStepImage"
+                  class="btn btn-primary px-6 shadow-sm disabled:opacity-50"
+                >
+                  Guardar paso
+                </button>
+              </div>
+            </form>
+          }
+
+          <div class="space-y-4">
+            @for (step of project.steps; track step._id) {
+              <div
+                class="flex items-center justify-between p-4 border border-border-main/10 rounded-2xl hover:border-primary/30 transition-colors"
+              >
+                <div class="flex items-center gap-4">
+                  <div
+                    class="w-8 h-8 bg-surface-hover rounded-lg flex items-center justify-center font-bold text-muted"
+                  >
+                    {{ step.order }}
+                  </div>
+                  <div>
+                    <h5 class="font-bold text-text-main">{{ step.title }}</h5>
+                    <p class="text-[13px] text-muted line-clamp-1">{{ step.description }}</p>
+                  </div>
+                </div>
+                <button
+                  class="w-8 h-8 flex items-center justify-center text-muted hover:text-primary hover:bg-primary/5 rounded-lg transition-colors"
+                >
+                  <svg
+                    class="w-4 h-4"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487zm0 0L19.5 7.125"
+                    />
+                  </svg>
+                </button>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  }
+</div>
