@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Output, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ProjectService } from '../../../core/services/project.service';
+import { UploadService } from '../../../core/services/upload.service';
 import { CreateProjectPayload, Project } from '../../models/project.model';
 
 @Component({
@@ -15,29 +16,31 @@ export class CreateProjectModal implements OnInit {
 
   private fb = inject(FormBuilder);
   private projectService = inject(ProjectService);
+  private uploadService = inject(UploadService);
   private cdr = inject(ChangeDetectorRef);
 
   isLoading = false;
   errorMessage = '';
 
-  // Nuevo: Control del wizard
+  isUploadingImage = false;
+  imagePreview: string | null = null;
+
   currentStep = 1;
   totalSteps = 2;
 
   projectForm: FormGroup = this.fb.group({
-    // Paso 1: Detalles básicos
     title: ['', [Validators.required, Validators.maxLength(100)]],
+    projectType: ['', [Validators.required]],
+    category: ['', [Validators.required]],
+    difficulty: ['', [Validators.required]],
+    inspirationImageUrl: [null],
     description: [''],
     status: ['Planificado'],
     isPublic: [true],
-    // Paso 2: Materiales
     materials: this.fb.array([]),
   });
 
-  ngOnInit() {
-    // Inicializar con un material vacío por defecto si lo deseas
-    // this.addMaterial();
-  }
+  ngOnInit() {}
 
   get materials() {
     return this.projectForm.get('materials') as FormArray;
@@ -55,10 +58,37 @@ export class CreateProjectModal implements OnInit {
     this.materials.removeAt(index);
   }
 
-  // Navegación del Wizard
+  onFileSelected(event: Event) {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+    this.isUploadingImage = true;
+    this.errorMessage = '';
+    this.cdr.detectChanges();
+
+    this.uploadService.uploadImage(file).subscribe({
+      next: (cloudinaryResponse) => {
+        this.imagePreview = cloudinaryResponse.secure_url;
+        this.projectForm.patchValue({ inspirationImageUrl: cloudinaryResponse.secure_url });
+        this.isUploadingImage = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.errorMessage = 'Error al subir la imagen a Cloudinary.';
+        this.isUploadingImage = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  removeImage() {
+    this.imagePreview = null;
+    this.projectForm.patchValue({ inspirationImageUrl: null });
+  }
+
   nextStep() {
-    // Validar solo los campos del primer paso antes de avanzar
-    const step1Controls = ['title', 'status', 'isPublic'];
+    const step1Controls = ['title', 'projectType', 'category', 'difficulty', 'status', 'isPublic'];
     let isStep1Valid = true;
 
     step1Controls.forEach((controlName) => {

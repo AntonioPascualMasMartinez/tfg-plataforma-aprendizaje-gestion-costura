@@ -1,35 +1,51 @@
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 
-// Subesquema para los Materiales
 const materialSchema = new mongoose.Schema({
-  name: { type: String, required: [true, 'El nombre del material es obligatorio'] },
-  quantity: { type: String, required: [true, 'La cantidad es obligatoria'] },
+  name: { type: String, required: true },
+  quantity: { type: String, required: true },
   isAcquired: { type: Boolean, default: false },
 });
 
-// Subesquema para los Pasos Secuenciales
 const stepSchema = new mongoose.Schema({
   order: { type: Number, required: true },
-  title: { type: String, required: [true, 'El título del paso es obligatorio'] },
+  title: { type: String, required: true },
   description: { type: String, required: true },
-  mediaUrl: { type: String, default: null }, // URL devuelta por Cloudinary
+  mediaUrl: { type: String, default: null },
 });
 
-// Esquema Principal del Proyecto Textil
 const projectSchema = new mongoose.Schema(
   {
     ownerId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-      index: true, // Indexado para búsquedas rápidas por usuario
+      index: true,
     },
     title: {
       type: String,
-      required: [true, 'El título del proyecto es obligatorio'],
+      required: true,
       trim: true,
       maxlength: 100,
+    },
+    projectType: {
+      type: String,
+      enum: ['Nuevo', 'Comenzado desde Tutorial'],
+      required: true,
+    },
+    category: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    difficulty: {
+      type: String,
+      enum: ['Fácil', 'Intermedio', 'Avanzado'],
+      required: true,
+    },
+    inspirationImageUrl: {
+      type: String,
+      default: null,
     },
     description: {
       type: String,
@@ -43,12 +59,10 @@ const projectSchema = new mongoose.Schema(
     },
     isPublic: {
       type: Boolean,
-      default: true, // Si es falso, no aparecerá en el feed de la comunidad
+      default: true,
     },
     materials: [materialSchema],
     steps: [stepSchema],
-
-    // RNF20, RNF21: Borrado Lógico (Soft Delete)
     deletedAt: {
       type: Date,
       default: null,
@@ -60,10 +74,8 @@ const projectSchema = new mongoose.Schema(
   },
 );
 
-// Plugin para habilitar paginación (Tabla 32 de la memoria)
 projectSchema.plugin(mongoosePaginate);
 
-// Middleware de Mongoose: Excluir automáticamente los proyectos "borrados" de todas las consultas FIND
 projectSchema.pre(/^find/, function () {
   this.where({ deletedAt: null });
 });

@@ -1,7 +1,8 @@
 import { User } from './user.model';
 
-// Enum de estados basados en el modelo de Mongoose
 export type ProjectStatus = 'Planificado' | 'En curso' | 'Pausado' | 'Finalizado';
+export type ProjectType = 'Nuevo' | 'Comenzado desde Tutorial';
+export type ProjectDifficulty = 'Fácil' | 'Intermedio' | 'Avanzado';
 
 export interface ProjectMaterial {
   _id?: string;
@@ -18,26 +19,30 @@ export interface ProjectStep {
   mediaUrl: string | null;
 }
 
-// Interfaz Principal del Proyecto
 export interface Project {
   _id: string;
-  // El backend hace un .populate('ownerId', 'displayName avatar'),
-  // por lo que ownerId puede ser un string o un objeto parcial de User.
   ownerId: string | Partial<User>;
   title: string;
+  projectType: ProjectType;
+  category: string;
+  difficulty: ProjectDifficulty;
+  inspirationImageUrl: string | null;
   description: string;
   status: ProjectStatus;
   isPublic: boolean;
   materials: ProjectMaterial[];
   steps: ProjectStep[];
-  deletedAt: string | null; // Refleja el Soft Delete (RNF20, RNF21)
+  deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
 }
 
-// Payloads para las peticiones de creación y actualización
 export interface CreateProjectPayload {
   title: string;
+  projectType: ProjectType;
+  category: string;
+  difficulty: ProjectDifficulty;
+  inspirationImageUrl?: string | null;
   description?: string;
   status?: ProjectStatus;
   isPublic?: boolean;
@@ -46,7 +51,6 @@ export interface CreateProjectPayload {
 
 export type UpdateProjectPayload = Partial<CreateProjectPayload>;
 
-// Payload para añadir un paso secuencial
 export interface AddStepPayload {
   title: string;
   description: string;
