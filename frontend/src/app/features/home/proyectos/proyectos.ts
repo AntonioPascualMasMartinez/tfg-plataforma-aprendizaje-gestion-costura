@@ -16,14 +16,12 @@ import { ProjectCardComponent } from '../../../shared/components/project-card/pr
 })
 export class Proyectos implements OnInit {
   private projectService = inject(ProjectService);
-  private cdr = inject(ChangeDetectorRef); // 1. Inyectamos el detector de cambios
+  private cdr = inject(ChangeDetectorRef);
 
-  // Estado
   projects: Project[] = [];
   isLoading = true;
   searchTerm = new FormControl('');
 
-  // Paginación
   currentPage = 1;
   totalPages = 1;
   totalResults = 0;
@@ -42,11 +40,12 @@ export class Proyectos implements OnInit {
 
   loadProjects() {
     this.isLoading = true;
-    this.cdr.detectChanges(); // Aseguramos que se muestre el esqueleto de carga
+    this.cdr.detectChanges();
 
     const search = this.searchTerm.value || '';
 
-    this.projectService.getPublicFeed(this.currentPage, 9, search).subscribe({
+    // Cambiamos getPublicFeed por getMyProjects
+    this.projectService.getMyProjects(this.currentPage, 9, 'Todos', 'nuevo', search).subscribe({
       next: (response) => {
         if (response.data) {
           this.projects = response.data.docs;
@@ -54,12 +53,12 @@ export class Proyectos implements OnInit {
           this.totalResults = response.data.totalDocs;
         }
         this.isLoading = false;
-        this.cdr.detectChanges(); // 2. Avisamos a Angular de que ya tiene los datos y quite el loading
+        this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error cargando proyectos:', err);
         this.isLoading = false;
-        this.cdr.detectChanges(); // 3. También avisamos si hay error para no dejar el loading infinito
+        this.cdr.detectChanges();
       },
     });
   }
@@ -67,7 +66,13 @@ export class Proyectos implements OnInit {
   deleteProject(id: string) {
     if (confirm('¿Estás seguro de que quieres eliminar este proyecto?')) {
       this.projectService.deleteProject(id).subscribe({
-        next: () => this.loadProjects(),
+        next: () => {
+          // Si es el último elemento de la página y no es la primera, volvemos una atrás
+          if (this.projects.length === 1 && this.currentPage > 1) {
+            this.currentPage--;
+          }
+          this.loadProjects();
+        },
         error: (err) => console.error('Error al eliminar:', err),
       });
     }

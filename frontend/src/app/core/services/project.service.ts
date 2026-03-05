@@ -68,12 +68,13 @@ export class ProjectService {
     return this.http.post<ApiResponse<Project>>(`${this.apiUrl}/${id}/steps`, stepData);
   }
 
-  // GET /api/v1/projects/me (Obtener proyectos del usuario logueado)
+  // GET /api/v1/projects/me
   getMyProjects(
     page: number = 1,
     limit: number = 20,
     status: string = 'Todos',
     sortBy: string = 'nuevo',
+    search: string = '',
   ): Observable<ApiResponse<PaginatedResult<Project>>> {
     let params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
 
@@ -85,7 +86,10 @@ export class ProjectService {
       params = params.set('sortBy', sortBy);
     }
 
-    // Llamamos al nuevo endpoint protegido
+    if (search) {
+      params = params.set('search', search);
+    }
+
     return this.http.get<ApiResponse<PaginatedResult<Project>>>(`${this.apiUrl}/me`, { params });
   }
 }

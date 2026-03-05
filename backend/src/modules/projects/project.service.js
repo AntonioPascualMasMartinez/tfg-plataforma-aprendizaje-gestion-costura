@@ -85,21 +85,30 @@ class ProjectService {
   }
 
   /* RNF19: Listar mis proyectos con filtros y paginación */
-  static async getMyProjects(userId, page = 1, limit = 10, status = 'Todos', sortBy = 'nuevo') {
-    // 1. Filtro base: Solo los proyectos del usuario
+  static async getMyProjects(
+    userId,
+    page = 1,
+    limit = 10,
+    status = 'Todos',
+    sortBy = 'nuevo',
+    search = '',
+  ) {
     const query = { ownerId: userId };
-    
-    // 2. Filtro opcional por estado
+
     if (status !== 'Todos') {
       query.status = status;
     }
 
-    // 3. Opciones de ordenación
+    // Añadimos el filtro de búsqueda por título
+    if (search) {
+      query.title = { $regex: search, $options: 'i' };
+    }
+
     const sortOptions = {};
     if (sortBy === 'nombre') {
-      sortOptions.title = 1; // A-Z
+      sortOptions.title = 1;
     } else {
-      sortOptions.createdAt = -1; // Más recientes primero
+      sortOptions.createdAt = -1;
     }
 
     const options = {

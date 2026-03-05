@@ -76,8 +76,15 @@ class ProjectController {
 
   static async getMyProjects(req, res, next) {
     try {
-      const { page, limit, status, sortBy } = req.query;
-      const projects = await ProjectService.getMyProjects(req.user.id, page, limit, status, sortBy);
+      const { page, limit, status, sortBy, search } = req.query;
+      const projects = await ProjectService.getMyProjects(
+        req.user.id,
+        page,
+        limit,
+        status,
+        sortBy,
+        search,
+      );
       return ResponseFormatter.success(res, 200, 'Taller personal recuperado', projects);
     } catch (error) {
       next(error);

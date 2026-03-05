@@ -6,6 +6,9 @@ const authenticate = require('../../middlewares/auth.middleware');
 // ==========================================
 // Rutas Públicas (Disponibles sin inicio de sesión)
 // ==========================================
+
+router.get('/me', authenticate, ProjectController.getMyProjects);
+
 router.get('/', ProjectController.getPublicFeed);
 router.get('/:id', ProjectController.getDetails);
 
@@ -14,7 +17,6 @@ router.get('/:id', ProjectController.getDetails);
 // ==========================================
 router.use(authenticate); // Todo lo que esté debajo requerirá token JWT
 
-router.get('/me', ProjectController.getMyProjects);
 router.post('/', ProjectController.create);
 router.put('/:id', ProjectController.update);
 router.delete('/:id', ProjectController.delete); // Borrado Lógico
