@@ -1,14 +1,14 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
-import { RouterLink, Router } from '@angular/router'; // Añadido Router
+import { RouterLink, Router } from '@angular/router';
 import { UserService } from '../../../core/services/user.service';
 import { User } from '../../../shared/models/user.model';
 import { Project } from '../../../shared/models/project.model';
-import { CreateProjectModal } from '../../../shared/modals/create-project/create-project.modal'; // Importar modal
+import { CreateProjectModal } from '../../../shared/modals/create-project/create-project.modal';
 
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [RouterLink, CreateProjectModal], // Añadir a imports
+  imports: [RouterLink, CreateProjectModal],
   templateUrl: './inicio.html',
 })
 export class Inicio implements OnInit {
@@ -20,6 +20,15 @@ export class Inicio implements OnInit {
   isLoadingUser = true;
   recentProject: Project | null = null;
   myProjects: Project[] = [];
+
+  // Datos mockeados para el tutorial recomendado
+  recommendedTutorial = {
+    title: 'Dominando los patrones base',
+    description:
+      'Aprende a crear y modificar patrones fundamentales para cualquier prenda superior.',
+    duration: '15 min',
+    level: 'Intermedio',
+  };
 
   // Estado del modal
   isCreateModalOpen = false;
