@@ -1,6 +1,7 @@
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { UserService } from '../../../core/services/user.service';
+import { UploadService } from '../../../core/services/upload.service'; // Añadido
 import { User, SewingLevel, UpdateProfilePayload } from '../../../shared/models/user.model';
 
 @Component({
@@ -11,6 +12,7 @@ import { User, SewingLevel, UpdateProfilePayload } from '../../../shared/models/
 })
 export class Perfil implements OnInit {
   private userService = inject(UserService);
+  private uploadService = inject(UploadService); // Inyectamos el servicio
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
 
@@ -19,10 +21,10 @@ export class Perfil implements OnInit {
 
   isLoading = true;
   isSaving = false;
+  isUploadingAvatar = false; // Nuevo estado de carga
   successMessage = '';
   errorMessage = '';
 
-  // Previsualización del avatar seleccionado antes de guardar
   avatarPreview: string | null = null;
 
   sewingLevels: SewingLevel[] = ['Principiante', 'Intermedio', 'Experto'];
@@ -32,7 +34,7 @@ export class Perfil implements OnInit {
       displayName: ['', [Validators.required, Validators.minLength(3)]],
       sewingLevel: [null],
       interests: [''],
-      avatar: [null], // Añadimos el control para el avatar
+      avatar: [null],
     });
   }
 
@@ -47,13 +49,13 @@ export class Perfil implements OnInit {
     this.userService.getMe().subscribe({
       next: (response) => {
         this.user = response.data;
-        this.avatarPreview = this.user.avatar; // Establecer avatar actual
+        this.avatarPreview = this.user.avatar;
 
         this.profileForm.patchValue({
           displayName: this.user.displayName,
           sewingLevel: this.user.sewingLevel || null,
           interests: this.user.interests ? this.user.interests.join(', ') : '',
-          avatar: null, // Mantenemos null hasta que suba uno nuevo
+          avatar: null,
         });
 
         this.isLoading = false;
@@ -68,11 +70,10 @@ export class Perfil implements OnInit {
     });
   }
 
-  // Método para manejar la selección de imagen
+  // Método modificado para subir a Cloudinary
   onFileSelected(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
-      // Validar tamaño (ej: máximo 2MB)
       if (file.size > 2 * 1024 * 1024) {
         this.errorMessage = 'La imagen es demasiado grande. Máximo 2MB.';
         this.cdr.detectChanges();
@@ -80,16 +81,24 @@ export class Perfil implements OnInit {
       }
 
       this.errorMessage = '';
-      const reader = new FileReader();
+      this.isUploadingAvatar = true; // Bloqueamos la UI
+      this.cdr.detectChanges();
 
-      reader.onload = () => {
-        this.avatarPreview = reader.result as string; // Mostrar previsualización
-        this.profileForm.patchValue({ avatar: this.avatarPreview }); // Guardar en el form
-        this.profileForm.markAsDirty(); // Marcar formulario como modificado
-        this.cdr.detectChanges();
-      };
-
-      reader.readAsDataURL(file); // Convertir a Base64
+      // Subimos usando la carpeta 'costura_avatars'
+      this.uploadService.uploadImage(file, 'costura_avatars').subscribe({
+        next: (cloudinaryResponse) => {
+          this.avatarPreview = cloudinaryResponse.secure_url;
+          this.profileForm.patchValue({ avatar: cloudinaryResponse.secure_url });
+          this.profileForm.markAsDirty();
+          this.isUploadingAvatar = false;
+          this.cdr.detectChanges();
+        },
+        error: () => {
+          this.errorMessage = 'Error al subir la imagen de perfil a Cloudinary.';
+          this.isUploadingAvatar = false;
+          this.cdr.detectChanges();
+        },
+      });
     }
   }
 
@@ -118,7 +127,6 @@ export class Perfil implements OnInit {
       interests: interestsArray,
     };
 
-    // Solo enviamos el avatar si se ha cambiado (si hay algo en el formControl)
     if (formValue.avatar) {
       payload.avatar = formValue.avatar;
     }
@@ -126,7 +134,7 @@ export class Perfil implements OnInit {
     this.userService.updateMe(payload).subscribe({
       next: (response) => {
         this.user = response.data;
-        this.profileForm.markAsPristine(); // Limpiamos el estado dirty
+        this.profileForm.markAsPristine();
         this.successMessage = '¡Tu perfil se ha actualizado correctamente!';
         this.isSaving = false;
         this.cdr.detectChanges();
