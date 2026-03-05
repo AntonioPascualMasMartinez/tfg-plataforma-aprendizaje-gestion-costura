@@ -1,45 +1,55 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core'; // <-- Importar ChangeDetectorRef
-import { RouterLink } from '@angular/router';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { RouterLink, Router } from '@angular/router'; // Añadido Router
 import { UserService } from '../../../core/services/user.service';
 import { User } from '../../../shared/models/user.model';
 import { Project } from '../../../shared/models/project.model';
+import { CreateProjectModal } from '../../../shared/modals/create-project/create-project.modal'; // Importar modal
 
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, CreateProjectModal], // Añadir a imports
   templateUrl: './inicio.html',
 })
 export class Inicio implements OnInit {
   private userService = inject(UserService);
-  private cdr = inject(ChangeDetectorRef); // <-- Inyectar ChangeDetectorRef
+  private cdr = inject(ChangeDetectorRef);
+  private router = inject(Router);
 
   user: User | null = null;
   isLoadingUser = true;
-
   recentProject: Project | null = null;
   myProjects: Project[] = [];
 
+  // Estado del modal
+  isCreateModalOpen = false;
+
   ngOnInit() {
     this.loadUserData();
+  }
+
+  // Métodos para el modal
+  openCreateModal() {
+    this.isCreateModalOpen = true;
+  }
+
+  handleProjectCreated(project: Project) {
+    // Al crearse, redirigimos al detalle del nuevo proyecto
+    this.router.navigate(['/home/proyectos', project._id]);
   }
 
   private loadUserData() {
     this.isLoadingUser = true;
     this.userService.getMe().subscribe({
       next: (response) => {
-        console.log('Datos del usuario cargados:', response.data);
         this.user = response.data;
-        this.isLoadingUser = false; // <-- Lo movemos aquí
-
-        this.cdr.detectChanges(); // <-- Forzamos a Angular a repintar el HTML
-      },
-      error: (err) => {
-        console.error('Error cargando los datos del usuario', err);
-        this.isLoadingUser = false; // <-- Lo movemos aquí también
+        this.isLoadingUser = false;
         this.cdr.detectChanges();
       },
-      // Eliminamos el bloque complete
+      error: () => {
+        this.isLoadingUser = false;
+        this.cdr.detectChanges();
+      },
     });
   }
 }
