@@ -5,6 +5,8 @@ import { ProjectService } from '../../../core/services/project.service';
 import { User } from '../../../shared/models/user.model';
 import { Project, ProjectStatus } from '../../../shared/models/project.model';
 import { CreateProjectModal } from '../../../shared/modals/create-project/create-project.modal';
+import { TutorialService } from '../../../core/services/tutorial.service';
+import { Tutorial } from '../../../shared/models/tutorial.model';
 
 @Component({
   selector: 'app-inicio',
@@ -26,6 +28,7 @@ import { CreateProjectModal } from '../../../shared/modals/create-project/create
 export class Inicio implements OnInit {
   private userService = inject(UserService);
   private projectService = inject(ProjectService);
+  private tutorialService = inject(TutorialService);
   private cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
 
@@ -40,19 +43,15 @@ export class Inicio implements OnInit {
   activeFilter: ProjectStatus | 'Todos' = 'Todos';
   sortBy: 'nuevo' | 'nombre' = 'nuevo';
 
-  recommendedTutorial = {
-    title: 'Dominando los patrones base',
-    description:
-      'Aprende a crear y modificar patrones fundamentales para cualquier prenda superior.',
-    duration: '15 min',
-    level: 'Intermedio',
-  };
+  recommendedTutorial: Tutorial | null = null;
 
   isCreateModalOpen = false;
+  isLoadingTutorial = true;
 
   ngOnInit() {
     this.loadUserData();
     this.loadMyProjects();
+    this.loadRandomTutorial();
   }
 
   get filteredProjects(): Project[] {
@@ -141,5 +140,38 @@ export class Inicio implements OnInit {
     if (this.carouselContainer) {
       this.carouselContainer.nativeElement.scrollBy({ left: 320, behavior: 'smooth' });
     }
+  }
+
+  private loadRandomTutorial() {
+    this.isLoadingTutorial = true;
+    // Pedimos la primera página con un límite generoso para tener variedad
+    this.tutorialService.getCatalog(1, 20).subscribe({
+      next: (response) => {
+        const tutorials = response.data.docs;
+        if (tutorials && tutorials.length > 0) {
+          // Elegimos un índice aleatorio del array devuelto
+          const randomIndex = Math.floor(Math.random() * tutorials.length);
+          this.recommendedTutorial = tutorials[randomIndex];
+        } else {
+          this.recommendedTutorial = null;
+        }
+        this.isLoadingTutorial = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.recommendedTutorial = null;
+        this.isLoadingTutorial = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  // Utilidad para formatear los minutos (ej: 90 -> "1h 30m")
+  formatTime(minutes: number): string {
+    if (!minutes) return '0 min';
+    if (minutes < 60) return `${minutes} min`;
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return m > 0 ? `${h}h ${m}m` : `${h}h`;
   }
 }
