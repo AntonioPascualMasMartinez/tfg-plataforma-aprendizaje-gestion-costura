@@ -64,18 +64,16 @@ export class Proyectos implements OnInit {
   }
 
   deleteProject(id: string) {
-    if (confirm('¿Estás seguro de que quieres eliminar este proyecto?')) {
-      this.projectService.deleteProject(id).subscribe({
-        next: () => {
-          // Si es el último elemento de la página y no es la primera, volvemos una atrás
-          if (this.projects.length === 1 && this.currentPage > 1) {
-            this.currentPage--;
-          }
-          this.loadProjects();
-        },
-        error: (err) => console.error('Error al eliminar:', err),
-      });
-    }
+    this.projectService.deleteProject(id).subscribe({
+      next: () => {
+        // Si es el último elemento de la página y no es la primera, volvemos una atrás
+        if (this.projects.length === 1 && this.currentPage > 1) {
+          this.currentPage--;
+        }
+        this.loadProjects();
+      },
+      error: (err) => console.error('Error al eliminar:', err),
+    });
   }
 
   changePage(newPage: number) {

@@ -2,7 +2,7 @@ import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser'; // 1. Importar sanitizer
 import { AuthService } from '../../../core/services/auth.service';
-
+import { ConfirmModalComponent } from '../../modals/confirm-modal/confirm-modal.component';
 // Opcional pero recomendado: Definir la interfaz para tipado estricto
 interface NavItem {
   label: string;
@@ -14,7 +14,7 @@ interface NavItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [RouterLink, RouterLinkActive, ConfirmModalComponent],
   templateUrl: './sidebar.html',
   styles: [
     `
@@ -40,6 +40,7 @@ export class Sidebar implements OnInit {
   private sanitizer = inject(DomSanitizer); // 3. Inyectar el servicio
 
   isLoadingLogout = false;
+  showLogoutModal = false;
 
   navItems: NavItem[] = [
     {
@@ -77,20 +78,30 @@ export class Sidebar implements OnInit {
     }));
   }
 
-  onLogout() {
+  confirmLogout() {
     this.isLoadingLogout = true;
     this.authService.logout().subscribe({
       next: () => {
         localStorage.removeItem('accessToken');
+        this.showLogoutModal = false; // Cerramos el modal al terminar
         this.router.navigate(['/auth/login']);
       },
       error: (err) => {
         console.error('Error al cerrar sesión', err);
+        this.showLogoutModal = false; // Cerramos en caso de error
         this.router.navigate(['/auth/login']);
       },
       complete: () => {
         this.isLoadingLogout = false;
       },
     });
+  }
+
+  requestLogout() {
+    this.showLogoutModal = true;
+  }
+
+  cancelLogout() {
+    this.showLogoutModal = false;
   }
 }

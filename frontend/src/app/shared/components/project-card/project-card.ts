@@ -2,16 +2,19 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Project } from '../../models/project.model';
 import { DatePipe, NgClass } from '@angular/common';
+import { ConfirmModalComponent } from '../../modals/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-project-card',
   standalone: true,
-  imports: [RouterLink, NgClass],
+  imports: [RouterLink, NgClass, ConfirmModalComponent],
   templateUrl: './project-card.html',
 })
 export class ProjectCardComponent {
   @Input({ required: true }) project!: Project;
   @Output() delete = new EventEmitter<string>();
+
+  showDeleteModal = false;
 
   get coverImage(): string | null {
     // 1. Prioridad: La nueva imagen de inspiración
@@ -42,9 +45,18 @@ export class ProjectCardComponent {
     }
   }
 
-  onDelete(event: Event) {
+  onDeleteRequest(event: Event) {
     event.preventDefault();
     event.stopPropagation();
+    this.showDeleteModal = true;
+  }
+
+  confirmDelete() {
     this.delete.emit(this.project._id);
+    this.showDeleteModal = false;
+  }
+
+  cancelDelete() {
+    this.showDeleteModal = false;
   }
 }

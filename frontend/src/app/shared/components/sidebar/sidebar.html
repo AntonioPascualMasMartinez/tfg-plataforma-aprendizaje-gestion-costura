@@ -55,7 +55,7 @@
 
   <div class="p-4 border-t border-border-main/10 mt-auto">
     <button
-      (click)="onLogout()"
+      (click)="requestLogout()"
       [disabled]="isLoadingLogout"
       class="flex items-center gap-3.5 px-4 py-3 w-full rounded-xl text-[14px] font-semibold text-muted hover:text-danger hover:bg-danger/10 transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-danger cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed group"
     >
@@ -137,3 +137,15 @@
     </a>
   }
 </nav>
+
+<app-confirm-modal
+  [isOpen]="showLogoutModal"
+  title="Cerrar sesión"
+  message="¿Estás seguro de que deseas salir de tu cuenta de Needly? Tendrás que volver a ingresar tus credenciales para acceder a tus proyectos."
+  confirmText="Sí, salir"
+  cancelText="Cancelar"
+  [isDestructive]="true"
+  [isLoading]="isLoadingLogout"
+  (confirm)="confirmLogout()"
+  (cancel)="cancelLogout()"
+></app-confirm-modal>

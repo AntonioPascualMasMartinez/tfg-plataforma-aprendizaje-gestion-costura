@@ -120,7 +120,7 @@
       </div>
 
       <button
-        (click)="onDelete($event)"
+        (click)="onDeleteRequest($event)"
         class="w-10 h-10 flex items-center justify-center text-muted hover:bg-danger/10 hover:text-danger rounded-xl transition-all"
         title="Eliminar proyecto"
       >
@@ -136,3 +136,14 @@
     </div>
   </div>
 </div>
+
+<app-confirm-modal
+  [isOpen]="showDeleteModal"
+  title="Eliminar diseño"
+  message="¿Estás seguro de que deseas eliminar este proyecto de costura permanentemente? Perderás todos los pasos, materiales y notas asociadas."
+  confirmText="Eliminar proyecto"
+  cancelText="Conservar"
+  [isDestructive]="true"
+  (confirm)="confirmDelete()"
+  (cancel)="cancelDelete()"
+></app-confirm-modal>
