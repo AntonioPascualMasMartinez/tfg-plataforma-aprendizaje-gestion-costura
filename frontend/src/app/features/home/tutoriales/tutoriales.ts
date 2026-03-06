@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { TutorialCardComponent } from '../../../shared/components/tutorial-card/tutorial-card';
 import { TutorialService } from '../../../core/services/tutorial.service';
 import { Tutorial } from '../../../shared/models/tutorial.model';
+import { TutorialDetailModalComponent } from '../../../shared/modals/tutorial-detail-modal/tutorial-detail-modal.component';
 
 @Component({
   selector: 'app-tutoriales',
   standalone: true,
-  imports: [CommonModule, TutorialCardComponent],
+  imports: [CommonModule, TutorialCardComponent, TutorialDetailModalComponent],
   templateUrl: './tutoriales.html',
 })
 export class Tutoriales implements OnInit {
@@ -22,6 +23,9 @@ export class Tutoriales implements OnInit {
   currentPage = 1;
   totalPages = 1;
   limit = 9; // Mostraremos 9 para encajar perfecto en el grid de 3 columnas (como proyectos)
+
+  selectedTutorial: Tutorial | null = null;
+  showDetailModal = false;
 
   // Configuración de filtros
   readonly categories = ['Todos', 'Bolsos', 'Monederos', 'Ropa', 'Hogar', 'Accesorios'];
@@ -72,5 +76,15 @@ export class Tutoriales implements OnInit {
       this.loadTutorials();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
+  }
+
+  openTutorialModal(tutorial: Tutorial) {
+    this.selectedTutorial = tutorial;
+    this.showDetailModal = true;
+  }
+
+  closeTutorialModal() {
+    this.showDetailModal = false;
+    this.selectedTutorial = null;
   }
 }

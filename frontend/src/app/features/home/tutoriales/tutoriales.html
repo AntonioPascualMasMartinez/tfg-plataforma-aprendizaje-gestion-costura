@@ -38,7 +38,6 @@
         </div>
       }
     </div>
-
   } @else if (errorMessage) {
     <div
       class="flex flex-col items-center justify-center py-20 bg-danger/5 rounded-[40px] border border-danger/10 text-center"
@@ -60,11 +59,11 @@
       <p class="text-[14px] text-muted">{{ errorMessage }}</p>
       <button (click)="loadTutorials()" class="mt-6 btn btn-primary px-6">Reintentar</button>
     </div>
-
   } @else if (tutorials.length > 0) {
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       @for (tutorial of tutorials; track tutorial._id) {
-        <app-tutorial-card [tutorial]="tutorial"></app-tutorial-card>
+        <app-tutorial-card [tutorial]="tutorial" (open)="openTutorialModal($event)">
+        </app-tutorial-card>
       }
     </div>
 
@@ -105,7 +104,6 @@
         </button>
       </div>
     }
-
   } @else {
     <div
       class="flex flex-col items-center justify-center py-20 text-center bg-surface rounded-[40px] border border-dashed border-border-main/30 shadow-sm"
@@ -131,3 +129,10 @@
     </div>
   }
 </div>
+
+@if (showDetailModal && selectedTutorial) {
+  <app-tutorial-detail-modal
+    [tutorial]="selectedTutorial"
+    (close)="closeTutorialModal()"
+  ></app-tutorial-detail-modal>
+}

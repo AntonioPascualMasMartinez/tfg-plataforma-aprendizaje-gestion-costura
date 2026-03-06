@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Tutorial } from '../../../shared/models/tutorial.model';
@@ -6,12 +6,13 @@ import { Tutorial } from '../../../shared/models/tutorial.model';
 @Component({
   selector: 'app-tutorial-card',
   standalone: true,
-  imports: [NgClass, RouterLink],
+  imports: [NgClass],
   templateUrl: './tutorial-card.html',
 })
 export class TutorialCardComponent {
   // Ahora recibimos el objeto de tutorial completo
   @Input({ required: true }) tutorial!: Tutorial;
+  @Output() open = new EventEmitter<Tutorial>();
 
   // Extraemos la imagen del primer paso que contenga una
   get coverImage(): string | null {
@@ -43,5 +44,9 @@ export class TutorialCardComponent {
     const h = Math.floor(mins / 60);
     const m = mins % 60;
     return m > 0 ? `${h}h ${m}m` : `${h}h`;
+  }
+
+  onCardClick() {
+    this.open.emit(this.tutorial);
   }
 }
