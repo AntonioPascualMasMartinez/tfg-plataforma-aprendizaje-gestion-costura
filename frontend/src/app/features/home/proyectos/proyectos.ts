@@ -8,6 +8,7 @@ import { ProjectService } from '../../../core/services/project.service';
 import { Project } from '../../../shared/models/project.model';
 import { ProjectCardComponent } from '../../../shared/components/project-card/project-card';
 
+import { ToastService } from '../../../core/services/toast.service';
 @Component({
   selector: 'app-proyectos',
   standalone: true,
@@ -17,6 +18,7 @@ import { ProjectCardComponent } from '../../../shared/components/project-card/pr
 export class Proyectos implements OnInit {
   private projectService = inject(ProjectService);
   private cdr = inject(ChangeDetectorRef);
+  private toastService = inject(ToastService);
 
   projects: Project[] = [];
   isLoading = true;
@@ -71,8 +73,12 @@ export class Proyectos implements OnInit {
           this.currentPage--;
         }
         this.loadProjects();
+        this.toastService.success('El diseño ha sido eliminado correctamente.');
       },
-      error: (err) => console.error('Error al eliminar:', err),
+      error: (err) => {
+        console.error('Error al eliminar:', err);
+        this.toastService.error('Hubo un problema al eliminar el proyecto. Inténtalo de nuevo.');
+      },
     });
   }
 
