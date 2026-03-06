@@ -1,28 +1,117 @@
 <article
-  class="group rounded-3xl overflow-hidden border border-border-main/15 dark:border-white/5 bg-surface dark:bg-surface/60 shadow-[0_14px_28px_rgba(0,0,0,0.06)] dark:shadow-none hover:shadow-[0_20px_40px_rgba(0,0,0,0.12)] dark:hover:shadow-[0_20px_40px_-15px_rgba(255,89,0,0.2)] hover:-translate-y-2 transition-all duration-300 cursor-pointer h-full"
+  class="group flex flex-col h-full bg-surface rounded-[20px] border border-border-main/15 overflow-hidden transition-all duration-300 ease-out hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_12px_30px_-10px_rgba(255,89,0,0.12)] relative cursor-pointer"
+  [routerLink]="['/home/tutoriales', tutorial._id]"
 >
-  <div class="relative h-64 overflow-hidden">
-    <div
-      class="absolute inset-0 bg-black/0 group-hover:bg-black/10 dark:group-hover:bg-white/5 transition-colors duration-300 z-10"
-    ></div>
+  <div class="relative h-48 w-full bg-surface-hover overflow-hidden shrink-0">
+    @if (coverImage) {
+      <img
+        [src]="coverImage"
+        [alt]="tutorial.title"
+        class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+      />
+      <div
+        class="absolute inset-0 bg-linear-to-t from-black/50 via-transparent to-transparent opacity-80"
+      ></div>
+    } @else {
+      <div
+        class="absolute inset-0 flex flex-col items-center justify-center bg-surface-hover transition-colors duration-500 group-hover:bg-primary/5"
+      >
+        <svg
+          class="w-10 h-10 mb-2 opacity-30 text-muted"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+          />
+        </svg>
+      </div>
+    }
 
-    <img
-      [src]="imageUrl"
-      [alt]="'Proyecto ' + title"
-      class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-    />
+    <div class="absolute top-3 left-3 z-10 flex gap-2">
+      <span
+        class="px-2.5 py-1 bg-surface text-text-main text-[10px] font-bold rounded-full shadow-sm uppercase tracking-wide border border-border-main/10"
+      >
+        {{ tutorial.category }}
+      </span>
+    </div>
+
+    <div class="absolute top-3 right-3 z-10">
+      <span
+        class="px-2.5 py-1 text-[10px] font-bold rounded-full shadow-sm uppercase tracking-wide border flex items-center justify-center"
+        [ngClass]="difficultyColorClass"
+      >
+        {{ tutorial.difficultyLevel }}
+      </span>
+    </div>
   </div>
 
-  <div
-    class="bg-transparent p-6 relative z-20 flex flex-col h-full border-t border-border-main/5 dark:border-white/5 rounded-b-3xl"
-  >
+  <div class="p-4 md:p-5 flex flex-col flex-1 relative bg-surface z-20">
     <h3
-      class="text-[20px] md:text-[22px] font-display font-semibold text-text-main mb-2 group-hover:text-primary transition-colors"
+      class="font-display font-bold text-text-main text-[19px] leading-tight group-hover:text-primary transition-colors line-clamp-2 mb-2"
     >
-      {{ title }}
+      {{ tutorial.title }}
     </h3>
-    <p class="text-[13px] md:text-[14px] text-muted leading-relaxed">
-      {{ description }}
+
+    <p class="text-[13px] text-muted mb-4 line-clamp-2 flex-1 leading-relaxed">
+      {{ tutorial.description }}
     </p>
+
+    <div class="flex items-center justify-between pt-3.5 border-t border-border-main/10 mt-auto">
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-1 text-muted" title="Tiempo estimado">
+          <svg
+            class="w-4 h-4 text-primary/80"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+          <span class="text-[12px] font-semibold">{{ formattedTime }}</span>
+        </div>
+
+        <div class="flex items-center gap-1 text-muted" title="Número de pasos">
+          <svg
+            class="w-4 h-4 text-primary/80"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"
+            />
+          </svg>
+          <span class="text-[12px] font-semibold">{{ tutorial.steps.length || 0 }}</span>
+        </div>
+      </div>
+
+      <span
+        class="text-[12px] font-bold text-primary flex items-center gap-1 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-300"
+      >
+        Ver detalles
+        <svg
+          class="w-3.5 h-3.5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="3"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+        </svg>
+      </span>
+    </div>
   </div>
 </article>

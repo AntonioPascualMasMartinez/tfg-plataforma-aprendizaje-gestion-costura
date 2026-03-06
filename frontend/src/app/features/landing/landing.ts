@@ -7,7 +7,9 @@ import { Footer } from '../../shared/components/footer/footer';
 
 import { ScrollAnimateDirective } from '../../shared/directives/scroll-animate.directive';
 
-import { TutorialCard } from '../../shared/components/tutorial-card/tutorial-card';
+import { Tutorial } from '../../shared/models/tutorial.model';
+
+import { TutorialCardComponent } from '../../shared/components/tutorial-card/tutorial-card';
 import { CommunityCard } from '../../shared/components/community-card/community-card';
 
 @Component({
@@ -18,7 +20,7 @@ import { CommunityCard } from '../../shared/components/community-card/community-
     Footer,
     NgClass,
     ScrollAnimateDirective,
-    TutorialCard,
+    TutorialCardComponent,
     CommunityCard,
   ],
   templateUrl: './landing.html',
@@ -32,21 +34,41 @@ export class Landing implements OnInit, OnDestroy {
     '/hero/hero-3.jpg',
   ];
 
-  tutorials = [
+  tutorials: any[] = [
+    // Tipado como 'any' o 'Partial<Tutorial>' para los datos mock de la landing
     {
-      imageUrl: '/hero/hero-1.jpg',
+      _id: 'mock-1',
       title: 'Zipper Pouch',
       description: 'El proyecto perfecto para iniciarte en la costura de accesorios.',
+      category: 'Monederos',
+      difficultyLevel: 'Principiante',
+      estimatedTime: 45,
+      steps: [{ order: 1, title: 'Inicio', description: '', mediaUrl: '/hero/hero-1.jpg' }],
     },
     {
-      imageUrl: '/hero/hero-2.jpg',
+      _id: 'mock-2',
       title: 'Tote Bag Reversible',
       description: 'Aprende a combinar telas y crear asas resistentes desde cero.',
+      category: 'Bolsos',
+      difficultyLevel: 'Principiante',
+      estimatedTime: 120,
+      steps: [
+        { order: 1, title: 'Inicio', description: '', mediaUrl: '/hero/hero-2.jpg' },
+        { order: 2, title: 'Paso 2', description: '', mediaUrl: null },
+      ],
     },
     {
-      imageUrl: '/hero/hero-3.jpg',
+      _id: 'mock-3',
       title: 'Falda Midi',
       description: 'Conceptos básicos de patronaje y colocación de cremalleras invisibles.',
+      category: 'Ropa',
+      difficultyLevel: 'Intermedio',
+      estimatedTime: 180,
+      steps: [
+        { order: 1, title: 'Inicio', description: '', mediaUrl: '/hero/hero-3.jpg' },
+        { order: 2, title: 'Medidas', description: '', mediaUrl: null },
+        { order: 3, title: 'Corte', description: '', mediaUrl: null },
+      ],
     },
   ];
 
