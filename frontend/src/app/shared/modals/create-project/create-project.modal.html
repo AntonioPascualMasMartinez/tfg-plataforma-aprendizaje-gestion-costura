@@ -367,9 +367,9 @@
 
         <div
           [class.hidden]="currentStep !== 2"
-          class="animate-in slide-in-from-right-4 duration-300 h-full"
+          class="animate-in slide-in-from-right-4 duration-300 h-full flex flex-col"
         >
-          <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center justify-between mb-4 shrink-0">
             <div>
               <h3 class="text-[18px] font-bold text-text-main">Lista de Materiales</h3>
               <p class="text-[14px] font-medium text-muted mt-1">
@@ -379,7 +379,7 @@
             <button
               type="button"
               (click)="addMaterial()"
-              class="text-primary text-[14px] font-bold flex items-center gap-1.5 bg-primary/10 hover:bg-primary/20 px-4 py-2.5 rounded-xl transition-colors"
+              class="text-primary text-[14px] font-bold flex items-center gap-1.5 bg-primary/10 hover:bg-primary/20 px-4 py-2.5 rounded-xl transition-colors shrink-0"
             >
               <svg
                 class="w-4 h-4"
@@ -390,41 +390,89 @@
               >
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
-              Añadir material
+              Añadir manual
             </button>
           </div>
 
-          <div formArrayName="materials" class="space-y-3">
+          <div class="mb-6 p-4 rounded-xl bg-surface border border-border-main/10 shrink-0">
+            <h4
+              class="text-[12px] font-bold text-text-main uppercase tracking-wider mb-3 flex items-center gap-2"
+            >
+              <svg class="w-4 h-4 text-warning" fill="currentColor" viewBox="0 0 24 24">
+                <path
+                  d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-1.81.181l1.323 5.378c.135.549-.462.981-.926.697l-4.721-2.887a.563.563 0 00-.598 0l-4.721 2.887c-.464.284-1.061-.148-.926-.697l1.323-5.378a.563.563 0 00-.181-.555L2.043 10.385c-.38-.325-.178-.948.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z"
+                />
+              </svg>
+              Sugerencias rápidas
+            </h4>
+            <div class="flex flex-wrap gap-2.5">
+              @for (mat of popularMaterials; track mat.name) {
+                <button
+                  type="button"
+                  (click)="addPredefinedMaterial(mat.name, mat.defaultQuantity)"
+                  class="group flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-bold border border-border-main/15 bg-bg text-muted hover:text-primary hover:border-primary/40 hover:bg-primary/5 transition-all shadow-sm"
+                  title="Añadir {{ mat.name }}"
+                >
+                  <svg
+                    class="w-3.5 h-3.5 text-muted group-hover:text-primary transition-colors"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="3"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M12 4.5v15m7.5-7.5h-15"
+                    />
+                  </svg>
+                  {{ mat.name }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <div
+            formArrayName="materials"
+            class="space-y-3 overflow-y-auto custom-scrollbar flex-1 pb-2"
+          >
             @for (material of materials.controls; track $index) {
               <div
                 [formGroupName]="$index"
-                class="flex items-center gap-3 bg-surface p-3 rounded-xl border border-border-main/20 shadow-sm"
+                class="flex items-center gap-3 bg-surface p-3 rounded-xl border border-border-main/20 shadow-sm animate-in slide-in-from-left-4 duration-200"
               >
                 <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <input
-                    type="text"
-                    formControlName="name"
-                    placeholder="Ej: Piel sintética negra"
-                    class="w-full h-11 px-4 text-[14px] rounded-lg border border-border-main/20 bg-bg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-                  />
-                  <input
-                    type="text"
-                    formControlName="quantity"
-                    placeholder="Ej: 1 metro"
-                    class="w-full h-11 px-4 text-[14px] rounded-lg border border-border-main/20 bg-bg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-                  />
+                  <div class="relative">
+                    <label class="sr-only">Nombre del material</label>
+                    <input
+                      type="text"
+                      formControlName="name"
+                      placeholder="Ej: Piel sintética negra"
+                      class="w-full h-11 px-4 text-[14px] rounded-lg border border-border-main/20 bg-bg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                    />
+                  </div>
+                  <div class="relative">
+                    <label class="sr-only">Cantidad</label>
+                    <input
+                      type="text"
+                      formControlName="quantity"
+                      placeholder="Ej: 1 metro"
+                      class="w-full h-11 px-4 text-[14px] rounded-lg border border-border-main/20 bg-bg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium"
+                    />
+                  </div>
                 </div>
                 <button
                   type="button"
                   (click)="removeMaterial($index)"
                   class="w-11 h-11 shrink-0 flex items-center justify-center rounded-lg text-muted hover:bg-danger hover:text-white transition-all outline-none"
+                  title="Eliminar este material"
                 >
                   <svg
                     class="w-5 h-5"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
-                    stroke-width="2"
+                    stroke-width="2.5"
                   >
                     <path
                       stroke-linecap="round"
@@ -438,11 +486,10 @@
 
             @if (materials.length === 0) {
               <div
-                class="flex flex-col items-center justify-center py-12 bg-surface rounded-2xl border-2 border-dashed border-border-main/20 text-center cursor-pointer hover:bg-surface-hover hover:border-primary/30 transition-all"
-                (click)="addMaterial()"
+                class="flex flex-col items-center justify-center py-10 bg-surface rounded-2xl border-2 border-dashed border-border-main/20 text-center"
               >
                 <div
-                  class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-3"
+                  class="w-12 h-12 bg-border-main/10 rounded-full flex items-center justify-center text-muted mb-3"
                 >
                   <svg
                     class="w-6 h-6"
@@ -454,18 +501,14 @@
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      d="M14.121 7.629A3 3 0 009.005 9.15l2.474 5.772a.75.75 0 001.376-.084l2.128-4.966a3 3 0 00-.862-2.243z"
-                    />
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M15 12.75V15a3 3 0 01-3 3h-1.5a3 3 0 01-3-3v-2.25"
+                      d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"
                     />
                   </svg>
                 </div>
-                <h4 class="font-bold text-text-main text-[16px] mb-1">Sin materiales</h4>
-                <p class="text-[14px] font-medium text-muted">
-                  Añade los elementos necesarios para tu diseño
+                <h4 class="font-bold text-text-main text-[15px] mb-1">Sin materiales añadidos</h4>
+                <p class="text-[13px] font-medium text-muted max-w-sm mx-auto">
+                  Selecciona una de las sugerencias de arriba o añade tus propios materiales
+                  manualmente.
                 </p>
               </div>
             }

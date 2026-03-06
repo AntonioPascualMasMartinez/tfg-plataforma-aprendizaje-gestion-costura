@@ -3,12 +3,12 @@ import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } fr
 import { ProjectService } from '../../../core/services/project.service';
 import { UploadService } from '../../../core/services/upload.service';
 import { CreateProjectPayload, Project } from '../../models/project.model';
-import { NgClass } from '@angular/common'; // Asegúrate de importar NgClass
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-create-project-modal',
   standalone: true,
-  imports: [ReactiveFormsModule, NgClass], // Añadido NgClass
+  imports: [ReactiveFormsModule, NgClass],
   templateUrl: './create-project.modal.html',
 })
 export class CreateProjectModal implements OnInit {
@@ -34,21 +34,30 @@ export class CreateProjectModal implements OnInit {
   readonly difficulties = ['Fácil', 'Intermedio', 'Avanzado'];
   readonly statuses = ['Planificado', 'En curso', 'Pausado'];
 
+  // NUEVO: Materiales populares para sugerencias rápidas
+  readonly popularMaterials = [
+    { name: 'Hilo de poliéster', defaultQuantity: '1 bobina' },
+    { name: 'Entretela termoadhesiva', defaultQuantity: '1/2 metro' },
+    { name: 'Cremallera', defaultQuantity: '1 ud' },
+    { name: 'Cinta al bies', defaultQuantity: '2 metros' },
+    { name: 'Agujas universales', defaultQuantity: '1 paq.' },
+    { name: 'Botones', defaultQuantity: '3 uds' },
+  ];
+
   projectForm: FormGroup = this.fb.group({
     title: ['', [Validators.required, Validators.maxLength(100)]],
-    projectType: ['Nuevo', [Validators.required]], // Por defecto 'Nuevo'
+    projectType: ['Nuevo', [Validators.required]],
     category: ['', [Validators.required]],
     difficulty: ['', [Validators.required]],
     inspirationImageUrl: [null],
     description: [''],
-    status: ['Planificado'], // Por defecto 'Planificado'
+    status: ['Planificado'],
     isPublic: [true],
     materials: this.fb.array([]),
   });
 
   ngOnInit() {}
 
-  // --- NUEVO: Helper para actualizar controles desde la UI personalizada ---
   setControlValue(controlName: string, value: string) {
     const control = this.projectForm.get(controlName);
     if (control) {
@@ -65,6 +74,15 @@ export class CreateProjectModal implements OnInit {
     const materialForm = this.fb.group({
       name: ['', Validators.required],
       quantity: ['', Validators.required],
+    });
+    this.materials.push(materialForm);
+  }
+
+  // NUEVO: Método para añadir material desde las sugerencias
+  addPredefinedMaterial(name: string, quantity: string) {
+    const materialForm = this.fb.group({
+      name: [name, Validators.required],
+      quantity: [quantity, Validators.required],
     });
     this.materials.push(materialForm);
   }
