@@ -1,20 +1,21 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser'; // 1. Importar sanitizer
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { NgClass, isPlatformBrowser } from '@angular/common'; // <-- Importar NgClass e isPlatformBrowser
 import { AuthService } from '../../../core/services/auth.service';
 import { ConfirmModalComponent } from '../../modals/confirm-modal/confirm-modal.component';
-// Opcional pero recomendado: Definir la interfaz para tipado estricto
+
 interface NavItem {
   label: string;
   path: string;
   icon: string;
-  safeIcon?: SafeHtml; // 2. Añadir propiedad para el HTML seguro
+  safeIcon?: SafeHtml;
 }
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, ConfirmModalComponent],
+  imports: [RouterLink, RouterLinkActive, ConfirmModalComponent, NgClass], // <-- Añadir NgClass
   templateUrl: './sidebar.html',
   styles: [
     `
@@ -37,10 +38,12 @@ interface NavItem {
 export class Sidebar implements OnInit {
   private authService = inject(AuthService);
   private router = inject(Router);
-  private sanitizer = inject(DomSanitizer); // 3. Inyectar el servicio
+  private sanitizer = inject(DomSanitizer);
+  private platformId = inject(PLATFORM_ID); // <-- Inyectar PLATFORM_ID
 
   isLoadingLogout = false;
   showLogoutModal = false;
+  isDarkMode = false; // <-- Estado del tema
 
   navItems: NavItem[] = [
     {
@@ -70,12 +73,36 @@ export class Sidebar implements OnInit {
     },
   ];
 
-  // 4. Convertir los strings a HTML de confianza al iniciar el componente
   ngOnInit() {
     this.navItems = this.navItems.map((item) => ({
       ...item,
       safeIcon: this.sanitizer.bypassSecurityTrustHtml(item.icon),
     }));
+
+    // <-- Lógica de inicialización del tema
+    if (isPlatformBrowser(this.platformId)) {
+      const savedTheme = localStorage.getItem('theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+      if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+        this.isDarkMode = true;
+        document.documentElement.classList.add('dark');
+      }
+    }
+  }
+
+  // <-- Nuevo método para alternar el tema
+  toggleTheme() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.isDarkMode = !this.isDarkMode;
+      if (this.isDarkMode) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+    }
   }
 
   confirmLogout() {
@@ -83,12 +110,12 @@ export class Sidebar implements OnInit {
     this.authService.logout().subscribe({
       next: () => {
         localStorage.removeItem('accessToken');
-        this.showLogoutModal = false; // Cerramos el modal al terminar
+        this.showLogoutModal = false;
         this.router.navigate(['/auth/login']);
       },
       error: (err) => {
         console.error('Error al cerrar sesión', err);
-        this.showLogoutModal = false; // Cerramos en caso de error
+        this.showLogoutModal = false;
         this.router.navigate(['/auth/login']);
       },
       complete: () => {
