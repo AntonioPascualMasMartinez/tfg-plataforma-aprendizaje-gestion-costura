@@ -903,7 +903,7 @@
     <div
       class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-4 lg:gap-10 items-center pt-8 pb-12"
     >
-      @for (post of communityPosts; track post.authorName; let i = $index) {
+      @for (post of communityPosts; track post._id; let i = $index) {
         <div
           class="relative transition-all duration-500 ease-out hover:z-50 group/polaroid cursor-pointer"
           [ngClass]="{
@@ -917,12 +917,10 @@
             class="absolute -inset-0.5 bg-linear-to-br from-like/0 to-primary/0 group-hover/polaroid:from-like/20 group-hover/polaroid:to-primary/20 rounded-4xl blur opacity-0 group-hover/polaroid:opacity-100 transition duration-500 z-0"
           ></div>
 
-          <div class="relative z-10 w-full h-full">
+          <div class="relative z-10 w-full h-full bg-surface rounded-2xl">
             <app-community-card
-              [imageUrl]="post.imageUrl"
-              [authorInitials]="post.authorInitials"
-              [authorName]="post.authorName"
-              [likes]="post.likes"
+              [project]="post"
+              (like)="handleMockLike($event)"
               class="block w-full h-full"
             ></app-community-card>
           </div>

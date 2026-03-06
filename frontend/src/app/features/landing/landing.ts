@@ -1,16 +1,16 @@
 import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { NgClass } from '@angular/common'; // Importante para las clases dinámicas
+import { NgClass } from '@angular/common';
 
 import { Navbar } from '../../shared/components/navbar/navbar';
 import { Footer } from '../../shared/components/footer/footer';
-
 import { ScrollAnimateDirective } from '../../shared/directives/scroll-animate.directive';
-
-import { Tutorial } from '../../shared/models/tutorial.model';
-
 import { TutorialCardComponent } from '../../shared/components/tutorial-card/tutorial-card';
-import { CommunityCard } from '../../shared/components/community-card/community-card';
+// IMPORTAMOS LA INTERFAZ:
+import {
+  CommunityCardComponent,
+  CommunityProject,
+} from '../../shared/components/community-card/community-card.component';
 
 @Component({
   selector: 'app-landing',
@@ -21,21 +21,16 @@ import { CommunityCard } from '../../shared/components/community-card/community-
     NgClass,
     ScrollAnimateDirective,
     TutorialCardComponent,
-    CommunityCard,
+    CommunityCardComponent,
   ],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
 })
 export class Landing implements OnInit, OnDestroy {
-  // Array con las rutas de tus imágenes (asegúrate de tenerlas en tu carpeta public/assets)
-  heroImages: string[] = [
-    '/hero/hero-1.jpg', // Reemplaza con tus imágenes reales
-    '/hero/hero-2.jpg',
-    '/hero/hero-3.jpg',
-  ];
+  heroImages: string[] = ['/hero/hero-1.jpg', '/hero/hero-2.jpg', '/hero/hero-3.jpg'];
 
   tutorials: any[] = [
-    // Tipado como 'any' o 'Partial<Tutorial>' para los datos mock de la landing
+    /* ... se mantienen tus tutoriales igual ... */
     {
       _id: 'mock-1',
       title: 'Zipper Pouch',
@@ -72,25 +67,41 @@ export class Landing implements OnInit, OnDestroy {
     },
   ];
 
-  communityPosts = [
+  // 1. ADAPTAMOS LOS DATOS MOCK AL MODELO COMMUNITYPROJECT
+  communityPosts: CommunityProject[] = [
     {
-      imageUrl: '/hero/hero-1.jpg',
-      authorInitials: 'MG',
-      authorName: 'Mark G.',
-      likes: 24,
-    },
+      _id: 'landing-post-1',
+      title: 'Chaqueta Denim Vintage',
+      inspirationImageUrl: '/hero/hero-1.jpg',
+      category: 'Ropa',
+      difficulty: 'Intermedio',
+      status: 'Finalizado',
+      likesCount: 24,
+      isLikedLocally: false,
+      ownerId: { displayName: 'Mark G.', avatar: '' } as any,
+    } as CommunityProject,
     {
-      imageUrl: '/hero/hero-2.jpg',
-      authorInitials: 'LC',
-      authorName: 'Laura C.',
-      likes: 156,
-    },
+      _id: 'landing-post-2',
+      title: 'Bolso de Lino Natural',
+      inspirationImageUrl: '/hero/hero-2.jpg',
+      category: 'Accesorios',
+      difficulty: 'Fácil',
+      status: 'Finalizado',
+      likesCount: 156,
+      isLikedLocally: false,
+      ownerId: { displayName: 'Laura C.', avatar: '' } as any,
+    } as CommunityProject,
     {
-      imageUrl: '/hero/hero-3.jpg',
-      authorInitials: 'AP',
-      authorName: 'Ana P.',
-      likes: 89,
-    },
+      _id: 'landing-post-3',
+      title: 'Vestido Floral de Verano',
+      inspirationImageUrl: '/hero/hero-3.jpg',
+      category: 'Ropa',
+      difficulty: 'Avanzado',
+      status: 'Finalizado',
+      likesCount: 89,
+      isLikedLocally: false,
+      ownerId: { displayName: 'Ana P.', avatar: '' } as any,
+    } as CommunityProject,
   ];
 
   currentImageIndex: number = 0;
@@ -101,29 +112,24 @@ export class Landing implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    // Limpiamos el intervalo si cambiamos de página para evitar fugas de memoria
     if (this.imageInterval) {
       clearInterval(this.imageInterval);
     }
   }
 
   startImageTransition() {
-    // Cambia la imagen cada 5 segundos
     this.imageInterval = setInterval(() => {
       this.currentImageIndex = (this.currentImageIndex + 1) % this.heroImages.length;
     }, 5000);
   }
 
-  // Permite al usuario cambiar la imagen manualmente al hacer clic en los puntos
   setCurrentImage(index: number) {
     this.currentImageIndex = index;
-    // Reiniciamos el temporizador para que no cambie justo después de hacer clic
     clearInterval(this.imageInterval);
     this.startImageTransition();
   }
 
-  // --- LÓGICA DEL CARRUSEL DE TUTORIALES ---
-  activeTutorialIndex: number = 1; // Empezamos con el del medio enfocado
+  activeTutorialIndex: number = 1;
 
   setActiveTutorial(index: number) {
     this.activeTutorialIndex = index;
@@ -142,15 +148,22 @@ export class Landing implements OnInit, OnDestroy {
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
-    // Calculamos la posición actual
     const scrollPosition = window.scrollY || document.documentElement.scrollTop || 0;
-    // Calculamos la altura total scrolleable
     const windowHeight =
       document.documentElement.scrollHeight - document.documentElement.clientHeight;
 
-    // Evitamos división por cero y sacamos el porcentaje (0 a 100)
     if (windowHeight > 0) {
       this.scrollProgress = (scrollPosition / windowHeight) * 100;
     }
+  }
+
+  // 2. FUNCIÓN PARA SIMULAR EL LIKE EN LA LANDING
+  handleMockLike(payload: { project: CommunityProject; event: Event }) {
+    payload.event.preventDefault();
+    payload.event.stopPropagation();
+
+    const project = payload.project;
+    project.isLikedLocally = !project.isLikedLocally;
+    project.likesCount = (project.likesCount || 0) + (project.isLikedLocally ? 1 : -1);
   }
 }

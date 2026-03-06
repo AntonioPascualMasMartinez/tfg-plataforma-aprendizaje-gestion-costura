@@ -1,21 +1,17 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { FormsModule } from '@angular/forms'; // Necesario para ngModel en el buscador
+import { FormsModule } from '@angular/forms';
 import { ProjectService } from '../../../core/services/project.service';
 import { CommunityService } from '../../../core/services/community.service';
-import { Project } from '../../../shared/models/project.model';
-import { User } from '../../../shared/models/user.model';
-
-// Extendemos localmente la interfaz para manejar el estado visual del Like
-interface CommunityProject extends Project {
-  likesCount?: number;
-  isLikedLocally?: boolean;
-}
+import {
+  CommunityCardComponent,
+  CommunityProject,
+} from '../../../shared/components/community-card/community-card.component'; // <-- NUEVO
 
 @Component({
   selector: 'app-comunidad',
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, CommunityCardComponent], // <-- AÑADIR A IMPORTS
   templateUrl: './comunidad.html',
   styleUrl: './comunidad.scss',
 })
@@ -25,7 +21,7 @@ export class Comunidad implements OnInit {
 
   projects: CommunityProject[] = [];
   currentPage = 1;
-  limit = 12; // Un buen número para grids de 1, 2, 3 o 4 columnas
+  limit = 12;
 
   isLoading = true;
   isLoadingMore = false;
@@ -51,7 +47,6 @@ export class Comunidad implements OnInit {
       next: (response) => {
         const newProjects = response.data.docs as CommunityProject[];
 
-        // Inicializamos valores visuales para evitar undefined
         newProjects.forEach((p) => {
           if (p.likesCount === undefined) p.likesCount = 0;
           p.isLikedLocally = false;
@@ -63,20 +58,18 @@ export class Comunidad implements OnInit {
           this.projects = [...this.projects, ...newProjects];
         }
 
-        // Asumiendo que tu PaginatedResult tiene estas propiedades (ajusta si es necesario)
         this.hasMore = response.data.hasNextPage ?? newProjects.length === this.limit;
         this.isLoading = false;
         this.isLoadingMore = false;
       },
       error: (err) => {
-        console.error('Error cargando el feed público', err);
+        console.error('Error cargando el feed', err);
         this.isLoading = false;
         this.isLoadingMore = false;
       },
     });
   }
 
-  // Búsqueda con debounce para no saturar la API en cada pulsación de tecla
   onSearchChange() {
     if (this.searchTimeout) {
       clearTimeout(this.searchTimeout);
@@ -93,40 +86,23 @@ export class Comunidad implements OnInit {
     }
   }
 
-  likeProject(project: CommunityProject, event: Event) {
-    event.stopPropagation(); // Evita que se dispare la navegación de la tarjeta
+  // Modificado para recibir el payload del evento
+  handleLike(payload: { project: CommunityProject; event: Event }) {
+    const { project, event } = payload;
+    event.stopPropagation();
     event.preventDefault();
 
-    // Actualización optimista: cambiamos la UI antes de recibir la respuesta
     project.isLikedLocally = true;
     project.likesCount = (project.likesCount || 0) + 1;
 
     this.communityService.likeProject(project._id).subscribe({
       next: (response) => {
-        // Sincronizamos con el dato real del servidor
         project.likesCount = response.data.likesCount;
       },
       error: () => {
-        // Revertimos en caso de fallo
         project.isLikedLocally = false;
         project.likesCount = (project.likesCount || 1) - 1;
       },
     });
-  }
-
-  // Utilidad para extraer el nombre del autor cuando está poblado
-  getAuthorName(ownerId: string | Partial<User>): string {
-    if (typeof ownerId === 'object' && ownerId !== null && 'displayName' in ownerId) {
-      return ownerId.displayName || 'Costurero Anónimo';
-    }
-    return 'Costurero Anónimo';
-  }
-
-  // Utilidad para extraer el avatar del autor
-  getAuthorAvatar(ownerId: string | Partial<User>): string {
-    if (typeof ownerId === 'object' && ownerId !== null && 'avatar' in ownerId && ownerId.avatar) {
-      return ownerId.avatar;
-    }
-    return '/assets/default-avatar.png'; // Asegúrate de tener esta imagen o usa un placeholder
   }
 }
