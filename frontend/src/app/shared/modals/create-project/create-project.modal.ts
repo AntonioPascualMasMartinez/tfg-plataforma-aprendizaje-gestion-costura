@@ -3,11 +3,12 @@ import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } fr
 import { ProjectService } from '../../../core/services/project.service';
 import { UploadService } from '../../../core/services/upload.service';
 import { CreateProjectPayload, Project } from '../../models/project.model';
+import { NgClass } from '@angular/common'; // Asegúrate de importar NgClass
 
 @Component({
   selector: 'app-create-project-modal',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, NgClass], // Añadido NgClass
   templateUrl: './create-project.modal.html',
 })
 export class CreateProjectModal implements OnInit {
@@ -28,19 +29,33 @@ export class CreateProjectModal implements OnInit {
   currentStep = 1;
   totalSteps = 2;
 
+  // Opciones predefinidas
+  readonly categories = ['Bolsos', 'Carteras', 'Monederos'];
+  readonly difficulties = ['Fácil', 'Intermedio', 'Avanzado'];
+  readonly statuses = ['Planificado', 'En curso', 'Pausado'];
+
   projectForm: FormGroup = this.fb.group({
     title: ['', [Validators.required, Validators.maxLength(100)]],
-    projectType: ['', [Validators.required]],
+    projectType: ['Nuevo', [Validators.required]], // Por defecto 'Nuevo'
     category: ['', [Validators.required]],
     difficulty: ['', [Validators.required]],
     inspirationImageUrl: [null],
     description: [''],
-    status: ['Planificado'],
+    status: ['Planificado'], // Por defecto 'Planificado'
     isPublic: [true],
     materials: this.fb.array([]),
   });
 
   ngOnInit() {}
+
+  // --- NUEVO: Helper para actualizar controles desde la UI personalizada ---
+  setControlValue(controlName: string, value: string) {
+    const control = this.projectForm.get(controlName);
+    if (control) {
+      control.setValue(value);
+      control.markAsTouched();
+    }
+  }
 
   get materials() {
     return this.projectForm.get('materials') as FormArray;

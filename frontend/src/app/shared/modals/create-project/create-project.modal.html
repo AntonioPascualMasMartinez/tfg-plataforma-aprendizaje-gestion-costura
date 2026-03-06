@@ -2,26 +2,26 @@
   class="fixed inset-0 z-50 flex items-center justify-center bg-text-main/40 backdrop-blur-sm p-4 animate-in fade-in duration-200"
 >
   <div
-    class="bg-surface w-full max-w-4xl rounded-[28px] shadow-2xl border border-border-main/10 flex flex-col max-h-[90vh] animate-in slide-in-from-bottom-8 duration-300"
+    class="bg-surface w-full max-w-5xl rounded-[28px] shadow-2xl border border-border-main/10 flex flex-col max-h-[90vh] animate-in slide-in-from-bottom-8 duration-300"
   >
-    <header class="px-6 py-5 border-b border-border-main/10 shrink-0">
-      <div class="flex items-center justify-between mb-3">
+    <header class="px-6 md:px-8 py-5 border-b border-border-main/10 shrink-0">
+      <div class="flex items-center justify-between mb-4">
         <div>
-          <h2 class="text-[22px] font-display font-bold text-text-main leading-none mb-1.5">
-            Nuevo Proyecto
+          <h2 class="text-[24px] font-display font-bold text-text-main leading-none mb-2">
+            Nuevo Diseño
           </h2>
-          <p class="text-[13px] font-medium text-muted">
+          <p class="text-[14px] font-medium text-muted">
             Paso {{ currentStep }} de {{ totalSteps }}:
             {{
               currentStep === 1
-                ? 'Detalles y planificación del diseño'
-                : 'Lista de materiales a utilizar'
+                ? 'Configura los detalles principales de tu proyecto'
+                : 'Añade la lista de materiales a utilizar'
             }}
           </p>
         </div>
         <button
           (click)="closeModal()"
-          class="w-9 h-9 flex items-center justify-center rounded-full bg-surface-hover/50 hover:bg-surface-hover text-muted hover:text-text-main transition-colors outline-none"
+          class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-hover hover:bg-danger/10 text-muted hover:text-danger transition-colors outline-none"
         >
           <svg
             class="w-5 h-5"
@@ -44,11 +44,11 @@
       </div>
     </header>
 
-    <div class="p-6 overflow-y-auto custom-scrollbar flex-1 bg-surface/50">
+    <div class="p-6 md:p-8 overflow-y-auto custom-scrollbar flex-1 bg-surface/30">
       <form [formGroup]="projectForm" id="projectForm" (ngSubmit)="onSubmit()" class="h-full">
         @if (errorMessage) {
           <div
-            class="mb-5 p-3.5 rounded-xl bg-danger/10 border border-danger/20 text-danger text-[13px] font-bold flex items-center gap-2.5 animate-in fade-in slide-in-from-top-2"
+            class="mb-6 p-4 rounded-xl bg-danger/10 border border-danger/20 text-danger text-[14px] font-bold flex items-center gap-3 animate-in fade-in slide-in-from-top-2"
           >
             <svg
               class="w-5 h-5 shrink-0"
@@ -71,188 +71,175 @@
           [class.hidden]="currentStep !== 1"
           class="animate-in slide-in-from-right-4 duration-300 h-full"
         >
-          <div class="grid grid-cols-1 md:grid-cols-12 gap-6 h-full">
-            <div class="md:col-span-7 space-y-4">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 h-full">
+            <div class="lg:col-span-7 flex flex-col gap-6">
               <div>
-                <label for="title" class="block text-[13px] font-bold text-text-main mb-1.5"
-                  >Título del proyecto <span class="text-danger">*</span></label
-                >
+                <label for="title" class="block text-[14px] font-bold text-text-main mb-2">
+                  Título del proyecto <span class="text-danger">*</span>
+                </label>
                 <input
                   type="text"
                   id="title"
                   formControlName="title"
-                  placeholder="Ej: Vestido de lino cruzado"
-                  class="w-full h-11 px-4 rounded-xl border border-border-main/20 bg-surface text-[14px] text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium placeholder:text-muted/50"
+                  placeholder="Ej: Cartera de cuero minimalista"
+                  class="w-full h-12 px-4 rounded-xl border border-border-main/20 bg-surface text-[15px] text-text-main outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-medium placeholder:text-muted/50"
                   [class.border-danger]="
                     projectForm.get('title')?.invalid && projectForm.get('title')?.touched
                   "
                 />
               </div>
 
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label for="projectType" class="block text-[13px] font-bold text-text-main mb-1.5"
-                    >Tipo <span class="text-danger">*</span></label
-                  >
-                  <div class="relative">
-                    <select
-                      id="projectType"
-                      formControlName="projectType"
-                      class="w-full h-11 pl-4 pr-10 rounded-xl border border-border-main/20 bg-surface text-[14px] text-text-main font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
-                      [class.border-danger]="
-                        projectForm.get('projectType')?.invalid &&
-                        projectForm.get('projectType')?.touched
-                      "
-                    >
-                      <option value="" disabled selected>Seleccionar...</option>
-                      <option value="Nuevo">Nuevo</option>
-                      <option value="Comenzado desde Tutorial">Desde Tutorial</option>
-                    </select>
-                    <div
-                      class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-muted"
-                    >
-                      <svg
-                        class="w-4 h-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2.5"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <label for="category" class="block text-[13px] font-bold text-text-main mb-1.5"
-                    >Categoría <span class="text-danger">*</span></label
-                  >
-                  <input
-                    type="text"
-                    id="category"
-                    formControlName="category"
-                    placeholder="Ej: Ropa"
-                    class="w-full h-11 px-4 rounded-xl border border-border-main/20 bg-surface text-[14px] text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium placeholder:text-muted/50"
-                    [class.border-danger]="
-                      projectForm.get('category')?.invalid && projectForm.get('category')?.touched
-                    "
-                  />
-                </div>
-              </div>
-
-              <div class="grid grid-cols-2 gap-4">
-                <div>
-                  <label for="difficulty" class="block text-[13px] font-bold text-text-main mb-1.5"
-                    >Dificultad <span class="text-danger">*</span></label
-                  >
-                  <div class="relative">
-                    <select
-                      id="difficulty"
-                      formControlName="difficulty"
-                      class="w-full h-11 pl-4 pr-10 rounded-xl border border-border-main/20 bg-surface text-[14px] text-text-main font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
-                      [class.border-danger]="
-                        projectForm.get('difficulty')?.invalid &&
-                        projectForm.get('difficulty')?.touched
-                      "
-                    >
-                      <option value="" disabled selected>Nivel...</option>
-                      <option value="Fácil">Fácil</option>
-                      <option value="Intermedio">Intermedio</option>
-                      <option value="Avanzado">Avanzado</option>
-                    </select>
-                    <div
-                      class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-muted"
-                    >
-                      <svg
-                        class="w-4 h-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2.5"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <label for="status" class="block text-[13px] font-bold text-text-main mb-1.5"
-                    >Estado inicial</label
-                  >
-                  <div class="relative">
-                    <select
-                      id="status"
-                      formControlName="status"
-                      class="w-full h-11 pl-4 pr-10 rounded-xl border border-border-main/20 bg-surface text-[14px] text-text-main font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
-                    >
-                      <option value="Planificado">Planificado</option>
-                      <option value="En curso">En curso</option>
-                      <option value="Pausado">Pausado</option>
-                    </select>
-                    <div
-                      class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-muted"
-                    >
-                      <svg
-                        class="w-4 h-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        stroke-width="2.5"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
-                        />
-                      </svg>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <div class="pt-2">
-                <label
-                  class="flex items-center gap-3 h-11 px-4 rounded-xl border border-border-main/20 bg-surface cursor-pointer hover:border-primary/50 transition-colors group w-full sm:w-fit"
+              <div>
+                <label class="block text-[14px] font-bold text-text-main mb-2"
+                  >Origen del diseño</label
                 >
-                  <input
-                    type="checkbox"
-                    formControlName="isPublic"
-                    class="w-4 h-4 rounded border-border-main/30 text-primary focus:ring-primary cursor-pointer accent-primary"
-                  />
-                  <span
-                    class="text-[13px] text-text-main font-bold group-hover:text-primary transition-colors"
-                    >Proyecto público para la comunidad</span
+                <div
+                  class="flex p-1.5 bg-surface-hover rounded-xl border border-border-main/10 relative"
+                >
+                  <button
+                    type="button"
+                    (click)="setControlValue('projectType', 'Nuevo')"
+                    class="flex-1 py-2.5 text-[14px] font-bold rounded-lg transition-all duration-300 z-10"
+                    [ngClass]="
+                      projectForm.get('projectType')?.value === 'Nuevo'
+                        ? 'bg-primary text-white shadow-md'
+                        : 'text-muted hover:text-text-main hover:bg-surface/50'
+                    "
                   >
+                    Diseño Propio
+                  </button>
+                  <button
+                    type="button"
+                    (click)="setControlValue('projectType', 'Comenzado desde Tutorial')"
+                    class="flex-1 py-2.5 text-[14px] font-bold rounded-lg transition-all duration-300 z-10"
+                    [ngClass]="
+                      projectForm.get('projectType')?.value === 'Comenzado desde Tutorial'
+                        ? 'bg-primary text-white shadow-md'
+                        : 'text-muted hover:text-text-main hover:bg-surface/50'
+                    "
+                  >
+                    Desde Tutorial
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-[14px] font-bold text-text-main mb-2">
+                  Categoría <span class="text-danger">*</span>
                 </label>
+                <div class="grid grid-cols-3 gap-3">
+                  @for (cat of categories; track cat) {
+                    <button
+                      type="button"
+                      (click)="setControlValue('category', cat)"
+                      class="py-3 px-2 rounded-xl text-[14px] font-bold transition-all duration-200"
+                      [ngClass]="
+                        projectForm.get('category')?.value === cat
+                          ? 'border-2 border-primary bg-primary/10 text-primary shadow-sm'
+                          : 'border border-border-main/20 bg-surface text-muted hover:border-primary/40 hover:text-primary'
+                      "
+                    >
+                      {{ cat }}
+                    </button>
+                  }
+                </div>
+                @if (projectForm.get('category')?.invalid && projectForm.get('category')?.touched) {
+                  <span class="text-danger text-[12px] font-bold mt-1.5 block"
+                    >Selecciona una categoría.</span
+                  >
+                }
+              </div>
+
+              <div>
+                <label class="block text-[14px] font-bold text-text-main mb-2">
+                  Nivel de Dificultad <span class="text-danger">*</span>
+                </label>
+                <div class="grid grid-cols-3 gap-3">
+                  <button
+                    type="button"
+                    (click)="setControlValue('difficulty', 'Fácil')"
+                    class="py-3 px-2 rounded-xl text-[13px] font-bold border transition-all duration-300"
+                    [ngClass]="
+                      projectForm.get('difficulty')?.value === 'Fácil'
+                        ? 'border-emerald-500 bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 -translate-y-0.5'
+                        : 'border-border-main/20 bg-surface text-muted hover:border-emerald-500/40 hover:bg-emerald-500/5 hover:text-emerald-600'
+                    "
+                  >
+                    Fácil
+                  </button>
+                  <button
+                    type="button"
+                    (click)="setControlValue('difficulty', 'Intermedio')"
+                    class="py-3 px-2 rounded-xl text-[13px] font-bold border transition-all duration-300"
+                    [ngClass]="
+                      projectForm.get('difficulty')?.value === 'Intermedio'
+                        ? 'border-amber-600 bg-amber-600 text-white shadow-lg shadow-amber-600/30 -translate-y-0.5'
+                        : 'border-border-main/20 bg-surface text-muted hover:border-amber-600/40 hover:bg-amber-600/5 hover:text-amber-700'
+                    "
+                  >
+                    Intermedio
+                  </button>
+                  <button
+                    type="button"
+                    (click)="setControlValue('difficulty', 'Avanzado')"
+                    class="py-3 px-2 rounded-xl text-[13px] font-bold border transition-all duration-300"
+                    [ngClass]="
+                      projectForm.get('difficulty')?.value === 'Avanzado'
+                        ? 'border-rose-500 bg-rose-500 text-white shadow-lg shadow-rose-500/30 -translate-y-0.5'
+                        : 'border-border-main/20 bg-surface text-muted hover:border-rose-500/40 hover:bg-rose-500/5 hover:text-rose-600'
+                    "
+                  >
+                    Avanzado
+                  </button>
+                </div>
+                @if (
+                  projectForm.get('difficulty')?.invalid && projectForm.get('difficulty')?.touched
+                ) {
+                  <span class="text-danger text-[12px] font-bold mt-1.5 block"
+                    >Selecciona una dificultad.</span
+                  >
+                }
+              </div>
+
+              <div>
+                <label class="block text-[14px] font-bold text-text-main mb-2"
+                  >Estado inicial</label
+                >
+                <div class="flex flex-wrap gap-2">
+                  @for (status of statuses; track status) {
+                    <button
+                      type="button"
+                      (click)="setControlValue('status', status)"
+                      class="px-4 py-2.5 rounded-full text-[13px] font-bold border transition-all duration-200"
+                      [ngClass]="
+                        projectForm.get('status')?.value === status
+                          ? 'border-text-main bg-text-main text-bg shadow-md'
+                          : 'border-border-main/20 bg-surface text-muted hover:border-text-main/40 hover:text-text-main'
+                      "
+                    >
+                      {{ status }}
+                    </button>
+                  }
+                </div>
               </div>
             </div>
 
-            <div class="md:col-span-5 flex flex-col gap-4">
-              <div class="flex-1 flex flex-col min-h-40">
-                <label class="block text-[13px] font-bold text-text-main mb-1.5"
+            <div class="lg:col-span-5 flex flex-col gap-6">
+              <div class="flex flex-col min-h-48">
+                <label class="block text-[14px] font-bold text-text-main mb-2"
                   >Foto de Inspiración</label
                 >
 
                 @if (!imagePreview) {
                   <label
-                    class="flex-1 flex flex-col items-center justify-center w-full px-4 transition bg-surface border-2 border-border-main/20 border-dashed rounded-xl cursor-pointer hover:border-primary/40 hover:bg-surface-hover focus:outline-none"
+                    class="flex-1 flex flex-col items-center justify-center w-full px-4 transition bg-surface border-2 border-border-main/20 border-dashed rounded-2xl cursor-pointer hover:border-primary/40 hover:bg-primary/5 focus:outline-none"
                     [class.opacity-50]="isUploadingImage"
                     [class.cursor-not-allowed]="isUploadingImage"
                   >
                     <div class="flex flex-col items-center text-center">
                       @if (isUploadingImage) {
                         <svg
-                          class="animate-spin h-7 w-7 text-primary mb-2"
+                          class="animate-spin h-8 w-8 text-primary mb-3"
                           xmlns="http://www.w3.org/2000/svg"
                           fill="none"
                           viewBox="0 0 24 24"
@@ -271,13 +258,13 @@
                             d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                           ></path>
                         </svg>
-                        <span class="text-[13px] font-bold text-text-main">Subiendo...</span>
+                        <span class="text-[14px] font-bold text-text-main">Subiendo imagen...</span>
                       } @else {
                         <div
-                          class="w-10 h-10 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-2"
+                          class="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-3"
                         >
                           <svg
-                            class="w-5 h-5"
+                            class="w-6 h-6"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -286,13 +273,15 @@
                             <path
                               stroke-linecap="round"
                               stroke-linejoin="round"
-                              d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+                              d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
                             />
                           </svg>
                         </div>
-                        <span class="text-[13px] font-bold text-text-main">Añadir imagen</span>
-                        <span class="text-[11px] font-medium text-muted mt-0.5"
-                          >JPG, PNG o WEBP</span
+                        <span class="text-[14px] font-bold text-text-main"
+                          >Haz clic para buscar</span
+                        >
+                        <span class="text-[12px] font-medium text-muted mt-1"
+                          >Soporta JPG, PNG o WEBP</span
                         >
                       }
                     </div>
@@ -306,7 +295,7 @@
                   </label>
                 } @else {
                   <div
-                    class="flex-1 relative w-full rounded-xl border border-border-main/20 overflow-hidden group"
+                    class="flex-1 relative w-full rounded-2xl border border-border-main/20 overflow-hidden group"
                   >
                     <img
                       [src]="imagePreview"
@@ -314,12 +303,12 @@
                       class="w-full h-full object-cover absolute inset-0"
                     />
                     <div
-                      class="absolute inset-0 bg-text-main/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm"
+                      class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-sm"
                     >
                       <button
                         type="button"
                         (click)="removeImage()"
-                        class="bg-danger text-white px-3 py-1.5 rounded-lg text-[13px] font-bold flex items-center gap-1.5 hover:bg-danger/90 transition-colors shadow-lg"
+                        class="bg-white/10 hover:bg-danger text-white border border-white/20 px-4 py-2 rounded-xl text-[13px] font-bold flex items-center gap-2 transition-colors shadow-xl backdrop-blur-md"
                       >
                         <svg
                           class="w-4 h-4"
@@ -334,7 +323,7 @@
                             d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
                           />
                         </svg>
-                        Cambiar
+                        Eliminar
                       </button>
                     </div>
                   </div>
@@ -342,16 +331,35 @@
               </div>
 
               <div>
-                <label for="description" class="block text-[13px] font-bold text-text-main mb-1.5"
+                <label for="description" class="block text-[14px] font-bold text-text-main mb-2"
                   >Descripción o Notas</label
                 >
                 <textarea
                   id="description"
                   formControlName="description"
-                  placeholder="Medidas, ideas..."
-                  rows="2"
-                  class="w-full p-3.5 text-[14px] rounded-xl border border-border-main/20 bg-surface text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all resize-none placeholder:text-muted/50 font-medium"
+                  placeholder="Añade aquí las medidas iniciales, ideas de fornituras o recordatorios..."
+                  rows="4"
+                  class="w-full p-4 text-[14px] rounded-xl border border-border-main/20 bg-surface text-text-main outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all resize-none placeholder:text-muted/50 font-medium custom-scrollbar"
                 ></textarea>
+              </div>
+
+              <div class="mt-auto pt-4 border-t border-border-main/10">
+                <label
+                  class="flex items-center justify-between p-4 rounded-xl border border-border-main/20 bg-surface cursor-pointer hover:border-primary/40 transition-colors group"
+                >
+                  <div class="flex flex-col">
+                    <span class="text-[14px] text-text-main font-bold">Proyecto Público</span>
+                    <span class="text-[12px] text-muted font-medium"
+                      >Otros usuarios podrán ver tu diseño</span
+                    >
+                  </div>
+                  <div class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" formControlName="isPublic" class="sr-only peer" />
+                    <div
+                      class="w-11 h-6 bg-border-main/30 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary shadow-inner"
+                    ></div>
+                  </div>
+                </label>
               </div>
             </div>
           </div>
@@ -359,19 +367,19 @@
 
         <div
           [class.hidden]="currentStep !== 2"
-          class="animate-in slide-in-from-right-4 duration-300"
+          class="animate-in slide-in-from-right-4 duration-300 h-full"
         >
-          <div class="flex items-center justify-between mb-4">
+          <div class="flex items-center justify-between mb-6">
             <div>
-              <h3 class="text-[16px] font-bold text-text-main">Lista de Materiales</h3>
-              <p class="text-[13px] font-medium text-muted mt-0.5">
-                Añade telas, hilos o fornituras.
+              <h3 class="text-[18px] font-bold text-text-main">Lista de Materiales</h3>
+              <p class="text-[14px] font-medium text-muted mt-1">
+                Añade las telas, hilos o fornituras necesarias.
               </p>
             </div>
             <button
               type="button"
               (click)="addMaterial()"
-              class="text-primary text-[13px] font-bold flex items-center gap-1.5 bg-primary/10 hover:bg-primary/20 px-3.5 py-2 rounded-xl transition-colors"
+              class="text-primary text-[14px] font-bold flex items-center gap-1.5 bg-primary/10 hover:bg-primary/20 px-4 py-2.5 rounded-xl transition-colors"
             >
               <svg
                 class="w-4 h-4"
@@ -386,38 +394,37 @@
             </button>
           </div>
 
-          <div formArrayName="materials" class="space-y-2.5">
+          <div formArrayName="materials" class="space-y-3">
             @for (material of materials.controls; track $index) {
               <div
                 [formGroupName]="$index"
-                class="flex items-center gap-2.5 bg-surface p-2.5 rounded-xl border border-border-main/15 shadow-sm group"
+                class="flex items-center gap-3 bg-surface p-3 rounded-xl border border-border-main/20 shadow-sm"
               >
-                <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <input
                     type="text"
                     formControlName="name"
-                    placeholder="Ej: Hilo de algodón"
-                    class="w-full h-10 px-3.5 text-[13px] rounded-lg border border-border-main/20 bg-bg outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all font-medium"
+                    placeholder="Ej: Piel sintética negra"
+                    class="w-full h-11 px-4 text-[14px] rounded-lg border border-border-main/20 bg-bg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium"
                   />
                   <input
                     type="text"
                     formControlName="quantity"
-                    placeholder="Ej: 1 bobina"
-                    class="w-full h-10 px-3.5 text-[13px] rounded-lg border border-border-main/20 bg-bg outline-none focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all font-medium"
+                    placeholder="Ej: 1 metro"
+                    class="w-full h-11 px-4 text-[14px] rounded-lg border border-border-main/20 bg-bg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium"
                   />
                 </div>
                 <button
                   type="button"
                   (click)="removeMaterial($index)"
-                  class="w-10 h-10 shrink-0 flex items-center justify-center rounded-lg text-muted hover:bg-danger/10 hover:text-danger transition-all outline-none"
-                  title="Eliminar material"
+                  class="w-11 h-11 shrink-0 flex items-center justify-center rounded-lg text-muted hover:bg-danger hover:text-white transition-all outline-none"
                 >
                   <svg
-                    class="w-4 h-4"
+                    class="w-5 h-5"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
-                    stroke-width="2.5"
+                    stroke-width="2"
                   >
                     <path
                       stroke-linecap="round"
@@ -431,14 +438,14 @@
 
             @if (materials.length === 0) {
               <div
-                class="flex flex-col items-center justify-center py-8 bg-surface rounded-2xl border border-dashed border-border-main/30 text-center cursor-pointer hover:bg-surface-hover hover:border-primary/30 transition-all"
+                class="flex flex-col items-center justify-center py-12 bg-surface rounded-2xl border-2 border-dashed border-border-main/20 text-center cursor-pointer hover:bg-surface-hover hover:border-primary/30 transition-all"
                 (click)="addMaterial()"
               >
                 <div
-                  class="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-2.5"
+                  class="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-3"
                 >
                   <svg
-                    class="w-5 h-5"
+                    class="w-6 h-6"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -456,9 +463,9 @@
                     />
                   </svg>
                 </div>
-                <h4 class="font-bold text-text-main text-[14px] mb-0.5">Lista vacía</h4>
-                <p class="text-[12px] font-medium text-muted">
-                  Haz clic para añadir el primer material
+                <h4 class="font-bold text-text-main text-[16px] mb-1">Sin materiales</h4>
+                <p class="text-[14px] font-medium text-muted">
+                  Añade los elementos necesarios para tu diseño
                 </p>
               </div>
             }
@@ -468,13 +475,13 @@
     </div>
 
     <footer
-      class="px-6 py-4 border-t border-border-main/10 bg-bg rounded-b-[28px] flex items-center justify-between shrink-0"
+      class="px-6 md:px-8 py-5 border-t border-border-main/10 bg-surface rounded-b-[28px] flex items-center justify-between shrink-0"
     >
       @if (currentStep === 1) {
         <button
           type="button"
           (click)="closeModal()"
-          class="px-5 py-2.5 rounded-xl text-[14px] font-bold text-muted hover:bg-danger/10 hover:text-danger transition-colors outline-none"
+          class="px-6 py-2.5 rounded-xl text-[15px] font-bold text-muted hover:bg-danger/10 hover:text-danger transition-colors outline-none"
         >
           Cancelar
         </button>
@@ -482,7 +489,7 @@
         <button
           type="button"
           (click)="previousStep()"
-          class="px-5 py-2.5 rounded-xl text-[14px] font-bold text-text-main bg-surface border border-border-main/20 hover:bg-surface-hover flex items-center gap-2 transition-colors outline-none"
+          class="px-6 py-2.5 rounded-xl text-[15px] font-bold text-text-main bg-surface-hover border border-border-main/10 hover:bg-border-main/20 flex items-center gap-2 transition-colors outline-none"
         >
           <svg
             class="w-4 h-4"
@@ -497,7 +504,7 @@
               d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
             />
           </svg>
-          Volver
+          Atrás
         </button>
       }
 
@@ -505,7 +512,7 @@
         <button
           type="button"
           (click)="nextStep()"
-          class="btn btn-primary px-6 py-2.5 text-[14px] font-bold flex items-center gap-2 shadow-sm"
+          class="btn btn-primary px-8 py-3 text-[15px] font-bold flex items-center gap-2 shadow-lg hover:shadow-primary/25 hover:-translate-y-0.5 transition-all"
         >
           Siguiente
           <svg
@@ -527,11 +534,11 @@
           type="submit"
           form="projectForm"
           [disabled]="projectForm.invalid || isLoading"
-          class="btn btn-primary px-6 py-2.5 text-[14px] font-bold flex items-center justify-center min-w-36 shadow-md hover:shadow-lg transition-all"
+          class="btn btn-primary px-8 py-3 text-[15px] font-bold flex items-center justify-center min-w-40 shadow-lg hover:shadow-primary/25 hover:-translate-y-0.5 transition-all disabled:hover:translate-y-0 disabled:shadow-none"
         >
           @if (isLoading) {
             <svg
-              class="animate-spin h-4 w-4 text-white mr-2"
+              class="animate-spin h-5 w-5 text-white mr-2"
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
               viewBox="0 0 24 24"
@@ -550,10 +557,10 @@
                 d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
               ></path>
             </svg>
-            Guardando...
+            Creando...
           } @else {
             <svg
-              class="w-4 h-4 mr-1.5"
+              class="w-5 h-5 mr-2"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
