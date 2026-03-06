@@ -1,51 +1,53 @@
 <div
-  class="group flex flex-col h-full bg-surface rounded-3xl border border-border-main/10 overflow-hidden hover:border-primary/40 hover:shadow-2xl hover:shadow-primary/10 transition-all duration-300 transform hover:-translate-y-1"
+  class="group flex flex-col h-full bg-surface rounded-[20px] border border-border-main/15 overflow-hidden transition-all duration-300 ease-out hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_12px_30px_-10px_rgba(255,89,0,0.12)] relative"
 >
   <a
     [routerLink]="['/home/proyectos', project._id]"
-    class="relative h-52 bg-bg overflow-hidden block"
+    class="relative h-48 w-full bg-surface-hover overflow-hidden block shrink-0"
   >
     @if (coverImage) {
       <img
         [src]="coverImage"
         [alt]="project.title"
-        class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700 ease-in-out"
+        class="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
       />
       <div
-        class="absolute inset-0 bg-linear-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        class="absolute inset-0 bg-linear-to-b from-black/30 via-transparent to-transparent opacity-80"
       ></div>
     } @else {
       <div
-        class="w-full h-full flex flex-col items-center justify-center text-muted/40 bg-surface-hover/50 group-hover:bg-primary/5 transition-colors duration-500"
+        class="absolute inset-0 flex flex-col items-center justify-center bg-surface-hover transition-colors duration-500 group-hover:bg-primary/5"
       >
         <svg
-          class="w-12 h-12 mb-2 opacity-50"
+          class="w-10 h-10 mb-2 opacity-30 text-muted"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
+          stroke-width="1.5"
         >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="1.5"
             d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
           />
         </svg>
-        <span class="text-xs font-medium uppercase tracking-wider">Sin imagen</span>
       </div>
     }
 
-    <div class="absolute top-4 left-4 flex flex-col gap-2">
-      <span
-        class="px-3 py-1 bg-surface/95 backdrop-blur-md text-text-main text-[11px] font-bold rounded-full shadow-sm uppercase tracking-wide border border-border-main/10 w-fit"
+    <div class="absolute top-3 left-3 z-10">
+      <div
+        class="flex items-center gap-1.5 px-2.5 py-1 bg-surface rounded-full shadow-sm border border-border-main/5"
       >
-        {{ project.status || 'Planificado' }}
-      </span>
+        <span class="w-1.5 h-1.5 rounded-full" [ngClass]="statusConfig.dot"></span>
+        <span class="text-[10px] font-bold uppercase tracking-wide text-text-main">
+          {{ project.status || 'Planificado' }}
+        </span>
+      </div>
     </div>
 
-    <div class="absolute top-4 right-4">
+    <div class="absolute top-3 right-3 z-10">
       <span
-        class="px-3 py-1 text-[11px] font-bold rounded-full shadow-sm uppercase tracking-wide border backdrop-blur-md"
+        class="px-2.5 py-1 text-[10px] font-bold rounded-full shadow-sm uppercase tracking-wide border flex items-center justify-center"
         [ngClass]="difficultyColorClass"
       >
         {{ project.difficulty || 'N/A' }}
@@ -53,83 +55,96 @@
     </div>
   </a>
 
-  <div class="p-6 flex flex-col flex-1 relative bg-surface">
-    <span class="text-xs font-bold text-primary mb-2 block uppercase tracking-wider">
-      {{ project.category || 'Sin categoría' }}
-    </span>
+  <div class="p-4 md:p-5 flex flex-col flex-1 relative bg-surface z-20">
+    <div class="flex items-center justify-between mb-2">
+      <span class="text-[10px] font-bold text-primary uppercase tracking-widest">
+        {{ project.category || 'Sin categoría' }}
+      </span>
+      <span class="text-[11px] font-medium text-muted">
+        {{ project.createdAt | date: 'MMM d, yyyy' }}
+      </span>
+    </div>
 
-    <a [routerLink]="['/home/proyectos', project._id]" class="block mb-3">
+    <a [routerLink]="['/home/proyectos', project._id]" class="block mb-1.5 group/title">
       <h3
-        class="font-display font-bold text-text-main text-xl group-hover:text-primary transition-colors line-clamp-1"
+        class="font-display font-bold text-text-main text-[19px] leading-tight group-hover/title:text-primary transition-colors line-clamp-1"
       >
         {{ project.title }}
       </h3>
     </a>
 
-    <p class="text-[15px] text-muted mb-6 line-clamp-2 flex-1 leading-relaxed">
+    <p class="text-[13px] text-muted mb-4 line-clamp-2 flex-1 leading-relaxed">
       {{
         project.description ||
-          'Sin descripción detallada. Entra para añadir notas sobre este diseño.'
+          'Sin notas adicionales. Entra para añadir medidas o ideas sobre este diseño.'
       }}
     </p>
 
-    <div class="flex items-center justify-between pt-5 border-t border-border-main/10 mt-auto">
+    <div class="flex items-center justify-between pt-3.5 border-t border-border-main/10 mt-auto">
       <div class="flex items-center gap-4">
-        <span
-          class="text-sm font-semibold text-text-main flex items-center gap-1.5 bg-surface-hover px-3 py-1.5 rounded-xl"
+        <div
+          class="flex items-center gap-1.5 text-muted group-hover:text-text-main transition-colors"
+          title="Pasos del proyecto"
         >
           <svg
-            class="w-4 h-4 text-primary"
+            class="w-4 h-4 text-primary/80"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
-            stroke-width="2.5"
+            stroke-width="1.8"
           >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
-              d="M3.75 12h16.5m-16.5 3.75h16.5M3.75 19.5h16.5M5.625 4.5h12.75a1.875 1.875 0 011.875 1.875v1.5a1.875 1.875 0 01-1.875 1.875H5.625a1.875 1.875 0 01-1.875-1.875v-1.5c0-1.036.84-1.875 1.875-1.875z"
+              d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
             />
           </svg>
-          {{ project.steps.length || 0 }} <span class="text-muted font-medium">pasos</span>
-        </span>
+          <span class="text-[12px] font-semibold"
+            >{{ project.steps.length || 0 }}
+            <span class="font-normal hidden sm:inline">pasos</span></span
+          >
+        </div>
 
-        <span
-          class="text-sm font-semibold text-text-main flex items-center gap-1.5 bg-surface-hover px-3 py-1.5 rounded-xl"
+        <div
+          class="flex items-center gap-1.5 text-muted group-hover:text-text-main transition-colors"
+          title="Materiales necesarios"
         >
           <svg
-            class="w-4 h-4 text-primary"
+            class="w-4 h-4 text-primary/80"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
-            stroke-width="2.5"
+            stroke-width="1.8"
           >
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
-              d="M14.121 7.629A3 3 0 009.005 9.15l2.474 5.772a.75.75 0 001.376-.084l2.128-4.966a3 3 0 00-.862-2.243z"
-            />
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M15 12.75V15a3 3 0 01-3 3h-1.5a3 3 0 01-3-3v-2.25"
+              d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"
             />
           </svg>
-          {{ project.materials.length || 0 }} <span class="text-muted font-medium">mat.</span>
-        </span>
+          <span class="text-[12px] font-semibold"
+            >{{ project.materials.length || 0 }}
+            <span class="font-normal hidden sm:inline">mat.</span></span
+          >
+        </div>
       </div>
 
       <button
         (click)="onDeleteRequest($event)"
-        class="w-10 h-10 flex items-center justify-center text-muted hover:bg-danger/10 hover:text-danger rounded-xl transition-all"
+        class="p-1.5 text-muted hover:bg-danger/10 hover:text-danger rounded-md transition-all duration-300 md:opacity-0 md:group-hover:opacity-100"
         title="Eliminar proyecto"
       >
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg
+          class="w-4.5 h-4.5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
-            stroke-width="2"
-            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0"
           />
         </svg>
       </button>
