@@ -1,1 +1,279 @@
-<p>comunidad works!</p>
+<div class="w-full max-w-7xl mx-auto pb-8 pt-2">
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+    <div>
+      <h1 class="font-display text-[28px] md:text-[32px] font-bold text-text-main mb-2">
+        Inspiración de la Comunidad
+      </h1>
+      <p class="text-[14px] md:text-[15px] text-muted max-w-xl">
+        Descubre los increíbles proyectos creados por otros miembros del taller. Explora, aprende y
+        comparte tu pasión por la costura.
+      </p>
+    </div>
+
+    <div class="relative w-full md:w-80 shrink-0">
+      <div class="absolute inset-y-0 left-4 flex items-center pointer-events-none text-muted">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+          />
+        </svg>
+      </div>
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        (ngModelChange)="onSearchChange()"
+        placeholder="Buscar proyectos, estilos..."
+        class="w-full h-12 pl-12 pr-4 bg-surface border border-border-main/20 rounded-2xl text-[14px] text-text-main focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
+      />
+    </div>
+  </div>
+
+  @if (isLoading) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
+      @for (item of [1, 2, 3, 4, 5, 6, 7, 8]; track item) {
+        <div
+          class="animate-pulse bg-surface border border-border-main/10 rounded-2xl overflow-hidden shadow-sm flex flex-col h-full"
+        >
+          <div class="w-full aspect-4/5 bg-border-main/10"></div>
+          <div class="p-4 flex flex-col gap-3">
+            <div class="h-4 bg-border-main/15 rounded w-1/3"></div>
+            <div class="h-5 bg-border-main/20 rounded w-3/4"></div>
+            <div class="mt-4 flex items-center gap-2">
+              <div class="w-8 h-8 bg-border-main/15 rounded-full"></div>
+              <div class="h-3 bg-border-main/15 rounded w-1/2"></div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  } @else if (projects.length > 0) {
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+      @for (project of projects; track project._id) {
+        <a
+          [routerLink]="['/home/proyectos', project._id]"
+          class="group flex flex-col bg-surface border border-border-main/15 rounded-2xl overflow-hidden hover:shadow-[0_12px_40px_rgba(0,0,0,0.06)] hover:border-primary/30 transition-all duration-500 cursor-pointer h-full relative"
+        >
+          <div
+            class="relative w-full aspect-4/5 bg-bg overflow-hidden flex items-center justify-center"
+          >
+            @if (project.inspirationImageUrl) {
+              <img
+                [src]="project.inspirationImageUrl"
+                [alt]="project.title"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                loading="lazy"
+              />
+            } @else {
+              <div
+                class="w-full h-full bg-linear-to-br from-surface to-primary/10 flex items-center justify-center group-hover:scale-105 transition-transform duration-700 ease-out"
+              >
+                <svg
+                  class="w-16 h-16 text-primary/20"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="1.5"
+                    d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                  />
+                </svg>
+              </div>
+            }
+
+            <div
+              class="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+            ></div>
+
+            <div class="absolute top-3 left-3 flex flex-wrap gap-1.5 z-10">
+              <span
+                class="px-2 py-1 bg-surface/90 backdrop-blur-md text-[10px] font-bold rounded shadow-sm uppercase text-primary border border-border-main/10"
+              >
+                {{ project.category || 'Costura' }}
+              </span>
+              <span
+                class="px-2 py-1 bg-surface/90 backdrop-blur-md text-[10px] font-bold rounded shadow-sm uppercase text-text-main border border-border-main/10"
+              >
+                {{ project.difficulty }}
+              </span>
+            </div>
+
+            <div
+              class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 pointer-events-none"
+            >
+              <div
+                class="w-12 h-12 bg-white/95 backdrop-blur-md rounded-full flex items-center justify-center text-primary shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-out"
+              >
+                <svg
+                  class="w-5 h-5 ml-0.5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                  />
+                </svg>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-4 md:p-5 flex flex-col flex-1 bg-surface z-20 relative">
+            <h3
+              class="font-display font-bold text-text-main text-[16px] md:text-[18px] leading-tight line-clamp-2 mb-4 group-hover:text-primary transition-colors"
+            >
+              {{ project.title }}
+            </h3>
+
+            <div
+              class="mt-auto flex items-center justify-between pt-3 border-t border-border-main/10"
+            >
+              <div class="flex items-center gap-2 max-w-[65%]">
+                <img
+                  [src]="getAuthorAvatar(project.ownerId)"
+                  alt="Avatar"
+                  class="w-7 h-7 rounded-full object-cover border border-border-main/20 bg-bg shrink-0"
+                />
+                <span class="text-[12px] font-medium text-muted truncate">
+                  por
+                  <span class="text-text-main font-semibold">{{
+                    getAuthorName(project.ownerId)
+                  }}</span>
+                </span>
+              </div>
+
+              <button
+                (click)="likeProject(project, $event)"
+                class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-like/5 transition-colors focus:outline-none focus:ring-2 focus:ring-like/30 group/like shrink-0"
+                title="Me gusta"
+              >
+                <svg
+                  class="w-5 h-5 transition-all duration-300"
+                  [class.text-like]="project.isLikedLocally"
+                  [class.fill-like]="project.isLikedLocally"
+                  [class.text-muted]="!project.isLikedLocally"
+                  [class.group-hover/like:text-like]="!project.isLikedLocally"
+                  [class.group-active/like:scale-75]="true"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+                  />
+                </svg>
+                <span
+                  class="text-[13px] font-semibold transition-colors"
+                  [class.text-like]="project.isLikedLocally"
+                  [class.text-muted]="!project.isLikedLocally"
+                >
+                  {{ project.likesCount }}
+                </span>
+              </button>
+            </div>
+          </div>
+        </a>
+      }
+    </div>
+
+    @if (hasMore) {
+      <div class="flex justify-center mt-6">
+        <button
+          (click)="loadMore()"
+          [disabled]="isLoadingMore"
+          class="btn btn-secondary px-6 group disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          @if (isLoadingMore) {
+            <svg
+              class="animate-spin -ml-1 mr-2 h-4 w-4 text-primary"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+            >
+              <circle
+                class="opacity-25"
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                stroke-width="4"
+              ></circle>
+              <path
+                class="opacity-75"
+                fill="currentColor"
+                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+              ></path>
+            </svg>
+            Cargando...
+          } @else {
+            <span>Descubrir más</span>
+            <svg
+              class="w-4 h-4 ml-2 group-hover:translate-y-1 transition-transform"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19.5 8.25l-7.5 7.5-7.5-7.5"
+              />
+            </svg>
+          }
+        </button>
+      </div>
+    }
+  } @else {
+    <div
+      class="flex flex-col items-center justify-center py-20 text-center bg-surface border border-dashed border-border-main/30 rounded-3xl mt-8"
+    >
+      <div
+        class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center text-primary mb-4"
+      >
+        <svg
+          class="w-8 h-8"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="1.5"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+          />
+        </svg>
+      </div>
+      <h3 class="text-[18px] md:text-[20px] font-display font-bold text-text-main mb-2">
+        No se encontraron proyectos
+      </h3>
+      <p class="text-[14px] md:text-[15px] text-muted max-w-sm">
+        @if (searchQuery) {
+          No hay resultados para "<span class="text-text-main font-semibold">{{ searchQuery }}</span
+          >". Intenta con otras palabras clave.
+        } @else {
+          La comunidad aún no tiene proyectos públicos. ¡Sé el primero en compartir uno!
+        }
+      </p>
+      @if (searchQuery) {
+        <button
+          (click)="searchQuery = ''; onSearchChange()"
+          class="mt-6 text-primary font-semibold hover:underline text-[14px]"
+        >
+          Limpiar búsqueda
+        </button>
+      }
+    </div>
+  }
+</div>
