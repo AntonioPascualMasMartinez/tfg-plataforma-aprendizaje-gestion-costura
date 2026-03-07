@@ -1,8 +1,17 @@
-import { Directive, ElementRef, Renderer2, AfterViewInit, OnDestroy } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import {
+  Directive,
+  ElementRef,
+  Renderer2,
+  AfterViewInit,
+  OnDestroy,
+  PLATFORM_ID,
+  Inject,
+} from '@angular/core';
 
 @Directive({
   selector: '[appScrollAnimate]',
-  standalone: true, // Muy importante en Angular 21
+  standalone: true,
 })
 export class ScrollAnimateDirective implements AfterViewInit, OnDestroy {
   private observer!: IntersectionObserver;
@@ -10,11 +19,11 @@ export class ScrollAnimateDirective implements AfterViewInit, OnDestroy {
   constructor(
     private el: ElementRef,
     private renderer: Renderer2,
+    @Inject(PLATFORM_ID) private platformId: Object,
   ) {}
 
   ngAfterViewInit() {
     // 1. Configuramos las clases iniciales (estado oculto)
-    // Usamos Tailwind: opacidad 0, desplazado hacia abajo y transición suave
     this.renderer.addClass(this.el.nativeElement, 'opacity-0');
     this.renderer.addClass(this.el.nativeElement, 'translate-y-8');
     this.renderer.addClass(this.el.nativeElement, 'transition-all');
@@ -49,7 +58,7 @@ export class ScrollAnimateDirective implements AfterViewInit, OnDestroy {
 
   ngOnDestroy() {
     // Limpieza vital para evitar fugas de memoria (Memory Leaks)
-    if (this.observer) {
+    if (isPlatformBrowser(this.platformId) && this.observer) {
       this.observer.disconnect();
     }
   }
