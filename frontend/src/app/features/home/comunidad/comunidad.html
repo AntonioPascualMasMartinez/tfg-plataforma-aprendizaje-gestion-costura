@@ -50,7 +50,12 @@
   } @else if (projects.length > 0) {
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
       @for (project of projects; track project._id) {
-        <app-community-card [project]="project" (like)="handleLike($event)"> </app-community-card>
+        <app-community-card
+          [project]="project"
+          (like)="handleLike($event)"
+          (viewDetails)="openModal($event)"
+        >
+        </app-community-card>
       }
     </div>
 
@@ -147,3 +152,8 @@
     </div>
   }
 </div>
+
+@if (selectedProject) {
+  <app-community-detail-modal [project]="selectedProject" (close)="closeModal()">
+  </app-community-detail-modal>
+}

@@ -1,5 +1,5 @@
-<a
-  [routerLink]="['/home/proyectos', project._id]"
+<div
+  (click)="onCardClick()"
   class="group flex flex-col bg-surface border border-border-main/15 rounded-2xl overflow-hidden hover:shadow-[0_12px_40px_rgba(0,0,0,0.06)] hover:border-primary/30 transition-all duration-500 cursor-pointer h-full relative"
 >
   <div class="relative w-full aspect-4/5 bg-bg overflow-hidden flex items-center justify-center">
@@ -118,4 +118,4 @@
       </button>
     </div>
   </div>
-</a>
+</div>

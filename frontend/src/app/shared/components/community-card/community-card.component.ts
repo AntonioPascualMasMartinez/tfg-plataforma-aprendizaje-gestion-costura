@@ -18,6 +18,11 @@ export interface CommunityProject extends Project {
 export class CommunityCardComponent {
   @Input({ required: true }) project!: CommunityProject;
   @Output() like = new EventEmitter<{ project: CommunityProject; event: Event }>();
+  @Output() viewDetails = new EventEmitter<CommunityProject>();
+
+  onCardClick() {
+    this.viewDetails.emit(this.project);
+  }
 
   onLikeClick(event: Event) {
     this.like.emit({ project: this.project, event });

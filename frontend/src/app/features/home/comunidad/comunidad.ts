@@ -11,10 +11,18 @@ import {
   CommunityProject,
 } from '../../../shared/components/community-card/community-card.component';
 
+import { CommunityDetailModalComponent } from '../../../shared/modals/community-detail-modal/community-detail-modal.component';
+
 @Component({
   selector: 'app-comunidad',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, CommunityCardComponent],
+  imports: [
+    CommonModule,
+    RouterLink,
+    ReactiveFormsModule,
+    CommunityCardComponent,
+    CommunityDetailModalComponent,
+  ],
   templateUrl: './comunidad.html',
   styleUrl: './comunidad.scss',
 })
@@ -32,6 +40,8 @@ export class Comunidad implements OnInit {
   hasMore = true;
 
   searchTerm = new FormControl('');
+
+  selectedProject: CommunityProject | null = null;
 
   ngOnInit() {
     this.setupSearch();
@@ -111,5 +121,13 @@ export class Comunidad implements OnInit {
         this.cdr.detectChanges();
       },
     });
+  }
+
+  openModal(project: CommunityProject) {
+    this.selectedProject = project;
+  }
+
+  closeModal() {
+    this.selectedProject = null;
   }
 }
