@@ -22,8 +22,7 @@
       </div>
       <input
         type="text"
-        [(ngModel)]="searchQuery"
-        (ngModelChange)="onSearchChange()"
+        [formControl]="searchTerm"
         placeholder="Buscar proyectos, estilos..."
         class="w-full h-12 pl-12 pr-4 bg-surface border border-border-main/20 rounded-2xl text-[14px] text-text-main focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
       />
@@ -128,16 +127,18 @@
         No se encontraron proyectos
       </h3>
       <p class="text-[14px] md:text-[15px] text-muted max-w-sm">
-        @if (searchQuery) {
-          No hay resultados para "<span class="text-text-main font-semibold">{{ searchQuery }}</span
+        @if (searchTerm.value) {
+          No hay resultados para "<span class="text-text-main font-semibold">{{
+            searchTerm.value
+          }}</span
           >". Intenta con otras palabras clave.
         } @else {
           La comunidad aún no tiene proyectos públicos. ¡Sé el primero en compartir uno!
         }
       </p>
-      @if (searchQuery) {
+      @if (searchTerm.value) {
         <button
-          (click)="searchQuery = ''; onSearchChange()"
+          (click)="searchTerm.setValue('')"
           class="mt-6 text-primary font-semibold hover:underline text-[14px]"
         >
           Limpiar búsqueda
