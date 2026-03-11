@@ -1,5 +1,9 @@
 <app-navbar></app-navbar>
 
+<!-- Scroll Progress Bar -->
+<div class="scroll-progress-bar" [style.width.%]="scrollProgress"></div>
+
+<!-- Animated Background Layer -->
 <div
   class="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-bg transition-colors duration-500"
 >
@@ -21,8 +25,8 @@
       d="M0,100 C200,400 400,-100 700,300 C1000,700 800,900 1000,1000"
       stroke="currentColor"
       stroke-width="3"
-      stroke-dasharray="15 15"
       stroke-linecap="round"
+      class="stitch-line-slow"
     />
   </svg>
 
@@ -38,8 +42,8 @@
       d="M-200,800 C300,900 500,200 1200,400"
       stroke="currentColor"
       stroke-width="2"
-      stroke-dasharray="8 8"
       stroke-linecap="round"
+      class="stitch-line"
     />
   </svg>
 
@@ -62,17 +66,36 @@
   >
     <path d="M0,1000 C300,700 100,200 1000,0 L0,0 Z" fill="currentColor" />
   </svg>
+
+  <!-- Floating decorative dots -->
+  <div
+    class="absolute top-[15%] right-[8%] w-3 h-3 rounded-full bg-primary/20 float-element"
+    style="animation-delay: 0s"
+  ></div>
+  <div
+    class="absolute top-[45%] left-[5%] w-2 h-2 rounded-full bg-warning/20 float-element"
+    style="animation-delay: 1.5s"
+  ></div>
+  <div
+    class="absolute top-[70%] right-[15%] w-2.5 h-2.5 rounded-full bg-like/15 float-element-slow"
+    style="animation-delay: 3s"
+  ></div>
 </div>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- HERO SECTION                                               -->
+<!-- ═══════════════════════════════════════════════════════════ -->
 <section
   appScrollAnimate
   class="w-full relative bg-transparent flex items-center min-h-svh pt-20 pb-16 overflow-hidden"
 >
   <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
     <div
-      class="absolute -top-[10%] -right-[10%] w-[50%] h-[50%] rounded-full bg-primary/5 blur-[120px]"
+      class="absolute -top-[10%] -right-[10%] w-[50%] h-[50%] rounded-full bg-primary/5 blur-[120px] float-element-slow"
     ></div>
     <div
-      class="absolute bottom-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-focus/5 blur-[100px]"
+      class="absolute bottom-[10%] -left-[10%] w-[40%] h-[40%] rounded-full bg-focus/5 blur-[100px] float-element"
+      style="animation-delay: 2s"
     ></div>
   </div>
 
@@ -81,45 +104,51 @@
   >
     <div class="flex flex-col items-start text-left pt-10 lg:pt-0">
       <div
-        class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-[14px] font-semibold mb-8 border border-primary/20 hover:bg-primary/15 transition-colors cursor-default shadow-sm hover:shadow-md hover:-translate-y-0.5 duration-300"
+        class="hero-badge inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-[14px] font-semibold mb-8 border border-primary/20 hover:bg-primary/15 transition-colors cursor-default shadow-sm hover:shadow-md hover:-translate-y-0.5 duration-300"
       >
-        <span class="w-2.5 h-2.5 rounded-full bg-primary animate-pulse"></span>
+        <span class="relative flex h-2.5 w-2.5">
+          <span
+            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"
+          ></span>
+          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
+        </span>
         Únete a la comunidad de Needly
       </div>
 
       <h1
-        class="mb-6 leading-[1.15] text-[40px] md:text-[56px] lg:text-[64px] font-display font-bold text-text-main tracking-tight"
+        class="hero-title mb-6 leading-[1.15] text-[40px] md:text-[56px] lg:text-[64px] font-display font-bold text-text-main tracking-tight"
       >
         Lleva tus proyectos de costura al
-        <span class="text-transparent bg-clip-text bg-linear-to-r from-primary to-[#FF8C42]"
+        <span
+          class="text-shimmer text-transparent bg-clip-text bg-[linear-gradient(90deg,var(--color-primary),#FF8C42,var(--color-primary))] bg-size-[200%_auto]"
           >siguiente nivel</span
         >
       </h1>
 
-      <p class="text-[16px] md:text-[18px] text-muted max-w-lg mb-10 leading-relaxed">
+      <p class="hero-subtitle text-[16px] md:text-[18px] text-muted max-w-lg mb-10 leading-relaxed">
         Needly es la plataforma definitiva para organizar tus patrones, aprender nuevas técnicas y
         compartir tu progreso con una comunidad apasionada.
       </p>
 
-      <div class="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+      <div class="hero-cta flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
         <a
           routerLink="/auth/register"
-          class="btn btn-primary text-[16px] py-3.5 px-8 shadow-lg shadow-primary/30 hover:-translate-y-1 hover:shadow-primary/40 transition-all duration-300"
+          class="btn btn-primary btn-magnetic btn-press text-[16px] py-3.5 px-8 shadow-lg shadow-primary/30 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/40 transition-all duration-300"
         >
           Comenzar gratis
         </a>
         <a
           href="#encontrar"
-          class="btn btn-secondary text-[16px] py-3.5 px-8 hover:bg-surface/80 hover:-translate-y-1 transition-all duration-300"
+          class="btn btn-secondary btn-press text-[16px] py-3.5 px-8 hover:bg-surface/80 hover:-translate-y-1 transition-all duration-300"
         >
           Descubrir proyectos
         </a>
       </div>
 
-      <div class="mt-12 flex items-center gap-4 group">
+      <div class="hero-social-proof mt-12 flex items-center gap-4 group">
         <div class="flex -space-x-3 transition-transform duration-300 group-hover:scale-105">
           <div
-            class="w-10 h-10 rounded-full border-2 border-surface bg-border-main/20 flex items-center justify-center overflow-hidden"
+            class="w-10 h-10 rounded-full border-2 border-surface bg-border-main/20 flex items-center justify-center overflow-hidden transition-transform duration-300 hover:scale-110 hover:z-10"
           >
             <svg class="w-5 h-5 text-muted" fill="currentColor" viewBox="0 0 24 24">
               <path
@@ -128,7 +157,7 @@
             </svg>
           </div>
           <div
-            class="w-10 h-10 rounded-full border-2 border-surface bg-border-main/30 flex items-center justify-center overflow-hidden"
+            class="w-10 h-10 rounded-full border-2 border-surface bg-border-main/30 flex items-center justify-center overflow-hidden transition-transform duration-300 hover:scale-110 hover:z-10"
           >
             <svg class="w-5 h-5 text-muted" fill="currentColor" viewBox="0 0 24 24">
               <path
@@ -137,7 +166,7 @@
             </svg>
           </div>
           <div
-            class="w-10 h-10 rounded-full border-2 border-surface bg-border-main/40 flex items-center justify-center overflow-hidden"
+            class="w-10 h-10 rounded-full border-2 border-surface bg-border-main/40 flex items-center justify-center overflow-hidden transition-transform duration-300 hover:scale-110 hover:z-10"
           >
             <svg class="w-5 h-5 text-muted" fill="currentColor" viewBox="0 0 24 24">
               <path
@@ -146,7 +175,7 @@
             </svg>
           </div>
           <div
-            class="w-10 h-10 rounded-full border-2 border-surface bg-primary/10 flex items-center justify-center text-[12px] font-bold text-primary"
+            class="w-10 h-10 rounded-full border-2 border-surface bg-primary/10 flex items-center justify-center text-[12px] font-bold text-primary counter-ring"
           >
             +2k
           </div>
@@ -156,29 +185,48 @@
     </div>
 
     <div
-      class="relative w-full aspect-4/5 sm:aspect-square lg:aspect-4/5 rounded-4xl overflow-hidden shadow-2xl shadow-primary/10 border border-border-main/10 group cursor-grab active:cursor-grabbing"
+      class="hero-image-container relative w-full aspect-4/5 sm:aspect-square lg:aspect-4/5 rounded-4xl overflow-hidden shadow-2xl shadow-primary/10 border border-border-main/10 group cursor-grab active:cursor-grabbing"
     >
       @for (img of heroImages; track $index) {
         <img
           [src]="img"
           alt="Proyecto de costura Needly"
-          class="absolute inset-0 w-full h-full object-cover transition-all duration-1000 ease-in-out transform"
+          class="absolute inset-0 w-full h-full object-cover carousel-image"
           [ngClass]="{
-            'opacity-100 scale-100 z-10': currentImageIndex === $index,
-            'opacity-0 scale-105 z-0': currentImageIndex !== $index,
+            active: currentImageIndex === $index,
+            inactive: currentImageIndex !== $index,
           }"
         />
       }
       <div
         class="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent z-20 pointer-events-none"
       ></div>
-      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-30">
+
+      <!-- Decorative sewing needle -->
+      <div class="absolute top-5 right-5 z-30 pointer-events-none needle-cursor opacity-50">
+        <svg
+          class="w-8 h-8 text-white/70 drop-shadow-lg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        >
+          <line x1="18" y1="6" x2="6" y2="18" />
+          <circle cx="19" cy="5" r="2" fill="currentColor" opacity="0.5" />
+          <path d="M6 18c-2 2-3 3-3 3" stroke-dasharray="2 2" />
+        </svg>
+      </div>
+
+      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2.5 z-30">
         @for (img of heroImages; track $index) {
           <button
             (click)="setCurrentImage($index)"
-            class="h-2 rounded-full transition-all duration-500 focus-visible:outline-white"
+            class="dot-indicator h-2 rounded-full transition-all duration-500 focus-visible:outline-white"
             [ngClass]="
-              currentImageIndex === $index ? 'w-8 bg-primary' : 'w-2 bg-white/50 hover:bg-white/90'
+              currentImageIndex === $index
+                ? 'w-8 bg-primary active'
+                : 'w-2 bg-white/50 hover:bg-white/90'
             "
             aria-label="Ir a la imagen"
           ></button>
@@ -205,6 +253,9 @@
   </a>
 </section>
 
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- FEATURES – "Todo lo que puedes encontrar"                  -->
+<!-- ═══════════════════════════════════════════════════════════ -->
 <section
   appScrollAnimate
   id="encontrar"
@@ -216,7 +267,8 @@
         class="text-5xl md:text-[64px] font-display font-bold tracking-tight text-text-main leading-[1.05]"
       >
         Todo lo que <br />
-        <span class="text-transparent bg-clip-text bg-linear-to-r from-primary to-[#FF8C42]"
+        <span
+          class="text-shimmer text-transparent bg-clip-text bg-[linear-gradient(90deg,var(--color-primary),#FF8C42,var(--color-primary))] bg-size-[200%_auto]"
           >puedes encontrar</span
         >
       </h2>
@@ -227,13 +279,14 @@
     </header>
 
     <div class="grid grid-cols-1 md:grid-cols-2 md:grid-rows-2 gap-6 lg:gap-8">
+      <!-- Card 1: Planificación Integral (tall) -->
       <article
         class="group md:row-span-2 rounded-[2.5rem] border border-border-main/10 dark:border-white/5 bg-surface dark:bg-surface/60 shadow-sm hover:shadow-[0_20px_40px_-15px_rgba(255,89,0,0.15)] hover:-translate-y-1.5 transition-all duration-500 overflow-hidden cursor-pointer flex flex-col relative"
       >
         <div class="p-8 md:p-10 z-10">
           <div class="flex items-center justify-between mb-6">
             <div
-              class="w-14 h-14 rounded-2xl bg-bg border border-border-main/10 dark:border-white/5 shadow-sm flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-md transition-all duration-500"
+              class="w-14 h-14 rounded-2xl bg-bg border border-border-main/10 dark:border-white/5 shadow-sm flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-md group-hover:border-primary/30 transition-all duration-500"
             >
               <svg
                 class="h-7 w-7 text-primary"
@@ -256,7 +309,7 @@
               class="w-10 h-10 rounded-full bg-bg/50 dark:bg-white/10 flex items-center justify-center opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500"
             >
               <svg
-                class="w-5 h-5 text-text-main"
+                class="w-5 h-5 text-text-main group-hover:text-primary transition-colors"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -292,13 +345,14 @@
         </div>
       </article>
 
+      <!-- Card 2: Comunidad Vibrante -->
       <article
         class="group rounded-[2.5rem] border border-border-main/10 dark:border-white/5 bg-surface dark:bg-surface/60 shadow-sm hover:shadow-[0_20px_40px_-15px_rgba(255,89,0,0.15)] hover:-translate-y-1.5 transition-all duration-500 overflow-hidden cursor-pointer flex flex-col md:flex-row relative"
       >
         <div class="p-8 md:p-10 flex-1 flex flex-col justify-center z-10">
           <div class="flex items-center justify-between mb-5">
             <div
-              class="w-12 h-12 rounded-xl bg-bg border border-border-main/10 dark:border-white/5 shadow-sm flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-md transition-all duration-500"
+              class="w-12 h-12 rounded-xl bg-bg border border-border-main/10 dark:border-white/5 shadow-sm flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-md group-hover:border-[#FF8C42]/30 transition-all duration-500"
             >
               <svg
                 class="h-6 w-6 text-[#FF8C42]"
@@ -320,7 +374,7 @@
               class="w-8 h-8 rounded-full bg-bg/50 dark:bg-white/10 flex items-center justify-center opacity-0 -translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500"
             >
               <svg
-                class="w-4 h-4 text-text-main"
+                class="w-4 h-4 text-text-main group-hover:text-[#FF8C42] transition-colors"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -356,6 +410,7 @@
         </div>
       </article>
 
+      <!-- Card 3: Aprendizaje Guiado -->
       <article
         class="group rounded-[2.5rem] border border-border-main/10 dark:border-white/5 bg-surface dark:bg-surface/60 shadow-sm hover:shadow-[0_20px_40px_-15px_rgba(255,89,0,0.15)] hover:-translate-y-1.5 transition-all duration-500 overflow-hidden cursor-pointer flex flex-col md:flex-row relative"
       >
@@ -375,7 +430,7 @@
         <div class="p-8 md:p-10 flex-1 flex flex-col justify-center order-1 md:order-2 z-10">
           <div class="flex items-center justify-between mb-5">
             <div
-              class="w-12 h-12 rounded-xl bg-bg border border-border-main/10 dark:border-white/5 shadow-sm flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-md transition-all duration-500"
+              class="w-12 h-12 rounded-xl bg-bg border border-border-main/10 dark:border-white/5 shadow-sm flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-md group-hover:border-info/30 transition-all duration-500"
             >
               <svg
                 class="h-6 w-6 text-info"
@@ -395,7 +450,7 @@
               class="w-8 h-8 rounded-full bg-bg/50 dark:bg-white/10 flex items-center justify-center opacity-0 -translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500"
             >
               <svg
-                class="w-4 h-4 text-text-main"
+                class="w-4 h-4 text-text-main group-hover:text-info transition-colors"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -421,6 +476,9 @@
   </div>
 </section>
 
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- HOW IT WORKS – "Cómo funciona Needly"                      -->
+<!-- ═══════════════════════════════════════════════════════════ -->
 <section
   appScrollAnimate
   id="funcionamiento"
@@ -436,16 +494,30 @@
       <div
         class="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-primary/5 border border-primary/20 text-primary text-[14px] font-bold mb-6 uppercase tracking-wider"
       >
+        <svg
+          class="w-4 h-4 mr-2 bobbin-spin"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <circle cx="12" cy="12" r="10" />
+          <circle cx="12" cy="12" r="4" />
+          <line x1="12" y1="2" x2="12" y2="8" />
+          <line x1="12" y1="16" x2="12" y2="22" />
+        </svg>
         Tu viaje creativo
       </div>
       <h2 class="text-[40px] md:text-[56px] font-display font-bold text-text-main tracking-tight">
         Cómo funciona
-        <span class="text-transparent bg-clip-text bg-linear-to-r from-primary to-[#FF8C42]"
+        <span
+          class="text-shimmer text-transparent bg-clip-text bg-[linear-gradient(90deg,var(--color-primary),#FF8C42,var(--color-primary))] bg-size-[200%_auto]"
           >Needly</span
         >
       </h2>
     </div>
 
+    <!-- Mobile timeline -->
     <div class="md:hidden relative pl-8 space-y-10">
       <span
         aria-hidden="true"
@@ -510,6 +582,7 @@
       </div>
     </div>
 
+    <!-- Desktop timeline (zigzag) -->
     <div
       class="hidden md:grid grid-cols-[1fr_120px_1fr] auto-rows-[minmax(200px,auto)] gap-x-8 gap-y-16 items-center"
     >
@@ -526,7 +599,7 @@
         ></span>
 
         <div
-          class="relative z-10 w-16 h-16 rounded-full bg-primary text-white font-display text-2xl font-bold flex items-center justify-center shadow-[0_0_30px_rgba(255,89,0,0.3)]"
+          class="relative z-10 w-16 h-16 rounded-full bg-primary text-white font-display text-2xl font-bold flex items-center justify-center shadow-[0_0_30px_rgba(255,89,0,0.3)] counter-ring"
         >
           1
         </div>
@@ -580,7 +653,7 @@
           class="absolute w-32 h-32 bg-primary/20 blur-2xl rounded-full group-hover:bg-primary/40 group-hover:scale-150 transition-all duration-700"
         ></div>
         <div
-          class="relative w-32 h-32 flex items-center justify-center text-border-main/50 group-hover:text-primary group-hover:-translate-y-2 transition-all duration-500 animate-[bounce_4s_ease-in-out_infinite]"
+          class="relative w-32 h-32 flex items-center justify-center text-border-main/50 group-hover:text-primary group-hover:-translate-y-2 transition-all duration-500 float-element"
         >
           <svg
             viewBox="0 0 24 24"
@@ -605,7 +678,7 @@
           class="absolute w-32 h-32 bg-warning/20 blur-2xl rounded-full group-hover:bg-warning/40 group-hover:scale-150 transition-all duration-700"
         ></div>
         <div
-          class="relative w-32 h-32 flex items-center justify-center text-border-main/50 group-hover:text-warning group-hover:-translate-y-2 transition-all duration-500 animate-[bounce_5s_ease-in-out_infinite]"
+          class="relative w-32 h-32 flex items-center justify-center text-border-main/50 group-hover:text-warning group-hover:-translate-y-2 transition-all duration-500 float-element-slow"
         >
           <svg
             viewBox="0 0 24 24"
@@ -702,7 +775,8 @@
           class="absolute w-32 h-32 bg-like/10 blur-2xl rounded-full group-hover:bg-like/30 group-hover:scale-150 transition-all duration-700"
         ></div>
         <div
-          class="relative w-32 h-32 flex items-center justify-center text-border-main/50 group-hover:text-like group-hover:-translate-y-2 transition-all duration-500 animate-[bounce_4.5s_ease-in-out_infinite]"
+          class="relative w-32 h-32 flex items-center justify-center text-border-main/50 group-hover:text-like group-hover:-translate-y-2 transition-all duration-500 float-element"
+          style="animation-delay: 1s"
         >
           <svg
             viewBox="0 0 24 24"
@@ -726,6 +800,9 @@
   </div>
 </section>
 
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- TUTORIALS – Carousel                                       -->
+<!-- ═══════════════════════════════════════════════════════════ -->
 <section
   appScrollAnimate
   id="tutoriales"
@@ -745,7 +822,8 @@
           class="text-[44px] md:text-[64px] font-display font-bold tracking-tight text-text-main leading-[1.05]"
         >
           Biblioteca de
-          <span class="text-transparent bg-clip-text bg-linear-to-r from-primary to-warning"
+          <span
+            class="text-shimmer text-transparent bg-clip-text bg-[linear-gradient(90deg,var(--color-primary),#f59e0b,var(--color-primary))] bg-size-[200%_auto]"
             >tutoriales</span
           >
         </h2>
@@ -758,7 +836,7 @@
       <div class="flex items-center gap-4 sm:flex">
         <button
           (click)="prevTutorial()"
-          class="w-14 h-14 rounded-full bg-bg border border-border-main/10 flex items-center justify-center text-text-main hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm hover:shadow-lg focus-visible:outline-focus group"
+          class="btn-press w-14 h-14 rounded-full bg-bg border border-border-main/10 flex items-center justify-center text-text-main hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm hover:shadow-lg focus-visible:outline-focus group"
           aria-label="Anterior tutorial"
         >
           <svg
@@ -773,7 +851,7 @@
         </button>
         <button
           (click)="nextTutorial()"
-          class="w-14 h-14 rounded-full bg-bg border border-border-main/10 flex items-center justify-center text-text-main hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm hover:shadow-lg focus-visible:outline-focus group"
+          class="btn-press w-14 h-14 rounded-full bg-bg border border-border-main/10 flex items-center justify-center text-text-main hover:bg-primary hover:text-white hover:border-primary transition-all duration-300 shadow-sm hover:shadow-lg focus-visible:outline-focus group"
           aria-label="Siguiente tutorial"
         >
           <svg
@@ -792,17 +870,16 @@
     <div class="relative h-125 md:h-137.5 w-full flex justify-center items-center perspective-1000">
       @for (tutorial of tutorials; track tutorial.title; let i = $index) {
         <div
-          class="absolute w-full max-w-[320px] md:max-w-105 transition-all duration-700 ease-out cursor-pointer origin-center"
+          class="tutorial-carousel-item absolute w-full max-w-[320px] md:max-w-105 cursor-pointer origin-center"
           [ngClass]="{
-            'z-30 scale-100 opacity-100 translate-x-0 shadow-[0_30px_60px_-15px_rgba(0,0,0,0.2)]':
-              activeTutorialIndex === i,
-            'z-20 scale-90 opacity-40 -translate-x-[65%] md:-translate-x-[105%] blur-[2px] hover:opacity-70 hover:blur-[1px]':
+            center: activeTutorialIndex === i,
+            left:
               activeTutorialIndex === i + 1 ||
               (activeTutorialIndex === 0 && i === tutorials.length - 1),
-            'z-20 scale-90 opacity-40 translate-x-[65%] md:translate-x-[105%] blur-[2px] hover:opacity-70 hover:blur-[1px]':
+            right:
               activeTutorialIndex === i - 1 ||
               (activeTutorialIndex === tutorials.length - 1 && i === 0),
-            'z-10 scale-75 opacity-0 translate-x-0 pointer-events-none':
+            'hidden-card':
               activeTutorialIndex !== i &&
               activeTutorialIndex !== i + 1 &&
               activeTutorialIndex !== i - 1 &&
@@ -812,7 +889,7 @@
           (click)="setActiveTutorial(i)"
         >
           <div
-            class="h-112.5 md:h-125 w-full pointer-events-auto rounded-[2.5rem] overflow-hidden bg-bg"
+            class="h-112.5 md:h-125 w-full pointer-events-auto rounded-[2.5rem] overflow-hidden bg-bg shadow-[0_30px_60px_-15px_rgba(0,0,0,0.15)]"
           >
             <app-tutorial-card
               [tutorial]="tutorial"
@@ -827,10 +904,10 @@
       @for (tutorial of tutorials; track tutorial.title; let i = $index) {
         <button
           (click)="setActiveTutorial(i)"
-          class="h-2.5 rounded-full transition-all duration-500 focus-visible:outline-focus"
+          class="dot-indicator h-2.5 rounded-full transition-all duration-500 focus-visible:outline-focus"
           [ngClass]="
             activeTutorialIndex === i
-              ? 'w-10 bg-primary shadow-sm'
+              ? 'w-10 bg-primary shadow-sm active'
               : 'w-2.5 bg-border-main/20 hover:bg-border-main/50'
           "
           [attr.aria-label]="'Ir al tutorial ' + (i + 1)"
@@ -840,6 +917,9 @@
   </div>
 </section>
 
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- COMMUNITY SECTION                                          -->
+<!-- ═══════════════════════════════════════════════════════════ -->
 <section
   appScrollAnimate
   id="comunidad"
@@ -874,7 +954,8 @@
           class="text-[44px] md:text-[64px] font-display font-bold tracking-tight text-text-main leading-[1.05]"
         >
           Hecho por la <br class="hidden md:block" />
-          <span class="text-transparent bg-clip-text bg-linear-to-r from-like to-[#FF8C42]"
+          <span
+            class="text-shimmer text-transparent bg-clip-text bg-[linear-gradient(90deg,#fe386a,#FF8C42,#fe386a)] bg-size-[200%_auto]"
             >comunidad</span
           >
         </h2>
@@ -889,7 +970,7 @@
       >
         Ver toda la galería
         <svg
-          class="w-4 h-4 transform group-hover:translate-x-1 transition-transform"
+          class="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform duration-300"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -905,7 +986,7 @@
     >
       @for (post of communityPosts; track post._id; let i = $index) {
         <div
-          class="relative transition-all duration-500 ease-out hover:z-50 group/polaroid cursor-pointer"
+          class="polaroid-card relative hover:z-50 group/polaroid cursor-pointer"
           [ngClass]="{
             '-rotate-3 md:-rotate-6 hover:rotate-0 hover:scale-105 origin-bottom-right': i === 0,
             'md:translate-y-12 hover:scale-105 hover:-translate-y-2 z-10 shadow-xl shadow-like/5':
@@ -914,7 +995,7 @@
           }"
         >
           <div
-            class="absolute -inset-0.5 bg-linear-to-br from-like/0 to-primary/0 group-hover/polaroid:from-like/20 group-hover/polaroid:to-primary/20 rounded-4xl blur opacity-0 group-hover/polaroid:opacity-100 transition duration-500 z-0"
+            class="absolute -inset-1 bg-linear-to-br from-like/0 to-primary/0 group-hover/polaroid:from-like/25 group-hover/polaroid:to-primary/25 rounded-4xl blur-md opacity-0 group-hover/polaroid:opacity-100 transition-all duration-500 z-0"
           ></div>
 
           <div class="relative z-10 w-full h-full bg-surface rounded-2xl">
@@ -929,21 +1010,23 @@
     </div>
 
     <div
-      class="mt-16 flex flex-col items-center justify-center opacity-70 hover:opacity-100 transition-opacity duration-300"
+      class="mt-16 flex flex-col items-center justify-center opacity-70 hover:opacity-100 transition-opacity duration-500 group"
     >
       <div class="flex -space-x-4 mb-3">
         <img
-          class="w-10 h-10 rounded-full border-2 border-surface object-cover grayscale hover:grayscale-0 transition-all"
+          class="w-10 h-10 rounded-full border-2 border-surface object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
           src="/hero/hero-2.jpg"
           alt="Usuario"
         />
         <img
-          class="w-10 h-10 rounded-full border-2 border-surface object-cover grayscale hover:grayscale-0 transition-all"
+          class="w-10 h-10 rounded-full border-2 border-surface object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+          style="transition-delay: 75ms"
           src="/hero/hero-1.jpg"
           alt="Usuario"
         />
         <img
-          class="w-10 h-10 rounded-full border-2 border-surface object-cover grayscale hover:grayscale-0 transition-all"
+          class="w-10 h-10 rounded-full border-2 border-surface object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+          style="transition-delay: 150ms"
           src="/hero/hero-3.jpg"
           alt="Usuario"
         />

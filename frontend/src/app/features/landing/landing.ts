@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, OnInit, OnDestroy, HostListener, ElementRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgClass } from '@angular/common';
 
@@ -6,7 +6,6 @@ import { Navbar } from '../../shared/components/navbar/navbar';
 import { Footer } from '../../shared/components/footer/footer';
 import { ScrollAnimateDirective } from '../../shared/directives/scroll-animate.directive';
 import { TutorialCardComponent } from '../../shared/components/tutorial-card/tutorial-card';
-// IMPORTAMOS LA INTERFAZ:
 import {
   CommunityCardComponent,
   CommunityProject,
@@ -27,10 +26,13 @@ import {
   styleUrl: './landing.scss',
 })
 export class Landing implements OnInit, OnDestroy {
+  // ─── Hero Carousel ────────────────────────────────────────
   heroImages: string[] = ['/hero/hero-1.jpg', '/hero/hero-2.jpg', '/hero/hero-3.jpg'];
+  currentImageIndex: number = 0;
+  private imageInterval: ReturnType<typeof setInterval> | null = null;
 
+  // ─── Tutorials ────────────────────────────────────────────
   tutorials: any[] = [
-    /* ... se mantienen tus tutoriales igual ... */
     {
       _id: 'mock-1',
       title: 'Zipper Pouch',
@@ -67,7 +69,9 @@ export class Landing implements OnInit, OnDestroy {
     },
   ];
 
-  // 1. ADAPTAMOS LOS DATOS MOCK AL MODELO COMMUNITYPROJECT
+  activeTutorialIndex: number = 1;
+
+  // ─── Community ────────────────────────────────────────────
   communityPosts: CommunityProject[] = [
     {
       _id: 'landing-post-1',
@@ -104,32 +108,49 @@ export class Landing implements OnInit, OnDestroy {
     } as CommunityProject,
   ];
 
-  currentImageIndex: number = 0;
-  private imageInterval: any;
+  // ─── Scroll ───────────────────────────────────────────────
+  scrollProgress: number = 0;
+  private ticking = false;
+
+  // ─── Touch/Swipe ──────────────────────────────────────────
+  private touchStartX = 0;
+  private touchStartY = 0;
+  private readonly SWIPE_THRESHOLD = 50;
+
+  constructor(private el: ElementRef) {}
+
+  // ═══ Lifecycle ═══════════════════════════════════════════
 
   ngOnInit() {
     this.startImageTransition();
   }
 
   ngOnDestroy() {
-    if (this.imageInterval) {
-      clearInterval(this.imageInterval);
-    }
+    this.stopImageTransition();
   }
 
+  // ═══ Hero Carousel ═══════════════════════════════════════
+
   startImageTransition() {
+    this.stopImageTransition();
     this.imageInterval = setInterval(() => {
       this.currentImageIndex = (this.currentImageIndex + 1) % this.heroImages.length;
     }, 5000);
   }
 
+  private stopImageTransition() {
+    if (this.imageInterval) {
+      clearInterval(this.imageInterval);
+      this.imageInterval = null;
+    }
+  }
+
   setCurrentImage(index: number) {
     this.currentImageIndex = index;
-    clearInterval(this.imageInterval);
     this.startImageTransition();
   }
 
-  activeTutorialIndex: number = 1;
+  // ═══ Tutorial Carousel ═══════════════════════════════════
 
   setActiveTutorial(index: number) {
     this.activeTutorialIndex = index;
@@ -144,20 +165,60 @@ export class Landing implements OnInit, OnDestroy {
       (this.activeTutorialIndex - 1 + this.tutorials.length) % this.tutorials.length;
   }
 
-  scrollProgress: number = 0;
+  // ═══ Scroll Progress (rAF-throttled) ═════════════════════
 
   @HostListener('window:scroll', [])
   onWindowScroll() {
-    const scrollPosition = window.scrollY || document.documentElement.scrollTop || 0;
-    const windowHeight =
-      document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    if (!this.ticking) {
+      requestAnimationFrame(() => {
+        const scrollPosition = window.scrollY || document.documentElement.scrollTop || 0;
+        const windowHeight =
+          document.documentElement.scrollHeight - document.documentElement.clientHeight;
 
-    if (windowHeight > 0) {
-      this.scrollProgress = (scrollPosition / windowHeight) * 100;
+        if (windowHeight > 0) {
+          this.scrollProgress = (scrollPosition / windowHeight) * 100;
+        }
+        this.ticking = false;
+      });
+      this.ticking = true;
     }
   }
 
-  // 2. FUNCIÓN PARA SIMULAR EL LIKE EN LA LANDING
+  // ═══ Keyboard navigation ═════════════════════════════════
+
+  @HostListener('window:keydown', ['$event'])
+  onKeyDown(event: KeyboardEvent) {
+    if (event.key === 'ArrowLeft') {
+      this.prevTutorial();
+    } else if (event.key === 'ArrowRight') {
+      this.nextTutorial();
+    }
+  }
+
+  // ═══ Touch / Swipe ═══════════════════════════════════════
+
+  @HostListener('touchstart', ['$event'])
+  onTouchStart(event: TouchEvent) {
+    this.touchStartX = event.touches[0].clientX;
+    this.touchStartY = event.touches[0].clientY;
+  }
+
+  @HostListener('touchend', ['$event'])
+  onTouchEnd(event: TouchEvent) {
+    const deltaX = event.changedTouches[0].clientX - this.touchStartX;
+    const deltaY = event.changedTouches[0].clientY - this.touchStartY;
+
+    if (Math.abs(deltaX) > this.SWIPE_THRESHOLD && Math.abs(deltaX) > Math.abs(deltaY)) {
+      if (deltaX < 0) {
+        this.nextTutorial();
+      } else {
+        this.prevTutorial();
+      }
+    }
+  }
+
+  // ═══ Community Like ══════════════════════════════════════
+
   handleMockLike(payload: { project: CommunityProject; event: Event }) {
     payload.event.preventDefault();
     payload.event.stopPropagation();

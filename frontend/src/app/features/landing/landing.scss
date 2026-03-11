@@ -1,0 +1,355 @@
+// ─── Keyframes ──────────────────────────────────────────────
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes stitchDash {
+  to {
+    stroke-dashoffset: -40;
+  }
+}
+
+@keyframes needlePulse {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translateY(-8px) rotate(5deg);
+    opacity: 1;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
+}
+
+@keyframes floatSlow {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+  66% {
+    transform: translateY(4px) rotate(-1deg);
+  }
+}
+
+@keyframes spin-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes counter-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 89, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(255, 89, 0, 0);
+  }
+}
+
+// ─── Scroll progress bar ────────────────────────────────────
+.scroll-progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-primary), #ff8c42, var(--color-primary));
+  background-size: 200% 100%;
+  animation: gradient-shift 3s ease infinite;
+  z-index: 9999;
+  transition: width 0.15s ease-out;
+  border-radius: 0 2px 2px 0;
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -1px;
+    width: 8px;
+    height: 5px;
+    border-radius: 50%;
+    background: #ff8c42;
+    box-shadow: 0 0 12px 2px rgba(255, 140, 66, 0.6);
+  }
+}
+
+// ─── Hero entrance choreography ─────────────────────────────
+.hero-badge {
+  animation: fadeInDown 0.7s ease-out 0.2s both;
+}
+
+.hero-title {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+}
+
+.hero-subtitle {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+}
+
+.hero-cta {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.65s both;
+}
+
+.hero-social-proof {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both;
+}
+
+.hero-image-container {
+  animation: fadeInScale 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+}
+
+// ─── Gradient text shimmer ──────────────────────────────────
+.text-shimmer {
+  background-size: 200% auto;
+  animation: shimmer 4s linear infinite;
+}
+
+// ─── Floating decorative elements ───────────────────────────
+.float-element {
+  animation: float 6s ease-in-out infinite;
+}
+
+.float-element-slow {
+  animation: floatSlow 8s ease-in-out infinite;
+}
+
+// ─── Stitch line animations ─────────────────────────────────
+.stitch-line {
+  stroke-dasharray: 10 10;
+  animation: stitchDash 2s linear infinite;
+}
+
+.stitch-line-slow {
+  stroke-dasharray: 15 15;
+  animation: stitchDash 4s linear infinite;
+}
+
+// ─── Needle cursor ──────────────────────────────────────────
+.needle-cursor {
+  animation: needlePulse 3s ease-in-out infinite;
+}
+
+// ─── Bobbin spin ────────────────────────────────────────────
+.bobbin-spin {
+  animation: spin-slow 12s linear infinite;
+}
+
+// ─── Counter ring pulse ─────────────────────────────────────
+.counter-ring {
+  animation: counter-pulse 2s ease-in-out infinite;
+}
+
+// ─── Carousel images ────────────────────────────────────────
+.carousel-image {
+  transition:
+    opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+    filter 1.2s ease;
+
+  &.active {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+
+  &.inactive {
+    opacity: 0;
+    transform: scale(1.08);
+    filter: brightness(0.8);
+  }
+}
+
+// ─── Dot indicators ─────────────────────────────────────────
+.dot-indicator {
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+
+  &.active::after {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 9999px;
+    border: 1.5px solid var(--color-primary);
+    opacity: 0.4;
+    animation: counter-pulse 2s ease-in-out infinite;
+  }
+}
+
+// ─── Button press effect ────────────────────────────────────
+.btn-press {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &:active {
+    transform: scale(0.95) translateY(1px);
+  }
+}
+
+// ─── Magnetic hover for CTA ─────────────────────────────────
+.btn-magnetic {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition:
+      width 0.6s ease,
+      height 0.6s ease;
+  }
+
+  &:hover::before {
+    width: 300%;
+    height: 300%;
+  }
+}
+
+// ─── Tutorial carousel 3D ───────────────────────────────────
+.tutorial-carousel-item {
+  transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform, opacity, filter;
+
+  &.center {
+    transform: translateX(0) scale(1) rotateY(0deg);
+    opacity: 1;
+    filter: blur(0);
+    z-index: 30;
+  }
+
+  &.left {
+    transform: translateX(-65%) scale(0.88) rotateY(8deg);
+    opacity: 0.4;
+    filter: blur(2px);
+    z-index: 20;
+
+    @media (min-width: 768px) {
+      transform: translateX(-105%) scale(0.88) rotateY(8deg);
+    }
+
+    &:hover {
+      opacity: 0.65;
+      filter: blur(1px);
+    }
+  }
+
+  &.right {
+    transform: translateX(65%) scale(0.88) rotateY(-8deg);
+    opacity: 0.4;
+    filter: blur(2px);
+    z-index: 20;
+
+    @media (min-width: 768px) {
+      transform: translateX(105%) scale(0.88) rotateY(-8deg);
+    }
+
+    &:hover {
+      opacity: 0.65;
+      filter: blur(1px);
+    }
+  }
+
+  &.hidden-card {
+    transform: translateX(0) scale(0.7);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+  }
+}
+
+// ─── Polaroid community cards ───────────────────────────────
+.polaroid-card {
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  &:hover {
+    z-index: 50;
+  }
+}
+
+// ─── Smooth scroll ──────────────────────────────────────────
+:host {
+  scroll-behavior: smooth;
+}
+
+// ─── Reduced motion ─────────────────────────────────────────
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
