@@ -1,69 +1,40 @@
 <header
-  class="w-full fixed top-0 z-50 transition-all duration-300 border-b"
+  class="w-full fixed top-0 z-50 transition-all duration-500"
   [ngClass]="{
-    'bg-surface/85 backdrop-blur-md py-3 shadow-sm border-border-main/20': isScrolled,
-    'bg-surface py-5 border-transparent': !isScrolled,
+    'bg-surface/80 backdrop-blur-xl py-3 shadow-[0_4px_30px_rgba(0,0,0,0.05)] border-b border-border-main/10':
+      isScrolled(),
+    'bg-transparent py-5 border-b border-transparent': !isScrolled(),
   }"
 >
   <div class="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
     <a
       routerLink="/"
-      class="flex items-center gap-2 focus-visible:outline-focus rounded-lg px-1 group"
+      aria-label="Ir al inicio"
+      class="flex items-center gap-2 focus-visible:outline-focus rounded-xl px-1 group outline-offset-4"
     >
       <img
         src="/logo/logo.png"
         alt="Logo de Needly"
-        class="w-12 h-12 md:w-14 md:h-14 object-contain transition-transform duration-300 group-hover:scale-105"
+        class="w-12 h-12 md:w-14 md:h-14 object-contain transition-all duration-500 ease-out group-hover:scale-110 group-hover:rotate-[-5deg]"
+        [class.invert]="isDarkMode()"
       />
       <span class="font-display text-[22px] md:text-[24px] font-bold text-text-main tracking-tight">
         Needly
       </span>
     </a>
 
-    <nav class="hidden md:flex items-center gap-8">
-      <a
-        href="/#encontrar"
-        class="relative text-[14px] font-medium text-text-main transition-colors focus-visible:outline-focus rounded py-1 group"
-      >
-        Encontrar
-        <span
-          class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 ease-out group-hover:w-full"
-        ></span>
-      </a>
-      <a
-        href="/#funcionamiento"
-        class="relative text-[14px] font-medium text-text-main transition-colors focus-visible:outline-focus rounded py-1 group"
-      >
-        Funcionamiento
-        <span
-          class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 ease-out group-hover:w-full"
-        ></span>
-      </a>
-      <a
-        href="/#biblioteca"
-        class="relative text-[14px] font-medium text-text-main transition-colors focus-visible:outline-focus rounded py-1 group"
-      >
-        Biblioteca
-        <span
-          class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 ease-out group-hover:w-full"
-        ></span>
-      </a>
-      <a
-        href="/#comunidad"
-        class="relative text-[14px] font-medium text-text-main transition-colors focus-visible:outline-focus rounded py-1 group"
-      >
-        Comunidad
-        <span
-          class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 ease-out group-hover:w-full"
-        ></span>
-      </a>
+    <nav class="hidden md:flex items-center gap-8" aria-label="Navegación principal">
+      <a href="/#encontrar" class="nav-link">Encontrar</a>
+      <a href="/#funcionamiento" class="nav-link">Funcionamiento</a>
+      <a href="/#tutoriales" class="nav-link">Biblioteca</a>
+      <a href="/#comunidad" class="nav-link">Comunidad</a>
     </nav>
 
-    <div class="flex items-center gap-4">
+    <div class="flex items-center gap-3 sm:gap-5">
       <button
         (click)="toggleTheme()"
-        class="relative flex items-center justify-center p-2 rounded-full text-text-main hover:bg-black/5 dark:hover:bg-white/10 transition-colors focus-visible:outline-focus"
-        aria-label="Alternar modo oscuro"
+        class="relative flex items-center justify-center w-10 h-10 rounded-full text-text-main hover:bg-black/5 dark:hover:bg-white/10 transition-colors focus-visible:outline-focus"
+        [attr.aria-label]="isDarkMode() ? 'Activar modo claro' : 'Activar modo oscuro'"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -71,8 +42,10 @@
           viewBox="0 0 24 24"
           stroke-width="1.5"
           stroke="currentColor"
-          class="w-5 h-5 transition-all duration-500 absolute"
-          [ngClass]="isDarkMode ? 'opacity-0 rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'"
+          class="w-5 h-5 absolute transition-all duration-500 ease-spring"
+          [ngClass]="
+            isDarkMode() ? 'opacity-0 rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'
+          "
         >
           <path
             stroke-linecap="round"
@@ -87,9 +60,9 @@
           viewBox="0 0 24 24"
           stroke-width="1.5"
           stroke="currentColor"
-          class="w-6 h-6 transition-all duration-500"
+          class="w-6 h-6 absolute transition-all duration-500 ease-spring"
           [ngClass]="
-            isDarkMode ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50'
+            isDarkMode() ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 -rotate-90 scale-50'
           "
         >
           <path
@@ -100,24 +73,30 @@
         </svg>
       </button>
 
-      <a
-        routerLink="/auth/login"
-        class="hidden sm:block text-[14px] font-semibold text-text-main hover:text-primary transition-colors duration-300 focus-visible:outline-focus rounded"
-      >
-        Iniciar sesión
-      </a>
-
-      <a
-        routerLink="/auth/register"
-        class="btn btn-primary hidden sm:inline-flex hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300"
-      >
-        Regístrate gratis
-      </a>
+      <div class="hidden sm:flex items-center gap-4">
+        <a
+          routerLink="/auth/login"
+          class="text-[15px] font-semibold text-text-main hover:text-primary transition-colors duration-300 focus-visible:outline-focus rounded-md px-2 py-1"
+        >
+          Iniciar sesión
+        </a>
+        <a
+          routerLink="/auth/register"
+          class="btn btn-primary relative overflow-hidden group shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300"
+        >
+          <span class="relative z-10">Regístrate gratis</span>
+          <div
+            class="absolute inset-0 h-full w-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer z-0"
+          ></div>
+        </a>
+      </div>
 
       <button
         class="md:hidden flex items-center justify-center p-2 text-text-main hover:text-primary transition-colors focus-visible:outline-focus rounded-lg"
-        (click)="toggleMobileMenu()"
-        aria-label="Alternar menú"
+        (click)="toggleMobileMenu($event)"
+        [attr.aria-expanded]="isMobileMenuOpen()"
+        aria-controls="mobile-menu"
+        aria-label="Alternar menú de navegación"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -125,11 +104,15 @@
           viewBox="0 0 24 24"
           stroke-width="2"
           stroke="currentColor"
-          class="w-6 h-6 transition-transform duration-300"
-          [ngClass]="{ 'rotate-90': isMobileMenuOpen }"
+          class="w-7 h-7 transition-transform duration-500 ease-spring"
+          [ngClass]="{ 'rotate-90': isMobileMenuOpen() }"
         >
-          @if (!isMobileMenuOpen) {
-            <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          @if (!isMobileMenuOpen()) {
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+            />
           } @else {
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           }
@@ -139,51 +122,67 @@
   </div>
 
   <div
-    class="md:hidden absolute top-full left-0 w-full bg-surface/95 backdrop-blur-xl border-b border-border-main/20 shadow-xl overflow-hidden transition-all duration-300 ease-in-out origin-top"
-    [ngClass]="isMobileMenuOpen ? 'max-h-100 opacity-100' : 'max-h-0 opacity-0'"
+    class="md:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-[-1] transition-opacity duration-300 cursor-pointer"
+    [ngClass]="{
+      'opacity-100 visible': isMobileMenuOpen(),
+      'opacity-0 invisible pointer-events-none': !isMobileMenuOpen(),
+    }"
+    (click)="closeMobileMenu()"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    id="mobile-menu"
+    class="md:hidden absolute top-[110%] left-4 right-4 bg-surface/95 backdrop-blur-2xl border border-border-main/10 shadow-2xl rounded-3xl overflow-hidden transition-all duration-500 ease-spring origin-top"
+    [ngClass]="{
+      'scale-100 opacity-100 visible translate-y-0': isMobileMenuOpen(),
+      'scale-95 opacity-0 invisible -translate-y-4 pointer-events-none': !isMobileMenuOpen(),
+    }"
   >
-    <nav class="flex flex-col px-6 py-4 gap-4">
-      <a
-        href="/#encontrar"
-        (click)="closeMobileMenu()"
-        class="text-[16px] font-medium text-text-main hover:text-primary transition-colors focus-visible:outline-focus rounded p-2"
-        >Encontrar</a
-      >
-      <a
-        href="/#funcionamiento"
-        (click)="closeMobileMenu()"
-        class="text-[16px] font-medium text-text-main hover:text-primary transition-colors focus-visible:outline-focus rounded p-2"
-        >Funcionamiento</a
-      >
-      <a
-        href="/#biblioteca"
-        (click)="closeMobileMenu()"
-        class="text-[16px] font-medium text-text-main hover:text-primary transition-colors focus-visible:outline-focus rounded p-2"
-        >Biblioteca</a
-      >
-      <a
-        href="/#comunidad"
-        (click)="closeMobileMenu()"
-        class="text-[16px] font-medium text-text-main hover:text-primary transition-colors focus-visible:outline-focus rounded p-2"
-        >Comunidad</a
-      >
-
-      <hr class="border-border-main/20 my-2" />
-
-      <a
-        routerLink="/auth/login"
-        (click)="closeMobileMenu()"
-        class="text-[16px] font-semibold text-text-main hover:text-primary transition-colors focus-visible:outline-focus rounded p-2"
-      >
-        Iniciar sesión
+    <nav class="flex flex-col p-6 gap-2">
+      <a href="/#encontrar" (click)="closeMobileMenu()" class="mobile-nav-link">
+        <span class="text-xl">Encontrar</span>
+        <svg class="w-5 h-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
       </a>
-      <a
-        routerLink="/auth/register"
-        (click)="closeMobileMenu()"
-        class="btn btn-primary w-full text-center mt-2"
-      >
-        Regístrate gratis
+      <a href="/#funcionamiento" (click)="closeMobileMenu()" class="mobile-nav-link">
+        <span class="text-xl">Funcionamiento</span>
+        <svg class="w-5 h-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
       </a>
+      <a href="/#tutoriales" (click)="closeMobileMenu()" class="mobile-nav-link">
+        <span class="text-xl">Biblioteca</span>
+        <svg class="w-5 h-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
+      <a href="/#comunidad" (click)="closeMobileMenu()" class="mobile-nav-link">
+        <span class="text-xl">Comunidad</span>
+        <svg class="w-5 h-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
+      </a>
+
+      <div class="h-px bg-border-main/10 my-4"></div>
+
+      <div class="flex flex-col gap-3">
+        <a
+          routerLink="/auth/login"
+          (click)="closeMobileMenu()"
+          class="btn btn-secondary w-full py-3 text-lg"
+        >
+          Iniciar sesión
+        </a>
+        <a
+          routerLink="/auth/register"
+          (click)="closeMobileMenu()"
+          class="btn btn-primary w-full py-3 text-lg"
+        >
+          Regístrate gratis
+        </a>
+      </div>
     </nav>
   </div>
 </header>
