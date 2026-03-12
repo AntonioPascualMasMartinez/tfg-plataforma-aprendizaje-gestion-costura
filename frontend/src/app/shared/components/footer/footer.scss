@@ -1,0 +1,43 @@
+@reference "../../../../styles.css";
+
+// Animación fluida base
+.ease-spring {
+  transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+// Inversión del Logo en Modo Oscuro (CSS Puro e infalible)
+:host-context(.dark) .footer-logo {
+  filter: invert(1);
+}
+
+// Enlaces del Footer con efecto de línea inferior deslizante
+.footer-link {
+  @apply relative text-[15px] text-muted transition-colors focus-visible:outline-focus rounded py-1 inline-block hover:text-primary duration-300;
+  
+  &::after {
+    content: '';
+    @apply absolute -bottom-0.5 left-0 w-0 h-[1.5px] bg-primary transition-all duration-300 ease-out;
+  }
+
+  &:hover::after {
+    @apply w-full;
+  }
+}
+
+// Botones de Redes Sociales
+.social-btn {
+  @apply relative flex items-center justify-center w-10 h-10 rounded-full bg-surface border border-border-main/20 text-muted transition-all duration-300 focus-visible:outline-focus z-10 overflow-hidden;
+
+  &::before {
+    content: '';
+    @apply absolute inset-0 bg-primary opacity-0 transition-opacity duration-300 z-[-1];
+  }
+
+  &:hover {
+    @apply text-white border-transparent -translate-y-1 shadow-[0_5px_15px_rgba(255,89,0,0.3)];
+    
+    &::before {
+      @apply opacity-100;
+    }
+  }
+}

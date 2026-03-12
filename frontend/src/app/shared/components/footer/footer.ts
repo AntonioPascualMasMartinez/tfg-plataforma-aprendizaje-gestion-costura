@@ -1,13 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-footer',
+  standalone: true,
   imports: [RouterLink],
   templateUrl: './footer.html',
   styleUrl: './footer.scss',
 })
 export class Footer {
-  // Año dinámico para el copyright
-  currentYear: number = new Date().getFullYear();
+  currentYear = signal(new Date().getFullYear());
 }
