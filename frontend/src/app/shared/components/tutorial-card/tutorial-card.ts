@@ -26,14 +26,20 @@ export class TutorialCardComponent {
   // Colores según la dificultad del modelo de tutoriales
   get difficultyColorClass(): string {
     switch (this.tutorial.difficultyLevel) {
-      case 'Principiante': // En tu backend se llama Principiante, no Fácil
-        return 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50';
+      case 'Principiante':
+        // Fondo blanco sólido, texto verde oscuro (emerald-700) para asegurar alto contraste
+        return 'bg-white text-emerald-700 border-emerald-200 dark:bg-surface dark:text-emerald-400 dark:border-emerald-800/60';
+
       case 'Intermedio':
-        return 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50';
+        // Usamos amber-700 (y no 500 o 600) para que el naranja sobre blanco sea muy legible
+        return 'bg-white text-amber-700 border-amber-200 dark:bg-surface dark:text-amber-400 dark:border-amber-800/60';
+
       case 'Avanzado':
-        return 'bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800/50';
+        // Texto rosa oscuro sobre blanco
+        return 'bg-white text-rose-700 border-rose-200 dark:bg-surface dark:text-rose-400 dark:border-rose-800/60';
+
       default:
-        return 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700';
+        return 'bg-white text-gray-700 border-gray-200 dark:bg-surface dark:text-gray-300 dark:border-gray-700/60';
     }
   }
 
