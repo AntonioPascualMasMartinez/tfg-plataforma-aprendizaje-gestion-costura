@@ -3,92 +3,34 @@
 <!-- Scroll Progress Bar -->
 <div class="scroll-progress-bar" [style.width.%]="scrollProgress"></div>
 
-<!-- Animated Background Layer -->
-<div
-  class="fixed inset-0 z-[-1] pointer-events-none overflow-hidden bg-bg transition-colors duration-500"
->
-  <div
-    class="absolute inset-0 opacity-[0.04] dark:opacity-[0.02] bg-[linear-gradient(to_right,#818181_2px,transparent_2px),linear-gradient(to_bottom,#818181_2px,transparent_2px)] bg-size-[60px_60px]"
-  ></div>
-
-  <svg
-    class="absolute top-[-10%] left-[-10vw] w-[120vw] h-[120vh] text-primary/30 dark:text-primary/15 transition-transform duration-700 ease-out"
-    [style.transform]="
-      'translateY(' + scrollProgress * -0.15 + '%) rotate(' + scrollProgress * 0.03 + 'deg)'
-    "
-    viewBox="0 0 1000 1000"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="none"
-  >
-    <path
-      d="M0,100 C200,400 400,-100 700,300 C1000,700 800,900 1000,1000"
-      stroke="currentColor"
-      stroke-width="3"
-      stroke-linecap="round"
-      class="stitch-line-slow"
-    />
-  </svg>
-
-  <svg
-    class="absolute top-[20%] left-[-20vw] w-[140vw] h-screen text-border-main/20 dark:text-white/5 transition-transform duration-700 ease-out"
-    [style.transform]="'translateX(' + scrollProgress * 0.1 + '%)'"
-    viewBox="0 0 1000 1000"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    preserveAspectRatio="none"
-  >
-    <path
-      d="M-200,800 C300,900 500,200 1200,400"
-      stroke="currentColor"
-      stroke-width="2"
-      stroke-linecap="round"
-      class="stitch-line"
-    />
-  </svg>
-
-  <svg
-    class="absolute top-[-10%] right-[-10%] w-[60vw] h-[80vh] text-info/5 dark:text-info/5 transition-transform duration-700 ease-out"
-    [style.transform]="'translate(' + scrollProgress * -0.1 + '%, ' + scrollProgress * 0.15 + '%)'"
-    viewBox="0 0 1000 1000"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path d="M1000,0 C500,100 700,700 0,1000 L1000,1000 Z" fill="currentColor" />
-  </svg>
-
-  <svg
-    class="absolute bottom-[-10%] left-[-10%] w-[70vw] h-[70vh] text-warning/5 dark:text-warning/5 transition-transform duration-700 ease-out"
-    [style.transform]="'translate(' + scrollProgress * 0.15 + '%, ' + scrollProgress * -0.1 + '%)'"
-    viewBox="0 0 1000 1000"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-  >
-    <path d="M0,1000 C300,700 100,200 1000,0 L0,0 Z" fill="currentColor" />
-  </svg>
-
-  <!-- Floating decorative dots -->
-  <div
-    class="absolute top-[15%] right-[8%] w-3 h-3 rounded-full bg-primary/20 float-element"
-    style="animation-delay: 0s"
-  ></div>
-  <div
-    class="absolute top-[45%] left-[5%] w-2 h-2 rounded-full bg-warning/20 float-element"
-    style="animation-delay: 1.5s"
-  ></div>
-  <div
-    class="absolute top-[70%] right-[15%] w-2.5 h-2.5 rounded-full bg-like/15 float-element-slow"
-    style="animation-delay: 3s"
-  ></div>
-</div>
-
 <!-- ═══════════════════════════════════════════════════════════ -->
 <!-- HERO SECTION                                               -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 <section
   appScrollAnimate
-  class="w-full relative bg-transparent flex items-center min-h-svh pt-20 pb-16 overflow-hidden"
+  class="w-full relative bg-bg flex items-center min-h-svh pt-20 pb-16 overflow-hidden z-10"
 >
+  <div class="absolute inset-0 pointer-events-none z-0">
+    <div
+      class="absolute -top-[10%] -right-[10%] w-[50vw] h-[50vw] rounded-full bg-primary/10 dark:bg-primary/5 blur-[120px] animate-blob"
+    ></div>
+    <div
+      class="absolute bottom-[10%] -left-[10%] w-[40vw] h-[40vw] rounded-full bg-warning/10 dark:bg-warning/5 blur-[100px] float-element"
+      style="animation-delay: 2s"
+    ></div>
+
+    <svg
+      class="absolute top-1/4 left-0 w-full h-full text-border-main/30"
+      viewBox="0 0 1000 1000"
+      preserveAspectRatio="none"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+    >
+      <path d="M-100,400 C200,200 500,700 1200,300" class="stitch-line-slow" />
+      <path d="M-100,415 C200,215 500,715 1200,315" opacity="0.3" stroke-dasharray="4 8" />
+    </svg>
+  </div>
   <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
     <div
       class="absolute -top-[10%] -right-[10%] w-[50%] h-[50%] rounded-full bg-primary/5 blur-[120px] float-element-slow"
@@ -103,18 +45,6 @@
     class="max-w-7xl mx-auto w-full px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center relative z-10"
   >
     <div class="flex flex-col items-start text-left pt-10 lg:pt-0">
-      <div
-        class="hero-badge inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-[14px] font-semibold mb-8 border border-primary/20 hover:bg-primary/15 transition-colors cursor-default shadow-sm hover:shadow-md hover:-translate-y-0.5 duration-300"
-      >
-        <span class="relative flex h-2.5 w-2.5">
-          <span
-            class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"
-          ></span>
-          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-primary"></span>
-        </span>
-        Únete a la comunidad de Needly
-      </div>
-
       <h1
         class="hero-title mb-6 leading-[1.15] text-[40px] md:text-[56px] lg:text-[64px] font-display font-bold text-text-main tracking-tight"
       >
@@ -143,44 +73,6 @@
         >
           Descubrir proyectos
         </a>
-      </div>
-
-      <div class="hero-social-proof mt-12 flex items-center gap-4 group">
-        <div class="flex -space-x-3 transition-transform duration-300 group-hover:scale-105">
-          <div
-            class="w-10 h-10 rounded-full border-2 border-surface bg-border-main/20 flex items-center justify-center overflow-hidden transition-transform duration-300 hover:scale-110 hover:z-10"
-          >
-            <svg class="w-5 h-5 text-muted" fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z"
-              />
-            </svg>
-          </div>
-          <div
-            class="w-10 h-10 rounded-full border-2 border-surface bg-border-main/30 flex items-center justify-center overflow-hidden transition-transform duration-300 hover:scale-110 hover:z-10"
-          >
-            <svg class="w-5 h-5 text-muted" fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z"
-              />
-            </svg>
-          </div>
-          <div
-            class="w-10 h-10 rounded-full border-2 border-surface bg-border-main/40 flex items-center justify-center overflow-hidden transition-transform duration-300 hover:scale-110 hover:z-10"
-          >
-            <svg class="w-5 h-5 text-muted" fill="currentColor" viewBox="0 0 24 24">
-              <path
-                d="M24 20.993V24H0v-2.996A14.977 14.977 0 0112.004 15c4.904 0 9.26 2.354 11.996 5.993zM16.002 8.999a4 4 0 11-8 0 4 4 0 018 0z"
-              />
-            </svg>
-          </div>
-          <div
-            class="w-10 h-10 rounded-full border-2 border-surface bg-primary/10 flex items-center justify-center text-[12px] font-bold text-primary counter-ring"
-          >
-            +2k
-          </div>
-        </div>
-        <p class="text-[14px] text-muted font-medium">creadores ya se han unido</p>
       </div>
     </div>
 
@@ -234,23 +126,6 @@
       </div>
     </div>
   </div>
-
-  <a
-    href="#encontrar"
-    class="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-muted hover:text-primary transition-colors animate-bounce z-20 focus-visible:outline-focus rounded-lg px-2"
-  >
-    <span class="text-[12px] font-medium tracking-widest uppercase">Scroll</span>
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke-width="2"
-      stroke="currentColor"
-      class="w-5 h-5"
-    >
-      <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
-    </svg>
-  </a>
 </section>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
@@ -259,8 +134,11 @@
 <section
   appScrollAnimate
   id="encontrar"
-  class="w-full bg-transparent py-24 px-6 md:px-12 transition-colors duration-300"
+  class="w-full bg-surface py-24 px-6 md:px-12 relative overflow-hidden"
 >
+  <div
+    class="absolute inset-0 z-0 opacity-20 dark:opacity-10 bg-[linear-gradient(to_right,var(--color-border-main)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border-main)_1px,transparent_1px)] bg-[size:24px_24px]"
+  ></div>
   <div class="max-w-7xl mx-auto">
     <header class="mb-16 max-w-2xl">
       <h2
@@ -279,17 +157,20 @@
     </header>
 
     <div class="grid grid-cols-1 md:grid-cols-2 md:grid-rows-2 gap-6 lg:gap-8">
-      <!-- Card 1: Planificación Integral (tall) -->
       <article
-        class="group md:row-span-2 rounded-[2.5rem] border border-border-main/10 dark:border-white/5 bg-surface dark:bg-surface/60 shadow-sm hover:shadow-[0_20px_40px_-15px_rgba(255,89,0,0.15)] hover:-translate-y-1.5 transition-all duration-500 overflow-hidden cursor-pointer flex flex-col relative"
+        class="group md:row-span-2 rounded-[2.5rem] border border-border-main/10 dark:border-white/5 bg-surface/90 backdrop-blur-md shadow-xl shadow-black/5 hover:shadow-[0_32px_64px_-16px_rgba(255,89,0,0.2)] hover:drop-shadow-[0_12px_12px_rgba(255,89,0,0.15)] hover:-translate-y-2 transition-all duration-500 overflow-hidden cursor-pointer flex flex-col relative"
       >
+        <div
+          class="absolute inset-0 bg-linear-to-b from-primary/0 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0"
+        ></div>
+
         <div class="p-8 md:p-10 z-10">
           <div class="flex items-center justify-between mb-6">
             <div
-              class="w-14 h-14 rounded-2xl bg-bg border border-border-main/10 dark:border-white/5 shadow-sm flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-md group-hover:border-primary/30 transition-all duration-500"
+              class="w-14 h-14 rounded-3xl bg-bg border border-border-main/10 dark:border-white/5 shadow-sm flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 group-hover:bg-primary group-hover:text-white group-hover:shadow-[0_6px_20px_rgba(255,89,0,0.4)] transition-all duration-500"
             >
               <svg
-                class="h-7 w-7 text-primary"
+                class="h-7 w-7 text-primary group-hover:text-white transition-colors"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -305,37 +186,26 @@
                 <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01" />
               </svg>
             </div>
-            <div
-              class="w-10 h-10 rounded-full bg-bg/50 dark:bg-white/10 flex items-center justify-center opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500"
-            >
-              <svg
-                class="w-5 h-5 text-text-main group-hover:text-primary transition-colors"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </div>
           </div>
 
           <h3
-            class="text-[22px] md:text-[26px] font-display font-bold text-text-main group-hover:text-primary transition-colors duration-300"
+            class="text-[24px] md:text-[28px] font-display font-bold text-text-main group-hover:text-primary transition-colors duration-300"
           >
             Planificación Integral
           </h3>
-          <p class="mt-4 text-[15px] md:text-[16px] text-muted leading-relaxed max-w-[44ch]">
+          <p
+            class="mt-4 text-[15px] md:text-[16px] text-muted leading-relaxed max-w-[44ch] group-hover:text-text-main/90 transition-colors"
+          >
             Gestiona inventarios de telas, asigna patrones digitales y sigue el progreso de cada
             puntada en un solo lugar.
           </p>
         </div>
 
         <div
-          class="relative flex-1 min-h-80 mx-4 mb-4 rounded-3xl overflow-hidden border border-border-main/10 dark:border-white/5 shadow-inner"
+          class="relative flex-1 min-h-80 mx-4 mb-4 rounded-[2rem] overflow-hidden border border-border-main/10 shadow-[0_0_20px_rgba(0,0,0,0.05)_inset]"
         >
           <div
-            class="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors duration-500 z-10"
+            class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 z-10"
           ></div>
           <img
             src="/hero/hero-1.jpg"
@@ -345,21 +215,24 @@
         </div>
       </article>
 
-      <!-- Card 2: Comunidad Vibrante -->
       <article
-        class="group rounded-[2.5rem] border border-border-main/10 dark:border-white/5 bg-surface dark:bg-surface/60 shadow-sm hover:shadow-[0_20px_40px_-15px_rgba(255,89,0,0.15)] hover:-translate-y-1.5 transition-all duration-500 overflow-hidden cursor-pointer flex flex-col md:flex-row relative"
+        class="group rounded-[2.5rem] border border-border-main/10 dark:border-white/5 bg-surface/90 backdrop-blur-md shadow-xl shadow-black/5 hover:shadow-[0_32px_64px_-16px_rgba(255,140,66,0.2)] hover:drop-shadow-[0_12px_12px_rgba(255,140,66,0.15)] hover:-translate-y-2 transition-all duration-500 overflow-hidden cursor-pointer flex flex-col md:flex-row relative"
       >
+        <div
+          class="absolute inset-0 bg-linear-to-r from-transparent to-[#FF8C42]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0"
+        ></div>
+
         <div class="p-8 md:p-10 flex-1 flex flex-col justify-center z-10">
           <div class="flex items-center justify-between mb-5">
             <div
-              class="w-12 h-12 rounded-xl bg-bg border border-border-main/10 dark:border-white/5 shadow-sm flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 group-hover:shadow-md group-hover:border-[#FF8C42]/30 transition-all duration-500"
+              class="w-14 h-14 rounded-3xl bg-bg border border-border-main/10 dark:border-white/5 shadow-sm flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 group-hover:bg-[#FF8C42] group-hover:text-white group-hover:shadow-[0_6px_20px_rgba(255,140,66,0.4)] transition-all duration-500"
             >
               <svg
-                class="h-6 w-6 text-[#FF8C42]"
+                class="h-6 w-6 text-[#FF8C42] group-hover:text-white transition-colors"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="1.8"
+                stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 aria-hidden="true"
@@ -370,37 +243,26 @@
                 <path d="M16 3.13a4 4 0 0 1 0 7.75" />
               </svg>
             </div>
-            <div
-              class="w-8 h-8 rounded-full bg-bg/50 dark:bg-white/10 flex items-center justify-center opacity-0 -translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500"
-            >
-              <svg
-                class="w-4 h-4 text-text-main group-hover:text-[#FF8C42] transition-colors"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </div>
           </div>
 
           <h3
-            class="text-[20px] md:text-[22px] font-display font-bold text-text-main group-hover:text-primary transition-colors duration-300"
+            class="text-[22px] md:text-[24px] font-display font-bold text-text-main group-hover:text-[#FF8C42] transition-colors duration-300"
           >
             Comunidad Vibrante
           </h3>
-          <p class="mt-3 text-[14px] md:text-[15px] text-muted leading-relaxed max-w-[40ch]">
+          <p
+            class="mt-3 text-[14px] md:text-[15px] text-muted leading-relaxed max-w-[40ch] group-hover:text-text-main/90 transition-colors"
+          >
             Comparte tus proyectos terminados, recibe feedback constructivo y encuentra inspiración
             diaria.
           </p>
         </div>
 
         <div
-          class="relative md:w-64 w-full h-56 md:h-auto m-4 md:ml-0 rounded-3xl overflow-hidden border border-border-main/10 dark:border-white/5 shadow-inner"
+          class="relative md:w-64 w-full h-56 md:h-auto m-4 md:ml-0 rounded-[2rem] overflow-hidden border border-border-main/10 shadow-[0_0_20px_rgba(0,0,0,0.05)_inset]"
         >
           <div
-            class="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors duration-500 z-10"
+            class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 z-10"
           ></div>
           <img
             src="/hero/hero-2.jpg"
@@ -410,15 +272,18 @@
         </div>
       </article>
 
-      <!-- Card 3: Aprendizaje Guiado -->
       <article
-        class="group rounded-[2.5rem] border border-border-main/10 dark:border-white/5 bg-surface dark:bg-surface/60 shadow-sm hover:shadow-[0_20px_40px_-15px_rgba(255,89,0,0.15)] hover:-translate-y-1.5 transition-all duration-500 overflow-hidden cursor-pointer flex flex-col md:flex-row relative"
+        class="group rounded-[2.5rem] border border-border-main/10 dark:border-white/5 bg-surface/90 backdrop-blur-md shadow-xl shadow-black/5 hover:shadow-[0_32px_64px_-16px_rgba(14,165,233,0.2)] hover:drop-shadow-[0_12px_12px_rgba(14,165,233,0.15)] hover:-translate-y-2 transition-all duration-500 overflow-hidden cursor-pointer flex flex-col md:flex-row relative"
       >
         <div
-          class="relative md:w-64 w-full h-56 md:h-auto m-4 md:mr-0 rounded-3xl overflow-hidden border border-border-main/10 dark:border-white/5 shadow-inner order-2 md:order-1"
+          class="absolute inset-0 bg-linear-to-l from-transparent to-info/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-0"
+        ></div>
+
+        <div
+          class="relative md:w-64 w-full h-56 md:h-auto m-4 md:mr-0 rounded-[2rem] overflow-hidden border border-border-main/10 shadow-[0_0_20px_rgba(0,0,0,0.05)_inset] order-2 md:order-1"
         >
           <div
-            class="absolute inset-0 bg-primary/0 group-hover:bg-primary/5 transition-colors duration-500 z-10"
+            class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 z-10"
           ></div>
           <img
             src="/hero/hero-3.jpg"
@@ -430,14 +295,14 @@
         <div class="p-8 md:p-10 flex-1 flex flex-col justify-center order-1 md:order-2 z-10">
           <div class="flex items-center justify-between mb-5">
             <div
-              class="w-12 h-12 rounded-xl bg-bg border border-border-main/10 dark:border-white/5 shadow-sm flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-md group-hover:border-info/30 transition-all duration-500"
+              class="w-14 h-14 rounded-3xl bg-bg border border-border-main/10 dark:border-white/5 shadow-sm flex items-center justify-center group-hover:scale-110 group-hover:-rotate-3 group-hover:bg-info group-hover:text-white group-hover:shadow-[0_6px_20px_rgba(14,165,233,0.4)] transition-all duration-500"
             >
               <svg
-                class="h-6 w-6 text-info"
+                class="h-6 w-6 text-info group-hover:text-white transition-colors"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="1.8"
+                stroke-width="2"
                 stroke-linecap="round"
                 stroke-linejoin="round"
                 aria-hidden="true"
@@ -446,27 +311,16 @@
                 <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
               </svg>
             </div>
-            <div
-              class="w-8 h-8 rounded-full bg-bg/50 dark:bg-white/10 flex items-center justify-center opacity-0 -translate-x-3 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500"
-            >
-              <svg
-                class="w-4 h-4 text-text-main group-hover:text-info transition-colors"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-              </svg>
-            </div>
           </div>
 
           <h3
-            class="text-[20px] md:text-[22px] font-display font-bold text-text-main group-hover:text-primary transition-colors duration-300"
+            class="text-[22px] md:text-[24px] font-display font-bold text-text-main group-hover:text-info transition-colors duration-300"
           >
             Aprendizaje Guiado
           </h3>
-          <p class="mt-3 text-[14px] md:text-[15px] text-muted leading-relaxed max-w-[44ch]">
+          <p
+            class="mt-3 text-[14px] md:text-[15px] text-muted leading-relaxed max-w-[44ch] group-hover:text-text-main/90 transition-colors"
+          >
             Accede a tutoriales paso a paso adaptados a tu nivel, desde el primer dobladillo hasta
             la sastrería.
           </p>
@@ -482,8 +336,42 @@
 <section
   appScrollAnimate
   id="funcionamiento"
-  class="w-full bg-transparent py-24 px-6 md:px-12 relative overflow-hidden"
+  class="w-full bg-bg py-24 px-6 md:px-12 relative overflow-hidden border-y border-border-main/10"
 >
+  <div
+    class="absolute inset-0 z-0 opacity-20 dark:opacity-10 pointer-events-none"
+    style="
+      background-image: url(&quot;data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 27v6M27 30h6' stroke='%23818181' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E&quot;);
+    "
+  ></div>
+
+  <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+    <div
+      class="absolute -top-[10%] -left-[10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-primary/10 dark:bg-primary/5 blur-[120px]"
+    ></div>
+
+    <div
+      class="absolute top-[40%] -right-[15%] w-[40vw] h-[40vw] max-w-[500px] max-h-[500px] rounded-full bg-warning/10 dark:bg-warning/5 blur-[100px]"
+    ></div>
+
+    <div
+      class="absolute -bottom-[10%] left-[5%] w-[45vw] h-[45vw] max-w-[550px] max-h-[550px] rounded-full bg-like/10 dark:bg-like/5 blur-[130px]"
+    ></div>
+  </div>
+
+  <svg
+    class="absolute inset-0 w-full h-full z-0 text-border-main/20 pointer-events-none"
+    preserveAspectRatio="none"
+  >
+    <path
+      d="M 150 -100 C 400 300 -100 700 250 1200"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-dasharray="8 12"
+      class="stitch-line-slow"
+    />
+  </svg>
   <div
     aria-hidden="true"
     class="pointer-events-none absolute inset-0 opacity-60 bg-[radial-gradient(circle_at_20%_20%,rgba(0,0,0,0.05),transparent_55%),radial-gradient(circle_at_80%_60%,rgba(255,89,0,0.03),transparent_50%),radial-gradient(circle_at_40%_90%,rgba(0,0,0,0.04),transparent_55%)]"
@@ -491,23 +379,6 @@
 
   <div class="max-w-6xl mx-auto relative z-10">
     <div class="text-center mb-20">
-      <div
-        class="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-primary/5 border border-primary/20 text-primary text-[14px] font-bold mb-6 uppercase tracking-wider"
-      >
-        <svg
-          class="w-4 h-4 mr-2 bobbin-spin"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <circle cx="12" cy="12" r="10" />
-          <circle cx="12" cy="12" r="4" />
-          <line x1="12" y1="2" x2="12" y2="8" />
-          <line x1="12" y1="16" x2="12" y2="22" />
-        </svg>
-        Tu viaje creativo
-      </div>
       <h2 class="text-[40px] md:text-[56px] font-display font-bold text-text-main tracking-tight">
         Cómo funciona
         <span
@@ -517,74 +388,250 @@
       </h2>
     </div>
 
-    <!-- Mobile timeline -->
-    <div class="md:hidden relative pl-8 space-y-10">
+    <div class="md:hidden relative pl-8 sm:pl-10 space-y-8">
       <span
         aria-hidden="true"
-        class="absolute top-4 bottom-4 left-[1.15rem] w-0.5 bg-linear-to-b from-primary via-primary/30 to-transparent"
+        class="absolute top-4 bottom-4 left-[1.15rem] sm:left-[1.65rem] w-0.5 bg-linear-to-b from-primary via-warning to-like/30"
       ></span>
 
-      <div class="relative group">
+      <div class="relative group" (click)="activeStep = 1">
         <span
-          class="absolute -left-12 top-2 w-8 h-8 rounded-full bg-primary text-white font-display font-bold flex items-center justify-center shadow-[0_0_15px_rgba(255,89,0,0.4)] z-10"
+          class="absolute -left-12 sm:-left-[3.4rem] top-3 w-8 h-8 rounded-full font-display font-bold flex items-center justify-center transition-all duration-500 z-20"
+          [ngClass]="
+            activeStep === 1
+              ? 'bg-primary text-white shadow-[0_0_15px_rgba(255,89,0,0.5)] scale-110'
+              : 'bg-surface border-[2px] border-primary text-primary opacity-70'
+          "
           >1</span
         >
+
         <div
-          class="bg-surface rounded-2xl border border-border-main/10 shadow-sm p-6 hover:shadow-lg hover:border-primary/30 transition-all duration-300"
+          class="bg-surface/95 backdrop-blur-md rounded-[2rem] border relative overflow-hidden transition-all duration-500"
+          [ngClass]="
+            activeStep === 1
+              ? 'shadow-[0_16px_32px_-10px_rgba(255,89,0,0.25)] border-primary/40 -translate-y-1'
+              : 'shadow-md shadow-black/5 border-border-main/10'
+          "
         >
-          <h3
-            class="text-[20px] font-display font-bold text-text-main mb-2 group-hover:text-primary transition-colors"
-          >
-            Elige tu Proyecto
-          </h3>
-          <p class="text-[14px] text-muted leading-relaxed">
-            Selecciona de nuestra biblioteca un patrón digital para empezar a organizar materiales.
-          </p>
+          <div
+            class="absolute inset-0 transition-opacity duration-500"
+            [ngClass]="
+              activeStep === 1
+                ? 'opacity-100 bg-linear-to-b from-primary/0 via-transparent to-primary/10'
+                : 'opacity-0'
+            "
+          ></div>
+
+          <div
+            class="absolute top-0 left-0 w-1 h-full bg-primary transition-all duration-500 shadow-[0_0_8px_rgba(255,89,0,0.6)]"
+            [ngClass]="activeStep === 1 ? 'opacity-100' : 'opacity-0'"
+          ></div>
+
+          <div class="relative z-10 p-6">
+            <div class="flex items-center gap-4 mb-4">
+              <div
+                class="shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-sm"
+                [ngClass]="
+                  activeStep === 1
+                    ? 'bg-primary text-white shadow-[0_4px_12px_rgba(255,89,0,0.4)] scale-105 -rotate-3'
+                    : 'bg-bg border border-border-main/10 text-muted'
+                "
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                  />
+                </svg>
+              </div>
+
+              <h3
+                class="text-[20px] font-display font-bold text-text-main transition-colors duration-300"
+                [ngClass]="{ 'text-primary': activeStep === 1 }"
+              >
+                Elige tu Proyecto
+              </h3>
+            </div>
+
+            <p
+              class="text-[14px] text-muted leading-relaxed transition-colors duration-300"
+              [ngClass]="{ 'text-text-main/90': activeStep === 1 }"
+            >
+              Selecciona de nuestra biblioteca un patrón digital interactivo y organiza tus
+              materiales.
+            </p>
+          </div>
         </div>
       </div>
 
-      <div class="relative group">
+      <div class="relative group" (click)="activeStep = 2">
         <span
-          class="absolute -left-12 top-2 w-8 h-8 rounded-full bg-surface border-2 border-primary text-primary font-display font-bold flex items-center justify-center z-10 group-hover:bg-primary group-hover:text-white transition-colors duration-300"
+          class="absolute -left-12 sm:-left-[3.4rem] top-3 w-8 h-8 rounded-full font-display font-bold flex items-center justify-center transition-all duration-500 z-20"
+          [ngClass]="
+            activeStep === 2
+              ? 'bg-warning text-white shadow-[0_0_15px_rgba(245,158,11,0.5)] scale-110'
+              : 'bg-surface border-[2px] border-warning text-warning opacity-70'
+          "
           >2</span
         >
+
         <div
-          class="bg-surface rounded-2xl border border-border-main/10 shadow-sm p-6 hover:shadow-lg hover:border-primary/30 transition-all duration-300"
+          class="bg-surface/95 backdrop-blur-md rounded-[2rem] border relative overflow-hidden transition-all duration-500"
+          [ngClass]="
+            activeStep === 2
+              ? 'shadow-[0_16px_32px_-10px_rgba(245,158,11,0.25)] border-warning/40 -translate-y-1'
+              : 'shadow-md shadow-black/5 border-border-main/10'
+          "
         >
-          <h3
-            class="text-[20px] font-display font-bold text-text-main mb-2 group-hover:text-primary transition-colors"
-          >
-            Sigue la guía
-          </h3>
-          <p class="text-[14px] text-muted leading-relaxed">
-            Vídeos detallados, listas de materiales interactivas y cronómetros para tus sesiones.
-          </p>
+          <div
+            class="absolute inset-0 transition-opacity duration-500"
+            [ngClass]="
+              activeStep === 2
+                ? 'opacity-100 bg-linear-to-b from-warning/0 via-transparent to-warning/15'
+                : 'opacity-0'
+            "
+          ></div>
+
+          <div
+            class="absolute top-0 left-0 w-1 h-full bg-warning transition-all duration-500 shadow-[0_0_8px_rgba(245,158,11,0.6)]"
+            [ngClass]="activeStep === 2 ? 'opacity-100' : 'opacity-0'"
+          ></div>
+
+          <div class="relative z-10 p-6">
+            <div class="flex items-center gap-4 mb-4">
+              <div
+                class="shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-sm"
+                [ngClass]="
+                  activeStep === 2
+                    ? 'bg-warning text-white shadow-[0_4px_12px_rgba(245,158,11,0.4)] scale-105 -rotate-3'
+                    : 'bg-bg border border-border-main/10 text-muted'
+                "
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+
+              <h3
+                class="text-[20px] font-display font-bold text-text-main transition-colors duration-300"
+                [ngClass]="{ 'text-warning': activeStep === 2 }"
+              >
+                Sigue la guía
+              </h3>
+            </div>
+
+            <p
+              class="text-[14px] text-muted leading-relaxed transition-colors duration-300"
+              [ngClass]="{ 'text-text-main/90': activeStep === 2 }"
+            >
+              Vídeos detallados, listas de materiales interactivas y cronómetros para tus sesiones.
+            </p>
+          </div>
         </div>
       </div>
 
-      <div class="relative group">
+      <div class="relative group" (click)="activeStep = 3">
         <span
-          class="absolute -left-12 top-2 w-8 h-8 rounded-full bg-surface border-2 border-primary text-primary font-display font-bold flex items-center justify-center z-10 group-hover:bg-primary group-hover:text-white transition-colors duration-300"
+          class="absolute -left-12 sm:-left-[3.4rem] top-3 w-8 h-8 rounded-full font-display font-bold flex items-center justify-center transition-all duration-500 z-20"
+          [ngClass]="
+            activeStep === 3
+              ? 'bg-like text-white shadow-[0_0_15px_rgba(254,56,106,0.5)] scale-110'
+              : 'bg-surface border-[2px] border-like text-like opacity-70'
+          "
           >3</span
         >
+
         <div
-          class="bg-surface rounded-2xl border border-border-main/10 shadow-sm p-6 hover:shadow-lg hover:border-primary/30 transition-all duration-300"
+          class="bg-surface/95 backdrop-blur-md rounded-[2rem] border relative overflow-hidden transition-all duration-500"
+          [ngClass]="
+            activeStep === 3
+              ? 'shadow-[0_16px_32px_-10px_rgba(254,56,106,0.25)] border-like/40 -translate-y-1'
+              : 'shadow-md shadow-black/5 border-border-main/10'
+          "
         >
-          <h3
-            class="text-[20px] font-display font-bold text-text-main mb-2 group-hover:text-primary transition-colors"
-          >
-            Comparte y Celebra
-          </h3>
-          <p class="text-[14px] text-muted leading-relaxed">
-            Publica fotos de tu creación, documenta ajustes y recibe amor de la comunidad.
-          </p>
+          <div
+            class="absolute inset-0 transition-opacity duration-500"
+            [ngClass]="
+              activeStep === 3
+                ? 'opacity-100 bg-linear-to-b from-like/0 via-transparent to-like/10'
+                : 'opacity-0'
+            "
+          ></div>
+
+          <div
+            class="absolute top-0 left-0 w-1 h-full bg-like transition-all duration-500 shadow-[0_0_8px_rgba(254,56,106,0.6)]"
+            [ngClass]="activeStep === 3 ? 'opacity-100' : 'opacity-0'"
+          ></div>
+
+          <div class="relative z-10 p-6">
+            <div class="flex items-center gap-4 mb-4">
+              <div
+                class="shrink-0 w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 shadow-sm"
+                [ngClass]="
+                  activeStep === 3
+                    ? 'bg-like text-white shadow-[0_4px_12px_rgba(254,56,106,0.4)] scale-105 -rotate-3'
+                    : 'bg-bg border border-border-main/10 text-muted'
+                "
+              >
+                <svg
+                  class="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+                  />
+                </svg>
+              </div>
+
+              <h3
+                class="text-[20px] font-display font-bold text-text-main transition-colors duration-300"
+                [ngClass]="{ 'text-like': activeStep === 3 }"
+              >
+                Comparte y Celebra
+              </h3>
+            </div>
+
+            <p
+              class="text-[14px] text-muted leading-relaxed transition-colors duration-300"
+              [ngClass]="{ 'text-text-main/90': activeStep === 3 }"
+            >
+              Publica fotos de tu creación, documenta ajustes y recibe amor de la comunidad.
+            </p>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Desktop timeline (zigzag) -->
     <div
       class="hidden md:grid grid-cols-[1fr_120px_1fr] auto-rows-[minmax(200px,auto)] gap-x-8 gap-y-16 items-center"
+      (mouseleave)="activeStep = 1"
     >
       <div
         class="col-start-2 row-start-1 row-span-3 relative flex flex-col items-center justify-between py-10 h-full"
@@ -593,207 +640,330 @@
           aria-hidden="true"
           class="absolute inset-y-10 left-1/2 -translate-x-1/2 w-0.5 bg-border-main/20"
         ></span>
+
         <span
           aria-hidden="true"
-          class="absolute top-10 bottom-1/2 left-1/2 -translate-x-1/2 w-0.75 bg-linear-to-b from-transparent via-primary to-transparent animate-pulse rounded-full"
+          class="absolute top-10 w-0.75 rounded-full transition-all duration-700 ease-in-out left-1/2 -translate-x-1/2"
+          [ngClass]="{
+            'bg-linear-to-b from-transparent via-primary to-transparent bottom-2/3 animate-pulse':
+              activeStep === 1,
+            'bg-linear-to-b from-transparent via-warning to-transparent bottom-1/3 top-1/3 animate-pulse':
+              activeStep === 2,
+            'bg-linear-to-b from-transparent via-like to-transparent bottom-10 top-2/3 animate-pulse':
+              activeStep === 3,
+          }"
         ></span>
 
         <div
-          class="relative z-10 w-16 h-16 rounded-full bg-primary text-white font-display text-2xl font-bold flex items-center justify-center shadow-[0_0_30px_rgba(255,89,0,0.3)] counter-ring"
+          class="relative z-10 rounded-full font-display text-2xl font-bold flex items-center justify-center transition-all duration-500 cursor-default"
+          [ngClass]="
+            activeStep === 1
+              ? 'w-16 h-16 bg-primary text-white shadow-[0_0_30px_rgba(255,89,0,0.3)] scale-110'
+              : 'w-14 h-14 bg-surface border-[3px] border-primary text-primary opacity-60'
+          "
         >
           1
         </div>
+
         <div
-          class="relative z-10 w-14 h-14 rounded-full bg-surface border-[3px] border-primary text-primary font-display text-xl font-bold flex items-center justify-center hover:scale-110 hover:bg-primary hover:text-white transition-all cursor-default"
+          class="relative z-10 rounded-full font-display text-xl font-bold flex items-center justify-center transition-all duration-500 cursor-default"
+          [ngClass]="
+            activeStep === 2
+              ? 'w-16 h-16 bg-warning text-white shadow-[0_0_30px_rgba(245,158,11,0.3)] scale-110'
+              : 'w-14 h-14 bg-surface border-[3px] border-warning text-warning opacity-60'
+          "
         >
           2
         </div>
+
         <div
-          class="relative z-10 w-14 h-14 rounded-full bg-surface border-[3px] border-primary text-primary font-display text-xl font-bold flex items-center justify-center hover:scale-110 hover:bg-primary hover:text-white transition-all cursor-default"
+          class="relative z-10 rounded-full font-display text-xl font-bold flex items-center justify-center transition-all duration-500 cursor-default"
+          [ngClass]="
+            activeStep === 3
+              ? 'w-16 h-16 bg-like text-white shadow-[0_0_30px_rgba(254,56,106,0.3)] scale-110'
+              : 'w-14 h-14 bg-surface border-[3px] border-like text-like opacity-60'
+          "
         >
           3
         </div>
       </div>
 
-      <div class="col-start-1 row-start-1 flex justify-end group cursor-default">
+      <div class="col-start-1 row-start-1 flex justify-end">
         <article
-          class="w-full max-w-md bg-surface/80 backdrop-blur-sm rounded-3xl border border-border-main/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] px-8 py-8 group-hover:shadow-[0_20px_40px_rgba(255,89,0,0.08)] group-hover:border-primary/30 group-hover:-translate-y-2 transition-all duration-500 relative overflow-hidden"
+          (mouseenter)="activeStep = 1"
+          class="group w-full max-w-md bg-surface/90 backdrop-blur-md rounded-[2.5rem] border transition-all duration-500 relative overflow-hidden cursor-pointer"
+          [ngClass]="
+            activeStep === 1
+              ? 'border-primary/50 -translate-y-3 scale-[1.03] shadow-[0_32px_64px_-16px_rgba(255,89,0,0.3),0_-8px_32px_-10px_rgba(0,0,0,0.1)_inset] drop-shadow-[0_24px_24px_rgba(255,89,0,0.4)]'
+              : 'shadow-xl shadow-black/5 border-border-main/10 hover:shadow-2xl hover:shadow-black/10 drop-shadow-[0_12px_12px_rgba(0,0,0,0.08)]'
+          "
         >
           <div
-            class="absolute top-0 left-0 w-1 h-full bg-primary transform origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-500"
+            class="absolute inset-0 transition-opacity duration-500"
+            [ngClass]="
+              activeStep === 1
+                ? 'opacity-100 bg-linear-to-b from-primary/0 via-transparent to-primary/20'
+                : 'opacity-0'
+            "
           ></div>
-          <h3
-            class="text-[24px] font-display font-bold text-text-main mb-3 group-hover:text-primary transition-colors"
-          >
-            Elige tu Proyecto
-          </h3>
-          <p class="text-[15px] text-muted leading-relaxed mb-4">
-            Selecciona de nuestra biblioteca un patrón digital interactivo. Filtra por dificultad,
-            tiempo o tejido ideal.
-          </p>
-          <span
-            class="text-primary text-[14px] font-bold flex items-center gap-1 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500"
-          >
-            Explorar catálogo
-            <svg
-              class="w-4 h-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2"
+
+          <div
+            class="absolute top-0 left-0 w-1.5 h-full bg-primary rounded-r-full transform origin-top transition-all duration-500 ease-out shadow-[0_0_12px_rgba(255,89,0,0.6)]"
+            [ngClass]="activeStep === 1 ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0'"
+          ></div>
+
+          <div class="relative z-10 px-8 py-9">
+            <div class="flex items-center gap-5 mb-5">
+              <div
+                class="w-14 h-14 rounded-3xl flex items-center justify-center transition-all duration-500 shadow-sm"
+                [ngClass]="
+                  activeStep === 1
+                    ? 'bg-primary text-white shadow-[0_6px_20px_rgba(255,89,0,0.4)] scale-110 -rotate-3'
+                    : 'bg-bg border border-border-main/10 text-muted group-hover:bg-surface'
+                "
+              >
+                <svg
+                  class="w-7 h-7"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
+                  />
+                </svg>
+              </div>
+
+              <h3
+                class="text-[26px] font-display font-bold text-text-main transition-colors duration-300"
+                [ngClass]="{ 'text-primary': activeStep === 1 }"
+              >
+                Elige tu Proyecto
+              </h3>
+            </div>
+
+            <p
+              class="text-[16px] text-muted leading-relaxed transition-colors duration-300"
+              [ngClass]="{ 'text-text-main/90': activeStep === 1 }"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </span>
+              Selecciona de nuestra biblioteca un patrón digital interactivo. Filtra por dificultad,
+              tiempo o tejido ideal de forma rápida e intuitiva.
+            </p>
+          </div>
         </article>
       </div>
 
-      <div class="col-start-3 row-start-1 flex items-center justify-start relative group">
+      <div
+        class="col-start-3 row-start-1 flex items-center justify-start relative"
+        (mouseenter)="activeStep = 1"
+      >
         <div
-          class="absolute w-32 h-32 bg-primary/20 blur-2xl rounded-full group-hover:bg-primary/40 group-hover:scale-150 transition-all duration-700"
+          class="absolute w-32 h-32 rounded-full transition-all duration-700 blur-2xl"
+          [ngClass]="activeStep === 1 ? 'bg-primary/40 scale-150' : 'bg-primary/10'"
         ></div>
         <div
-          class="relative w-32 h-32 flex items-center justify-center text-border-main/50 group-hover:text-primary group-hover:-translate-y-2 transition-all duration-500 float-element"
+          class="relative w-32 h-32 flex items-center justify-center transition-all duration-500 float-element"
+          [ngClass]="activeStep === 1 ? '-translate-y-2' : ''"
         >
-          <svg
-            viewBox="0 0 24 24"
-            class="w-20 h-20 drop-shadow-xl"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M4 4h16v16H4z" stroke-dasharray="2 2" />
-            <path d="M4 12c4 0 8 4 8 8" />
-            <path d="M20 12c-4 0-8-4-8-8" />
-            <circle cx="12" cy="12" r="2" fill="currentColor" class="opacity-20" />
-            <path d="M7 7l2 2m6 6l2 2" />
-          </svg>
+          <img
+            src="assets/item1.png"
+            alt="Hilo y aguja"
+            class="w-20 h-20 object-contain drop-shadow-xl transition-all duration-500"
+            [ngClass]="
+              activeStep === 1 ? 'scale-110 opacity-100' : 'scale-100 opacity-70 grayscale-30'
+            "
+          />
         </div>
       </div>
 
-      <div class="col-start-1 row-start-2 flex items-center justify-end relative group">
+      <div
+        class="col-start-1 row-start-2 flex items-center justify-end relative"
+        (mouseenter)="activeStep = 2"
+      >
         <div
-          class="absolute w-32 h-32 bg-warning/20 blur-2xl rounded-full group-hover:bg-warning/40 group-hover:scale-150 transition-all duration-700"
+          class="absolute w-32 h-32 rounded-full transition-all duration-700 blur-2xl"
+          [ngClass]="activeStep === 2 ? 'bg-warning/40 scale-150' : 'bg-warning/10'"
         ></div>
         <div
-          class="relative w-32 h-32 flex items-center justify-center text-border-main/50 group-hover:text-warning group-hover:-translate-y-2 transition-all duration-500 float-element-slow"
+          class="relative w-32 h-32 flex items-center justify-center transition-all duration-500 float-element-slow"
+          [ngClass]="activeStep === 2 ? '-translate-y-2' : ''"
         >
-          <svg
-            viewBox="0 0 24 24"
-            class="w-20 h-20 drop-shadow-xl"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path d="M12 2v20M8 6h8M8 18h8" />
-            <rect
-              x="10"
-              y="6"
-              width="4"
-              height="12"
-              rx="1"
-              fill="currentColor"
-              class="opacity-20"
-            />
-            <path d="M12 22s-3-2-3-5 3-3 3-3 3-2 3-5-3-5-3-5" stroke-dasharray="2 2" />
-          </svg>
+          <img
+            src="assets/item3.png"
+            alt="Máquina de coser"
+            class="w-24 h-24 object-contain drop-shadow-xl transition-all duration-500"
+            [ngClass]="
+              activeStep === 2 ? 'scale-110 opacity-100' : 'scale-100 opacity-70 grayscale-30'
+            "
+          />
         </div>
       </div>
 
-      <div class="col-start-3 row-start-2 flex justify-start group cursor-default">
+      <div class="col-start-3 row-start-2 flex justify-start">
         <article
-          class="w-full max-w-md bg-surface/80 backdrop-blur-sm rounded-3xl border border-border-main/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] px-8 py-8 group-hover:shadow-[0_20px_40px_rgba(245,158,11,0.08)] group-hover:border-warning/30 group-hover:-translate-y-2 transition-all duration-500 relative overflow-hidden"
+          (mouseenter)="activeStep = 2"
+          class="group w-full max-w-md bg-surface/90 backdrop-blur-md rounded-[2.5rem] border transition-all duration-500 relative overflow-hidden cursor-pointer"
+          [ngClass]="
+            activeStep === 2
+              ? 'border-warning/50 -translate-y-3 scale-[1.03] shadow-[0_32px_64px_-16px_rgba(245,158,11,0.3),0_-8px_32px_-10px_rgba(0,0,0,0.1)_inset] drop-shadow-[0_24px_24px_rgba(245,158,11,0.4)]'
+              : 'shadow-xl shadow-black/5 border-border-main/10 hover:shadow-2xl hover:shadow-black/10 drop-shadow-[0_12px_12px_rgba(0,0,0,0.08)]'
+          "
         >
           <div
-            class="absolute top-0 right-0 w-1 h-full bg-warning transform origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-500"
+            class="absolute inset-0 transition-opacity duration-500"
+            [ngClass]="
+              activeStep === 2
+                ? 'opacity-100 bg-linear-to-b from-warning/0 via-transparent to-warning/20'
+                : 'opacity-0'
+            "
           ></div>
-          <h3
-            class="text-[24px] font-display font-bold text-text-main mb-3 group-hover:text-warning transition-colors"
-          >
-            Sigue la guía
-          </h3>
-          <p class="text-[15px] text-muted leading-relaxed mb-4">
-            Vídeos detallados paso a paso, listas de materiales con casillas de verificación y un
-            cronómetro integrado para medir tus sesiones de costura.
-          </p>
-          <span
-            class="text-warning text-[14px] font-bold flex items-center gap-1 opacity-0 translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500"
-          >
-            Ver panel de control
-            <svg
-              class="w-4 h-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2"
+
+          <div
+            class="absolute top-0 right-0 w-1.5 h-full bg-warning rounded-l-full transform origin-top transition-all duration-500 ease-out shadow-[0_0_12px_rgba(245,158,11,0.6)]"
+            [ngClass]="activeStep === 2 ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0'"
+          ></div>
+
+          <div class="relative z-10 px-8 py-9">
+            <div class="flex items-center gap-5 mb-5">
+              <div
+                class="w-14 h-14 rounded-3xl flex items-center justify-center transition-all duration-500 shadow-sm"
+                [ngClass]="
+                  activeStep === 2
+                    ? 'bg-warning text-white shadow-[0_6px_20px_rgba(245,158,11,0.4)] scale-110 -rotate-3'
+                    : 'bg-bg border border-border-main/10 text-muted group-hover:bg-surface'
+                "
+              >
+                <svg
+                  class="w-7 h-7"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"
+                  />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                  />
+                </svg>
+              </div>
+
+              <h3
+                class="text-[26px] font-display font-bold text-text-main transition-colors duration-300"
+                [ngClass]="{ 'text-warning': activeStep === 2 }"
+              >
+                Sigue la guía
+              </h3>
+            </div>
+
+            <p
+              class="text-[16px] text-muted leading-relaxed transition-colors duration-300"
+              [ngClass]="{ 'text-text-main/90': activeStep === 2 }"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </span>
+              Vídeos detallados paso a paso, listas de materiales con casillas de verificación y un
+              cronómetro integrado para medir tus sesiones de costura.
+            </p>
+          </div>
         </article>
       </div>
 
-      <div class="col-start-1 row-start-3 flex justify-end group cursor-default">
+      <div class="col-start-1 row-start-3 flex justify-end">
         <article
-          class="w-full max-w-md bg-surface/80 backdrop-blur-sm rounded-3xl border border-border-main/10 shadow-[0_8px_30px_rgba(0,0,0,0.04)] px-8 py-8 group-hover:shadow-[0_20px_40px_rgba(254,56,106,0.08)] group-hover:border-like/30 group-hover:-translate-y-2 transition-all duration-500 relative overflow-hidden"
+          (mouseenter)="activeStep = 3"
+          class="group w-full max-w-md bg-surface/90 backdrop-blur-md rounded-[2.5rem] border transition-all duration-500 relative overflow-hidden cursor-pointer"
+          [ngClass]="
+            activeStep === 3
+              ? 'border-like/50 -translate-y-3 scale-[1.03] shadow-[0_32px_64px_-16px_rgba(254,56,106,0.3),0_-8px_32px_-10px_rgba(0,0,0,0.1)_inset] drop-shadow-[0_24px_24px_rgba(254,56,106,0.4)]'
+              : 'shadow-xl shadow-black/5 border-border-main/10 hover:shadow-2xl hover:shadow-black/10 drop-shadow-[0_12px_12px_rgba(0,0,0,0.08)]'
+          "
         >
           <div
-            class="absolute top-0 left-0 w-1 h-full bg-like transform origin-bottom scale-y-0 group-hover:scale-y-100 transition-transform duration-500"
+            class="absolute inset-0 transition-opacity duration-500"
+            [ngClass]="
+              activeStep === 3
+                ? 'opacity-100 bg-linear-to-b from-like/0 via-transparent to-like/20'
+                : 'opacity-0'
+            "
           ></div>
-          <h3
-            class="text-[24px] font-display font-bold text-text-main mb-3 group-hover:text-like transition-colors"
-          >
-            Comparte y Celebra
-          </h3>
-          <p class="text-[15px] text-muted leading-relaxed mb-4">
-            Sube fotos de tu prenda terminada, documenta los ajustes que hiciste al patrón original
-            y recibe el apoyo de otros creadores.
-          </p>
-          <span
-            class="text-like text-[14px] font-bold flex items-center gap-1 opacity-0 -translate-x-4 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-500"
-          >
-            Unirse al foro
-            <svg
-              class="w-4 h-4"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2"
+
+          <div
+            class="absolute top-0 left-0 w-1.5 h-full bg-like rounded-r-full transform origin-top transition-all duration-500 ease-out shadow-[0_0_12px_rgba(254,56,106,0.6)]"
+            [ngClass]="activeStep === 3 ? 'scale-y-100 opacity-100' : 'scale-y-0 opacity-0'"
+          ></div>
+
+          <div class="relative z-10 px-8 py-9">
+            <div class="flex items-center gap-5 mb-5">
+              <div
+                class="w-14 h-14 rounded-3xl flex items-center justify-center transition-all duration-500 shadow-sm"
+                [ngClass]="
+                  activeStep === 3
+                    ? 'bg-like text-white shadow-[0_6px_20px_rgba(254,56,106,0.4)] scale-110 -rotate-3'
+                    : 'bg-bg border border-border-main/10 text-muted group-hover:bg-surface'
+                "
+              >
+                <svg
+                  class="w-7 h-7"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+                  />
+                </svg>
+              </div>
+
+              <h3
+                class="text-[26px] font-display font-bold text-text-main transition-colors duration-300"
+                [ngClass]="{ 'text-like': activeStep === 3 }"
+              >
+                Comparte y Celebra
+              </h3>
+            </div>
+
+            <p
+              class="text-[16px] text-muted leading-relaxed transition-colors duration-300"
+              [ngClass]="{ 'text-text-main/90': activeStep === 3 }"
             >
-              <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </span>
+              Sube fotos de tu prenda terminada, documenta los ajustes que hiciste al patrón
+              original y recibe el apoyo constructivo de otros creadores.
+            </p>
+          </div>
         </article>
       </div>
 
-      <div class="col-start-3 row-start-3 flex items-center justify-start relative group">
+      <div
+        class="col-start-3 row-start-3 flex items-center justify-start relative"
+        (mouseenter)="activeStep = 3"
+      >
         <div
-          class="absolute w-32 h-32 bg-like/10 blur-2xl rounded-full group-hover:bg-like/30 group-hover:scale-150 transition-all duration-700"
+          class="absolute w-32 h-32 rounded-full transition-all duration-700 blur-2xl"
+          [ngClass]="activeStep === 3 ? 'bg-like/30 scale-150' : 'bg-like/10'"
         ></div>
         <div
-          class="relative w-32 h-32 flex items-center justify-center text-border-main/50 group-hover:text-like group-hover:-translate-y-2 transition-all duration-500 float-element"
+          class="relative w-32 h-32 flex items-center justify-center transition-all duration-500 float-element"
           style="animation-delay: 1s"
+          [ngClass]="activeStep === 3 ? '-translate-y-2' : ''"
         >
-          <svg
-            viewBox="0 0 24 24"
-            class="w-20 h-20 drop-shadow-xl"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="1.5"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-          >
-            <path
-              d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"
-              fill="currentColor"
-              class="opacity-20"
-            />
-            <path d="M15 10l-4 4l-2-2" />
-          </svg>
+          <img
+            src="assets/item2.png"
+            alt="Comunidad de costura"
+            class="w-24 h-24 object-contain drop-shadow-xl transition-all duration-500"
+            [ngClass]="
+              activeStep === 3 ? 'scale-110 opacity-100' : 'scale-100 opacity-70 grayscale-30'
+            "
+          />
         </div>
       </div>
     </div>
@@ -806,8 +976,15 @@
 <section
   appScrollAnimate
   id="tutoriales"
-  class="w-full bg-transparent py-24 px-6 md:px-12 relative overflow-hidden"
+  class="w-full bg-surface py-24 px-6 md:px-12 relative overflow-hidden"
 >
+  <div
+    class="absolute inset-0 z-0 opacity-[0.03] dark:opacity-[0.05] bg-[radial-gradient(circle,var(--color-primary)_2px,transparent_2px)] bg-[size:30px_30px]"
+  ></div>
+
+  <div
+    class="absolute top-0 right-0 -translate-y-12 translate-x-1/3 w-96 h-96 bg-primary/10 rounded-full blur-[100px] pointer-events-none z-0"
+  ></div>
   <div
     class="absolute top-0 right-0 -translate-y-12 translate-x-1/3 w-96 h-96 bg-primary/5 rounded-full blur-[100px] pointer-events-none"
   ></div>
@@ -923,8 +1100,13 @@
 <section
   appScrollAnimate
   id="comunidad"
-  class="w-full bg-transparent py-24 px-6 md:px-12 relative overflow-hidden"
+  class="w-full bg-bg py-24 px-6 md:px-12 relative overflow-hidden"
 >
+  <div class="absolute inset-0 z-0">
+    <div class="absolute top-10 left-10 w-64 h-64 bg-like/5 rounded-2xl rotate-3"></div>
+    <div class="absolute bottom-20 right-20 w-80 h-80 bg-warning/5 rounded-3xl -rotate-6"></div>
+    <div class="absolute top-40 right-1/4 w-48 h-48 bg-info/5 rounded-xl rotate-12"></div>
+  </div>
   <div
     class="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[24px_24px]"
   ></div>
@@ -938,18 +1120,6 @@
   <div class="max-w-7xl mx-auto relative z-10">
     <header class="mb-16 max-w-3xl flex flex-col md:flex-row md:items-end justify-between gap-8">
       <div>
-        <div
-          class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-like/10 text-like text-[13px] font-bold mb-6 border border-like/20 uppercase tracking-widest"
-        >
-          <span class="relative flex h-2.5 w-2.5">
-            <span
-              class="animate-ping absolute inline-flex h-full w-full rounded-full bg-like opacity-75"
-            ></span>
-            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-like"></span>
-          </span>
-          Feed en vivo
-        </div>
-
         <h2
           class="text-[44px] md:text-[64px] font-display font-bold tracking-tight text-text-main leading-[1.05]"
         >
@@ -963,22 +1133,6 @@
           Inspírate con lo que otros creadores están confeccionando ahora mismo en sus talleres.
         </p>
       </div>
-
-      <a
-        href="#comunidad"
-        class="group flex items-center gap-2 text-[15px] font-semibold text-text-main hover:text-like transition-colors pb-1 border-b-2 border-transparent hover:border-like focus-visible:outline-focus"
-      >
-        Ver toda la galería
-        <svg
-          class="w-4 h-4 transform group-hover:translate-x-1.5 transition-transform duration-300"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-        </svg>
-      </a>
     </header>
 
     <div
@@ -1007,38 +1161,6 @@
           </div>
         </div>
       }
-    </div>
-
-    <div
-      class="mt-16 flex flex-col items-center justify-center opacity-70 hover:opacity-100 transition-opacity duration-500 group"
-    >
-      <div class="flex -space-x-4 mb-3">
-        <img
-          class="w-10 h-10 rounded-full border-2 border-surface object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-          src="/hero/hero-2.jpg"
-          alt="Usuario"
-        />
-        <img
-          class="w-10 h-10 rounded-full border-2 border-surface object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-          style="transition-delay: 75ms"
-          src="/hero/hero-1.jpg"
-          alt="Usuario"
-        />
-        <img
-          class="w-10 h-10 rounded-full border-2 border-surface object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-          style="transition-delay: 150ms"
-          src="/hero/hero-3.jpg"
-          alt="Usuario"
-        />
-        <div
-          class="w-10 h-10 rounded-full border-2 border-surface bg-border-main/10 flex items-center justify-center text-[10px] font-bold text-text-main backdrop-blur-sm"
-        >
-          +4k
-        </div>
-      </div>
-      <p class="text-[13px] text-muted font-medium">
-        Únete a miles de creadores compartiendo su arte
-      </p>
     </div>
   </div>
 </section>

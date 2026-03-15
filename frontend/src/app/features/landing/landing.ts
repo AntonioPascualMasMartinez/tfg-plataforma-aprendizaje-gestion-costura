@@ -30,7 +30,7 @@ export class Landing implements OnInit, OnDestroy {
   heroImages: string[] = ['/hero/hero-1.jpg', '/hero/hero-2.jpg', '/hero/hero-3.jpg'];
   currentImageIndex: number = 0;
   private imageInterval: ReturnType<typeof setInterval> | null = null;
-
+  activeStep = 0;
   // ─── Tutorials ────────────────────────────────────────────
   tutorials: any[] = [
     {

@@ -32,10 +32,16 @@
   }
 }
 
-@keyframes stitchDash {
+@keyframes stitchDash1 {
   to {
-    stroke-dashoffset: -40;
-  }
+    stroke-dashoffset: -20;
+  } /* Suma de 8 + 12 */
+}
+
+@keyframes stitchDash2 {
+  to {
+    stroke-dashoffset: -28;
+  } /* Suma de 12 + 16 */
 }
 
 @keyframes needlePulse {
@@ -181,13 +187,38 @@
 
 // ─── Stitch line animations ─────────────────────────────────
 .stitch-line {
-  stroke-dasharray: 10 10;
-  animation: stitchDash 2s linear infinite;
+  stroke-dasharray: 8 12;
+  animation: stitchDash1 1.5s linear infinite;
 }
 
 .stitch-line-slow {
-  stroke-dasharray: 15 15;
-  animation: stitchDash 4s linear infinite;
+  stroke-dasharray: 12 16;
+  animation: stitchDash2 2s linear infinite;
+}
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 12s infinite alternate cubic-bezier(0.4, 0, 0.2, 1);
+}
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+.animation-delay-4000 {
+  animation-delay: 4s;
 }
 
 // ─── Needle cursor ──────────────────────────────────────────
