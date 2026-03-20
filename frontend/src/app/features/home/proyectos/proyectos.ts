@@ -1,40 +1,84 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core'; // Añadido OnDestroy
 import { CommonModule } from '@angular/common';
-import { RouterLink } from '@angular/router';
+import { RouterLink, Router } from '@angular/router'; // Añadido Router
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { merge, Subscription } from 'rxjs'; // Añadida Subscription
 
 import { ProjectService } from '../../../core/services/project.service';
 import { Project } from '../../../shared/models/project.model';
 import { ProjectCardComponent } from '../../../shared/components/project-card/project-card';
-
+import { CreateProjectModal } from '../../../shared/modals/create-project/create-project.modal'; // Añadido el Modal
 import { ToastService } from '../../../core/services/toast.service';
+
 @Component({
   selector: 'app-proyectos',
   standalone: true,
-  imports: [CommonModule, RouterLink, ReactiveFormsModule, ProjectCardComponent],
+  // IMPORTANTE: Añadir CreateProjectModal a los imports
+  imports: [
+    CommonModule,
+    RouterLink,
+    ReactiveFormsModule,
+    ProjectCardComponent,
+    CreateProjectModal,
+  ],
   templateUrl: './proyectos.html',
 })
-export class Proyectos implements OnInit {
+export class Proyectos implements OnInit, OnDestroy {
+  // Implementar OnDestroy
   private projectService = inject(ProjectService);
   private cdr = inject(ChangeDetectorRef);
   private toastService = inject(ToastService);
+  private router = inject(Router);
 
   projects: Project[] = [];
   isLoading = true;
+
+  // Controles
   searchTerm = new FormControl('');
+  statusFilter = new FormControl('Todos');
+  difficultyFilter = new FormControl('Todas');
+  sortByFilter = new FormControl('nuevo');
 
   currentPage = 1;
   totalPages = 1;
   totalResults = 0;
 
+  // NUEVO: Variables para controlar el modal y fugas de memoria
+  isCreateModalOpen = false;
+  private filterSubscription?: Subscription;
+
   ngOnInit() {
     this.loadProjects();
-    this.setupSearch();
+    this.setupFilters();
   }
 
-  private setupSearch() {
-    this.searchTerm.valueChanges.pipe(debounceTime(400), distinctUntilChanged()).subscribe(() => {
+  // NUEVO: Destruir la suscripción al salir de la vista (SOLUCIONA EL BUG)
+  ngOnDestroy() {
+    if (this.filterSubscription) {
+      this.filterSubscription.unsubscribe();
+    }
+  }
+
+  // NUEVO: Lógica del Modal
+  openCreateModal() {
+    this.isCreateModalOpen = true;
+  }
+
+  handleProjectCreated(project: Project) {
+    this.isCreateModalOpen = false;
+    // Redirigir al proyecto recién creado (igual que hace la vista inicio)
+    this.router.navigate(['/home/proyectos', project._id]);
+  }
+
+  private setupFilters() {
+    const search$ = this.searchTerm.valueChanges.pipe(debounceTime(400), distinctUntilChanged());
+    const status$ = this.statusFilter.valueChanges;
+    const difficulty$ = this.difficultyFilter.valueChanges;
+    const sort$ = this.sortByFilter.valueChanges;
+
+    // Guardamos la suscripción para poder limpiarla en ngOnDestroy
+    this.filterSubscription = merge(search$, status$, difficulty$, sort$).subscribe(() => {
       this.currentPage = 1;
       this.loadProjects();
     });
@@ -42,25 +86,36 @@ export class Proyectos implements OnInit {
 
   loadProjects() {
     this.isLoading = true;
-    this.cdr.detectChanges();
+    this.cdr.markForCheck(); // Cambiado a markForCheck() (SOLUCIONA EL BUG)
 
     const search = this.searchTerm.value || '';
+    const status = this.statusFilter.value || 'Todos';
+    const sortBy = this.sortByFilter.value || 'nuevo';
+    const difficulty = this.difficultyFilter.value || 'Todas';
 
-    // Cambiamos getPublicFeed por getMyProjects
-    this.projectService.getMyProjects(this.currentPage, 9, 'Todos', 'nuevo', search).subscribe({
+    this.projectService.getMyProjects(this.currentPage, 9, status, sortBy, search).subscribe({
       next: (response) => {
         if (response.data) {
-          this.projects = response.data.docs;
+          let fetchedDocs = response.data.docs;
+          if (difficulty !== 'Todas') {
+            fetchedDocs = fetchedDocs.filter((p) => p.difficulty === difficulty);
+          }
+
+          this.projects = fetchedDocs;
           this.totalPages = response.data.totalPages;
           this.totalResults = response.data.totalDocs;
+        } else {
+          this.projects = [];
         }
+
         this.isLoading = false;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck(); // Cambiado a markForCheck()
       },
       error: (err) => {
         console.error('Error cargando proyectos:', err);
+        this.projects = [];
         this.isLoading = false;
-        this.cdr.detectChanges();
+        this.cdr.markForCheck(); // Cambiado a markForCheck()
       },
     });
   }
@@ -68,7 +123,6 @@ export class Proyectos implements OnInit {
   deleteProject(id: string) {
     this.projectService.deleteProject(id).subscribe({
       next: () => {
-        // Si es el último elemento de la página y no es la primera, volvemos una atrás
         if (this.projects.length === 1 && this.currentPage > 1) {
           this.currentPage--;
         }

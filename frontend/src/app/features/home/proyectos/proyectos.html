@@ -5,8 +5,8 @@
       <p class="text-muted text-[16px]">Gestiona y organiza todas tus creaciones textiles.</p>
     </div>
     <button
-      routerLink="/home/proyectos/nuevo"
-      class="btn btn-primary shadow-sm flex items-center gap-2 w-fit"
+      (click)="openCreateModal()"
+      class="btn btn-primary shadow-sm flex items-center gap-2 w-fit cursor-pointer"
     >
       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -15,22 +15,126 @@
     </button>
   </header>
 
-  <div class="relative w-full max-w-md">
-    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-muted">
-      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-        />
-      </svg>
-    </span>
-    <input
-      [formControl]="searchTerm"
-      type="text"
-      placeholder="Buscar por título o prenda..."
-      class="w-full pl-11 pr-4 py-3.5 bg-surface border border-border-main/20 rounded-2xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all font-medium placeholder:text-muted/60"
-    />
+  <div
+    class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-surface p-4 rounded-2xl border border-border-main/20 shadow-sm"
+  >
+    <div class="relative w-full xl:w-96 shrink-0">
+      <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-muted">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          />
+        </svg>
+      </span>
+      <input
+        [formControl]="searchTerm"
+        type="text"
+        placeholder="Buscar en mis creaciones..."
+        class="w-full pl-10 pr-4 py-2.5 bg-bg/50 border border-border-main/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-[14px] font-medium placeholder:text-muted/70"
+      />
+      @if (searchTerm.value) {
+        <button
+          (click)="searchTerm.setValue('')"
+          class="absolute inset-y-0 right-0 pr-3 flex items-center text-muted hover:text-text-main transition-colors outline-none cursor-pointer"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      }
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3 w-full xl:w-auto">
+      <div class="relative w-full sm:w-auto flex-1 sm:flex-none min-w-[140px]">
+        <select
+          [formControl]="statusFilter"
+          class="w-full h-10 pl-3 pr-8 rounded-xl border border-border-main/20 bg-bg/50 text-text-main text-[13px] font-semibold outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer hover:bg-surface-hover transition-colors"
+        >
+          <option value="Todos">Todos los estados</option>
+          <option value="Planificado">Planificados</option>
+          <option value="En curso">En curso</option>
+          <option value="Pausado">Pausados</option>
+          <option value="Finalizado">Finalizados</option>
+        </select>
+        <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-muted">
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <div class="relative w-full sm:w-auto flex-1 sm:flex-none min-w-[140px]">
+        <select
+          [formControl]="difficultyFilter"
+          class="w-full h-10 pl-3 pr-8 rounded-xl border border-border-main/20 bg-bg/50 text-text-main text-[13px] font-semibold outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer hover:bg-surface-hover transition-colors"
+        >
+          <option value="Todas">Cualquier nivel</option>
+          <option value="Fácil">Fácil</option>
+          <option value="Intermedio">Intermedio</option>
+          <option value="Avanzado">Avanzado</option>
+        </select>
+        <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-muted">
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+            />
+          </svg>
+        </div>
+      </div>
+
+      <div class="relative w-full sm:w-auto flex-1 sm:flex-none min-w-[160px]">
+        <select
+          [formControl]="sortByFilter"
+          class="w-full h-10 pl-3 pr-8 rounded-xl border border-border-main/20 bg-bg/50 text-text-main text-[13px] font-semibold outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer hover:bg-surface-hover transition-colors"
+        >
+          <option value="nuevo">Más recientes primero</option>
+          <option value="antiguo">Más antiguos primero</option>
+          <option value="nombre_asc">Nombre (A-Z)</option>
+          <option value="nombre_desc">Nombre (Z-A)</option>
+        </select>
+        <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-muted">
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
   </div>
 
   @if (isLoading) {
@@ -119,7 +223,7 @@
           Limpiar búsqueda
         </button>
       } @else {
-        <button routerLink="/home/proyectos/nuevo" class="btn btn-primary shadow-sm gap-2">
+        <button (click)="openCreateModal()" class="btn btn-primary shadow-sm gap-2 cursor-pointer">
           <svg
             class="w-5 h-5"
             fill="none"
@@ -135,3 +239,10 @@
     </div>
   }
 </div>
+
+@if (isCreateModalOpen) {
+  <app-create-project-modal
+    (close)="isCreateModalOpen = false"
+    (projectCreated)="handleProjectCreated($event)"
+  />
+}
