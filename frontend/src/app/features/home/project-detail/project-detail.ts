@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, inject, ChangeDetectorRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -26,12 +26,10 @@ export class ProjectDetail implements OnInit {
   isLoading = true;
   errorMessage = '';
 
-  // Control de Modos y Pestañas
   viewMode: ViewMode = 'taller';
-  tallerTab: TallerTab = 'pasos'; // Pestaña activa en el modo taller
-  activeStepIndex = 0; // Índice del paso actual en el carrusel
+  tallerTab: TallerTab = 'pasos';
+  activeStepIndex = 0;
 
-  // Formulario para añadir paso
   stepForm: FormGroup;
   isAddingStep = false;
   isUploadingStepImage = false;
@@ -52,13 +50,24 @@ export class ProjectDetail implements OnInit {
     }
   }
 
+  // --- NUEVA FUNCIONALIDAD: Navegación por Teclado ---
+  @HostListener('window:keydown', ['$event'])
+  handleKeyDown(event: KeyboardEvent) {
+    if (this.viewMode === 'taller' && this.tallerTab === 'pasos') {
+      if (event.key === 'ArrowRight') {
+        this.nextStep();
+      } else if (event.key === 'ArrowLeft') {
+        this.prevStep();
+      }
+    }
+  }
+
   loadProject(id: string) {
     this.isLoading = true;
     this.projectService.getProjectById(id).subscribe({
       next: (res) => {
         this.project = res.data;
         this.isLoading = false;
-        // Si no hay pasos al cargar, enviamos al usuario a la pestaña de materiales por defecto
         if (this.project?.steps.length === 0) {
           this.tallerTab = 'materiales';
         }
@@ -80,7 +89,6 @@ export class ProjectDetail implements OnInit {
     this.tallerTab = tab;
   }
 
-  // Lógica del Carrusel de Pasos
   get progressPercentage(): number {
     if (!this.project || !this.project.steps || this.project.steps.length === 0) return 0;
     return ((this.activeStepIndex + 1) / this.project.steps.length) * 100;
@@ -98,7 +106,6 @@ export class ProjectDetail implements OnInit {
     }
   }
 
-  // Lógica de Edición
   toggleAddStep() {
     this.isAddingStep = !this.isAddingStep;
     if (!this.isAddingStep) {
@@ -143,7 +150,6 @@ export class ProjectDetail implements OnInit {
       next: (res) => {
         this.project = res.data;
         this.toggleAddStep();
-        // Navegamos automáticamente al nuevo paso si estamos en modo taller
         this.activeStepIndex = this.project!.steps.length - 1;
         this.cdr.detectChanges();
       },
