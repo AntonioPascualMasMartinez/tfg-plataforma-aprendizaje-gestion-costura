@@ -123,29 +123,34 @@
 /* =========================================
      CUSTOM SCROLLBAR (Identidad Needly)
      ========================================= */
-  
-  html {
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-border-main) transparent;
-  }
 
-  ::-webkit-scrollbar {
-    width: 10px;
-    height: 10px; 
-  }
+html {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-border-main) transparent;
+}
 
-  ::-webkit-scrollbar-track {
-    background: transparent; 
-  }
+.btn {
+  @apply cursor-pointer transition-all duration-300;
+  /* O simplemente 'cursor: pointer;' si no usas directivas @apply */
+}
 
-  /* La barra en sí (Thumb) */
-  ::-webkit-scrollbar-thumb {
-    background-color: var(--color-border-main);
-    border-radius: 9999px;
-    border: 3px solid var(--color-bg);
-    transition: background-color 0.3s ease;
-  }
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
 
-  ::-webkit-scrollbar-thumb:hover {
-    background-color: var(--color-primary);
-  }
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* La barra en sí (Thumb) */
+::-webkit-scrollbar-thumb {
+  background-color: var(--color-border-main);
+  border-radius: 9999px;
+  border: 3px solid var(--color-bg);
+  transition: background-color 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-primary);
+}
