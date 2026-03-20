@@ -55,8 +55,8 @@
           [class.text-white]="viewMode === 'taller'"
           [class.shadow-md]="viewMode === 'taller'"
           [class.text-muted]="viewMode !== 'taller'"
-          [class.hover:bg-border-main/5]="viewMode !== 'taller'"
-          class="flex-1 md:flex-none flex justify-center items-center gap-2 px-5 py-2 rounded-lg text-[13px] font-bold transition-all duration-300"
+          [class.hover:bg-border-main/10]="viewMode !== 'taller'"
+          class="flex-1 md:flex-none flex justify-center items-center gap-2 px-5 py-2 rounded-lg text-[13px] font-bold transition-all duration-300 cursor-pointer"
         >
           <svg
             class="w-4 h-4"
@@ -81,8 +81,8 @@
           [class.shadow-sm]="viewMode === 'edicion'"
           [class.text-text-main]="viewMode === 'edicion'"
           [class.text-muted]="viewMode !== 'edicion'"
-          [class.hover:bg-border-main/5]="viewMode !== 'edicion'"
-          class="flex-1 md:flex-none flex justify-center items-center gap-2 px-5 py-2 rounded-lg text-[13px] font-bold transition-all duration-300"
+          [class.hover:bg-border-main/10]="viewMode !== 'edicion'"
+          class="flex-1 md:flex-none flex justify-center items-center gap-2 px-5 py-2 rounded-lg text-[13px] font-bold transition-all duration-300 cursor-pointer"
         >
           <svg
             class="w-4 h-4"
@@ -116,7 +116,7 @@
             [class.text-text-main]="tallerTab === 'pasos'"
             [class.border-transparent]="tallerTab !== 'pasos'"
             [class.text-muted]="tallerTab !== 'pasos'"
-            class="px-4 py-3 font-bold text-[14px] border-b-2 transition-colors whitespace-nowrap"
+            class="px-4 py-3 font-bold text-[14px] border-b-2 transition-all duration-300 whitespace-nowrap cursor-pointer hover:text-primary hover:bg-border-main/5 rounded-t-lg"
           >
             Paso a Paso
           </button>
@@ -128,7 +128,7 @@
             [class.text-text-main]="tallerTab === 'materiales'"
             [class.border-transparent]="tallerTab !== 'materiales'"
             [class.text-muted]="tallerTab !== 'materiales'"
-            class="px-4 py-3 font-bold text-[14px] border-b-2 transition-colors whitespace-nowrap"
+            class="px-4 py-3 font-bold text-[14px] border-b-2 transition-all duration-300 whitespace-nowrap cursor-pointer hover:text-primary hover:bg-border-main/5 rounded-t-lg"
           >
             Materiales y Notas
           </button>
@@ -280,7 +280,7 @@
                     (click)="prevStep()"
                     [disabled]="activeStepIndex === 0"
                     aria-label="Anterior"
-                    class="flex-1 btn bg-surface border-2 border-border-main/20 hover:border-primary/50 hover:text-primary text-text-main gap-2 py-3 disabled:opacity-30 disabled:hover:border-border-main/20 disabled:hover:text-text-main transition-all"
+                    class="flex-1 btn bg-surface border-2 border-border-main/20 hover:border-primary/50 hover:text-primary hover:bg-primary/5 text-text-main gap-2 py-3 disabled:opacity-30 disabled:hover:border-border-main/20 disabled:hover:text-text-main disabled:hover:bg-surface disabled:cursor-not-allowed cursor-pointer transition-all duration-300"
                   >
                     <svg
                       class="w-5 h-5"
@@ -301,7 +301,7 @@
                     (click)="nextStep()"
                     [disabled]="activeStepIndex === project.steps.length - 1"
                     aria-label="Siguiente"
-                    class="flex-1 btn btn-primary gap-2 py-3 shadow-md shadow-primary/20 disabled:opacity-40 hover:-translate-y-0.5 transition-all"
+                    class="flex-1 btn btn-primary gap-2 py-3 shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/40 disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:shadow-md disabled:cursor-not-allowed cursor-pointer hover:-translate-y-0.5 transition-all duration-300"
                   >
                     <span class="hidden sm:inline">Siguiente paso</span>
                     <span class="sm:hidden">Siguiente</span>
