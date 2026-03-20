@@ -2,7 +2,9 @@
   class="group flex flex-col h-full bg-surface/95 backdrop-blur-md rounded-[2.5rem] border border-border-main/10 shadow-xl shadow-black/5 overflow-hidden transition-all duration-500 ease-out hover:-translate-y-2 hover:border-primary/40 hover:shadow-[0_24px_48px_-12px_rgba(255,89,0,0.15)] hover:drop-shadow-[0_8px_8px_rgba(255,89,0,0.05)] relative cursor-pointer"
   (click)="onCardClick()"
 >
-  <div class="relative h-56 w-full bg-bg/50 overflow-hidden shrink-0 border-b border-border-main/5">
+  <div
+    class="relative h-44 md:h-48 w-full bg-bg/50 overflow-hidden shrink-0 border-b border-border-main/5"
+  >
     @if (coverImage) {
       <img
         [src]="coverImage"
@@ -58,7 +60,7 @@
     </h3>
 
     <p
-      class="text-[14px] text-muted mb-6 line-clamp-3 flex-1 leading-relaxed group-hover:text-text-main/80 transition-colors duration-300"
+      class="text-[14px] text-muted mb-4 line-clamp-2 flex-1 leading-relaxed group-hover:text-text-main/80 transition-colors duration-300"
     >
       {{ tutorial.description }}
     </p>
