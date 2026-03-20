@@ -8,10 +8,13 @@ import { CreateProjectModal } from '../../../shared/modals/create-project/create
 import { TutorialService } from '../../../core/services/tutorial.service';
 import { Tutorial } from '../../../shared/models/tutorial.model';
 
+import { TutorialCardComponent } from '../../../shared/components/tutorial-card/tutorial-card';
+import { TutorialDetailModalComponent } from '../../../shared/modals/tutorial-detail-modal/tutorial-detail-modal.component';
+
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [RouterLink, CreateProjectModal],
+  imports: [RouterLink, CreateProjectModal, TutorialCardComponent, TutorialDetailModalComponent],
   templateUrl: './inicio.html',
   styles: [
     `
@@ -36,6 +39,9 @@ export class Inicio implements OnInit {
   isLoadingUser = true;
   isLoadingProjects = true;
   recentProject: Project | null = null;
+
+  isTutorialModalOpen = false;
+  selectedTutorial: Tutorial | null = null;
 
   @ViewChild('carouselContainer') carouselContainer!: ElementRef;
 
@@ -89,6 +95,18 @@ export class Inicio implements OnInit {
 
   handleProjectCreated(project: Project) {
     this.router.navigate(['/home/proyectos', project._id]);
+  }
+
+  openTutorialModal(tutorial: Tutorial) {
+    this.selectedTutorial = tutorial;
+    this.isTutorialModalOpen = true;
+  }
+
+  closeTutorialModal() {
+    this.isTutorialModalOpen = false;
+    setTimeout(() => {
+      this.selectedTutorial = null; // Limpiamos después de cerrar para evitar parpadeos
+    }, 300);
   }
 
   private loadUserData() {
