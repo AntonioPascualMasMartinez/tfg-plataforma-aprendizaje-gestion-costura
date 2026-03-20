@@ -17,11 +17,11 @@
   </div>
 
   <div class="relative flex items-center mb-8">
-    <div class="flex-grow border-t border-border-main/15"></div>
-    <span class="flex-shrink-0 mx-4 text-muted/70 text-[12px] font-bold uppercase tracking-widest">
+    <div class="grow border-t border-border-main/15"></div>
+    <span class="shrink-0 mx-4 text-muted/70 text-[12px] font-bold uppercase tracking-widest">
       O usa tu correo
     </span>
-    <div class="flex-grow border-t border-border-main/15"></div>
+    <div class="grow border-t border-border-main/15"></div>
   </div>
 
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
@@ -52,7 +52,7 @@
           id="email"
           formControlName="email"
           placeholder="tu@email.com"
-          class="w-full h-[52px] pl-11 pr-4 rounded-2xl border border-border-main/15 bg-surface-hover/30 text-text-main outline-none focus:bg-surface focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all duration-300"
+          class="w-full h-13 pl-11 pr-4 rounded-2xl border border-border-main/15 bg-surface-hover/30 text-text-main outline-none focus:bg-surface focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all duration-300"
           [class.border-danger]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
           [class.focus:ring-danger/20]="
             loginForm.get('email')?.invalid && loginForm.get('email')?.touched
@@ -94,7 +94,7 @@
           id="password"
           formControlName="password"
           placeholder="••••••••"
-          class="w-full h-[52px] pl-11 pr-4 rounded-2xl border border-border-main/15 bg-surface-hover/30 text-text-main outline-none focus:bg-surface focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all duration-300"
+          class="w-full h-13 pl-11 pr-4 rounded-2xl border border-border-main/15 bg-surface-hover/30 text-text-main outline-none focus:bg-surface focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all duration-300"
           [class.border-danger]="
             loginForm.get('password')?.invalid && loginForm.get('password')?.touched
           "
@@ -129,7 +129,7 @@
     <button
       type="submit"
       [disabled]="loginForm.invalid || isLoading"
-      class="btn btn-primary relative w-full h-[52px] mt-2 rounded-2xl shadow-[0_8px_20px_-6px_rgba(255,89,0,0.3)] hover:shadow-[0_12px_24px_-8px_rgba(255,89,0,0.45)] hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none text-[16px] overflow-hidden"
+      class="btn btn-primary relative w-full h-13 mt-2 rounded-2xl shadow-[0_8px_20px_-6px_rgba(255,89,0,0.3)] hover:shadow-[0_12px_24px_-8px_rgba(255,89,0,0.45)] hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none text-[16px] overflow-hidden"
     >
       @if (isLoading) {
         <span class="flex items-center justify-center gap-2">
