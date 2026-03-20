@@ -26,13 +26,28 @@ class TutorialService {
       throw new ApiError(409, 'Ya has iniciado este tutorial previamente.');
     }
 
+    const difficultyMapping = {
+      Principiante: 'Fácil',
+      Intermedio: 'Media',
+      Avanzado: 'Alta',
+    };
+
     // 3. Clonar el modelo: Crear un Proyecto derivado en el espacio del usuario
     const clonedProject = await Project.create({
       ownerId: userId,
       title: `[Tutorial] ${tutorial.title}`,
       description: tutorial.description,
       status: 'En curso',
-      isPublic: false, // Por defecto privado hasta que el usuario decida mostrarlo
+      isPublic: false,
+
+      category: tutorial.category,
+
+      projectType: 'Comenzado desde Tutorial',
+
+      difficulty: difficultyMapping[tutorial.difficultyLevel] || 'Fácil',
+
+      inspirationImageUrl: tutorial.steps.find((s) => s.mediaUrl)?.mediaUrl || null,
+
       materials: tutorial.materialsNeeded.map((m) => ({
         name: m.name,
         quantity: m.quantity,
