@@ -24,16 +24,36 @@
     </a>
 
     <nav class="hidden md:flex items-center gap-8" aria-label="Navegación principal">
-      <a href="/#encontrar" class="nav-link">Encontrar</a>
-      <a href="/#funcionamiento" class="nav-link">Funcionamiento</a>
-      <a href="/#tutoriales" class="nav-link">Biblioteca</a>
-      <a href="/#comunidad" class="nav-link">Comunidad</a>
+      <a
+        href="/#encontrar"
+        class="nav-link cursor-pointer"
+        [class.active]="activeSection() === 'encontrar'"
+        >Encontrar</a
+      >
+      <a
+        href="/#funcionamiento"
+        class="nav-link cursor-pointer"
+        [class.active]="activeSection() === 'funcionamiento'"
+        >Funcionamiento</a
+      >
+      <a
+        href="/#tutoriales"
+        class="nav-link cursor-pointer"
+        [class.active]="activeSection() === 'tutoriales'"
+        >Biblioteca</a
+      >
+      <a
+        href="/#comunidad"
+        class="nav-link cursor-pointer"
+        [class.active]="activeSection() === 'comunidad'"
+        >Comunidad</a
+      >
     </nav>
 
     <div class="flex items-center gap-3 sm:gap-5">
       <button
         (click)="toggleTheme()"
-        class="relative flex items-center justify-center w-10 h-10 rounded-full text-text-main hover:bg-black/5 dark:hover:bg-white/10 transition-colors focus-visible:outline-focus"
+        class="relative flex items-center justify-center w-10 h-10 rounded-full text-text-main hover:bg-black/10 dark:hover:bg-white/20 transition-all duration-300 hover:scale-105 cursor-pointer focus-visible:outline-focus"
         [attr.aria-label]="isDarkMode() ? 'Activar modo claro' : 'Activar modo oscuro'"
       >
         <svg
@@ -92,7 +112,7 @@
       </div>
 
       <button
-        class="md:hidden flex items-center justify-center p-2 text-text-main hover:text-primary transition-colors focus-visible:outline-focus rounded-lg"
+        class="md:hidden flex items-center justify-center p-2 text-text-main hover:text-primary transition-colors focus-visible:outline-focus rounded-lg cursor-pointer"
         (click)="toggleMobileMenu($event)"
         [attr.aria-expanded]="isMobileMenuOpen()"
         aria-controls="mobile-menu"
@@ -140,29 +160,40 @@
     }"
   >
     <nav class="flex flex-col p-6 gap-2">
-      <a href="/#encontrar" (click)="closeMobileMenu()" class="mobile-nav-link">
+      <a
+        href="/#encontrar"
+        (click)="closeMobileMenu()"
+        class="mobile-nav-link cursor-pointer"
+        [class.active]="activeSection() === 'encontrar'"
+      >
         <span class="text-xl">Encontrar</span>
         <svg class="w-5 h-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
       </a>
-      <a href="/#funcionamiento" (click)="closeMobileMenu()" class="mobile-nav-link">
+      <a
+        href="/#funcionamiento"
+        (click)="closeMobileMenu()"
+        class="mobile-nav-link cursor-pointer"
+        [class.active]="activeSection() === 'funcionamiento'"
+      >
         <span class="text-xl">Funcionamiento</span>
-        <svg class="w-5 h-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
       </a>
-      <a href="/#tutoriales" (click)="closeMobileMenu()" class="mobile-nav-link">
+      <a
+        href="/#tutoriales"
+        (click)="closeMobileMenu()"
+        class="mobile-nav-link cursor-pointer"
+        [class.active]="activeSection() === 'tutoriales'"
+      >
         <span class="text-xl">Biblioteca</span>
-        <svg class="w-5 h-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
       </a>
-      <a href="/#comunidad" (click)="closeMobileMenu()" class="mobile-nav-link">
+      <a
+        href="/#comunidad"
+        (click)="closeMobileMenu()"
+        class="mobile-nav-link cursor-pointer"
+        [class.active]="activeSection() === 'comunidad'"
+      >
         <span class="text-xl">Comunidad</span>
-        <svg class="w-5 h-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-        </svg>
       </a>
 
       <div class="h-px bg-border-main/10 my-4"></div>

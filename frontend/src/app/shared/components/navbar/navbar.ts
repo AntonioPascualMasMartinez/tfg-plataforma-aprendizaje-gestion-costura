@@ -1,4 +1,13 @@
-import { Component, HostListener, OnInit, inject, PLATFORM_ID, signal } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  OnInit,
+  AfterViewInit,
+  OnDestroy,
+  inject,
+  PLATFORM_ID,
+  signal,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NgClass, isPlatformBrowser } from '@angular/common';
 
@@ -9,13 +18,16 @@ import { NgClass, isPlatformBrowser } from '@angular/common';
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss',
 })
-export class Navbar implements OnInit {
-  // Uso de Signals para una reactividad moderna en Angular 21
+export class Navbar implements OnInit, AfterViewInit, OnDestroy {
   isScrolled = signal(false);
   isMobileMenuOpen = signal(false);
   isDarkMode = signal(false);
 
+  // NUEVO: Signal para rastrear la sección activa
+  activeSection = signal<string>('');
+
   private platformId = inject(PLATFORM_ID);
+  private observer: IntersectionObserver | null = null;
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
@@ -29,6 +41,45 @@ export class Navbar implements OnInit {
     }
   }
 
+  ngAfterViewInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.setupScrollSpy();
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+  }
+
+  private setupScrollSpy() {
+    const sections = ['encontrar', 'funcionamiento', 'tutoriales', 'comunidad'];
+
+    const options = {
+      root: null,
+      rootMargin: '-40% 0px -60% 0px',
+      threshold: 0,
+    };
+
+    this.observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          this.activeSection.set(entry.target.id);
+        }
+      });
+    }, options);
+
+    setTimeout(() => {
+      sections.forEach((section) => {
+        const element = document.getElementById(section);
+        if (element) {
+          this.observer?.observe(element);
+        }
+      });
+    }, 300);
+  }
+
   @HostListener('window:scroll', [])
   onWindowScroll() {
     if (isPlatformBrowser(this.platformId)) {
@@ -36,7 +87,6 @@ export class Navbar implements OnInit {
     }
   }
 
-  // Accesibilidad: Cerrar el menú móvil con Escape
   @HostListener('document:keydown.escape')
   onKeydownHandler() {
     if (this.isMobileMenuOpen()) {
@@ -57,7 +107,6 @@ export class Navbar implements OnInit {
     this.handleBodyScroll();
   }
 
-  // UX: Bloquear el scroll del fondo cuando el menú móvil está abierto
   private handleBodyScroll() {
     if (isPlatformBrowser(this.platformId)) {
       document.body.style.overflow = this.isMobileMenuOpen() ? 'hidden' : '';

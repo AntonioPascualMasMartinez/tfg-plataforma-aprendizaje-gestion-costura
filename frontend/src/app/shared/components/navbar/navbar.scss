@@ -1,21 +1,19 @@
-/* Añade esta línea al principio de navbar.scss */
 @reference "../../../../styles.css";
 
-// Animación de rebote suave (muy 2026)
 .ease-spring {
   transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-// Enlaces de escritorio (Efecto Pill en lugar de subrayado clásico)
 .nav-link {
-  @apply relative px-3 py-1.5 text-[15px] font-medium text-text-main transition-colors focus-visible:outline-focus rounded-full;
-  
+  @apply relative px-3 py-1.5 text-[15px] font-medium text-text-main transition-colors focus-visible:outline-focus rounded-full cursor-pointer;
+
   &::before {
     content: '';
     @apply absolute inset-0 bg-primary/10 rounded-full scale-50 opacity-0 transition-all duration-300 ease-out z-[-1];
   }
 
-  &:hover {
+  &:hover,
+  &.active {
     @apply text-primary;
     &::before {
       @apply scale-100 opacity-100;
@@ -23,12 +21,14 @@
   }
 }
 
-// Enlaces del menú móvil
 .mobile-nav-link {
-  @apply flex items-center justify-between p-3 rounded-2xl font-display font-medium text-text-main hover:bg-black/5 dark:hover:bg-white/5 hover:text-primary transition-colors focus-visible:outline-focus;
+  @apply flex items-center justify-between p-3 rounded-2xl font-display font-medium text-text-main hover:bg-black/5 dark:hover:bg-white/5 hover:text-primary transition-colors focus-visible:outline-focus cursor-pointer;
+
+  &.active {
+    @apply text-primary bg-primary/5 dark:bg-primary/10;
+  }
 }
 
-// Efecto de brillo para el botón CTA
 @keyframes shimmer {
   100% {
     transform: translateX(100%);
