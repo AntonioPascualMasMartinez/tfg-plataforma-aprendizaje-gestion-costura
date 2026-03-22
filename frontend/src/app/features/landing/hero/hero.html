@@ -1,0 +1,185 @@
+<section
+  appScrollAnimate
+  class="w-full relative bg-bg flex items-center min-h-svh pt-20 pb-16 overflow-hidden z-10"
+>
+  <div class="absolute inset-0 pointer-events-none z-0 overflow-hidden">
+    <div
+      class="absolute inset-0 bg-gradient-to-br from-rose-50/90 via-bg to-rose-100/40 dark:from-rose-950/20 dark:via-bg dark:to-primary/5"
+    ></div>
+
+    <svg
+      class="absolute top-1/4 left-0 w-full h-full text-rose-300/20"
+      viewBox="0 0 1000 1000"
+      preserveAspectRatio="none"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.5"
+    >
+      <path d="M-100,400 C200,200 500,700 1200,300" class="stitch-line-slow" />
+      <path d="M-100,415 C200,215 500,715 1200,315" opacity="0.3" stroke-dasharray="4 8" />
+    </svg>
+
+    @for (elem of floatingElements; track $index) {
+      <svg
+        [class]="
+          'absolute ' +
+          elem.size +
+          ' ' +
+          elem.color +
+          ' blur-[2px] ' +
+          elem.rotation +
+          ' ' +
+          elem.animation
+        "
+        [style.top]="elem.top"
+        [style.bottom]="elem.bottom"
+        [style.left]="elem.left"
+        [style.right]="elem.right"
+        [style.animation-delay]="elem.delay"
+        viewBox="0 0 100 100"
+      >
+        @if (elem.type === 'scissor') {
+          <circle cx="30" cy="70" r="12" fill="none" stroke="currentColor" stroke-width="6" />
+          <circle cx="70" cy="70" r="12" fill="none" stroke="currentColor" stroke-width="6" />
+          <line
+            x1="36"
+            y1="60"
+            x2="80"
+            y2="20"
+            stroke="currentColor"
+            stroke-width="6"
+            stroke-linecap="round"
+          />
+          <line
+            x1="64"
+            y1="60"
+            x2="20"
+            y2="20"
+            stroke="currentColor"
+            stroke-width="6"
+            stroke-linecap="round"
+          />
+          <circle cx="50" cy="46" r="3" fill="currentColor" />
+        } @else if (elem.type === 'needle') {
+          <path d="M50,25 L50,95" stroke="currentColor" stroke-width="4" stroke-linecap="round" />
+          <ellipse
+            cx="50"
+            cy="15"
+            rx="3"
+            ry="10"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="4"
+          />
+        } @else if (elem.type === 'spool') {
+          <rect
+            x="35"
+            y="20"
+            width="30"
+            height="60"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="4"
+          />
+          <path
+            d="M25,20 L75,20 M25,80 L75,80"
+            stroke="currentColor"
+            stroke-width="6"
+            stroke-linecap="round"
+          />
+          <line x1="35" y1="35" x2="65" y2="35" stroke="currentColor" stroke-width="2" />
+          <line x1="35" y1="50" x2="65" y2="50" stroke="currentColor" stroke-width="2" />
+          <line x1="35" y1="65" x2="65" y2="65" stroke="currentColor" stroke-width="2" />
+        } @else if (elem.type === 'pin') {
+          <line
+            x1="50"
+            y1="30"
+            x2="50"
+            y2="90"
+            stroke="currentColor"
+            stroke-width="4"
+            stroke-linecap="round"
+          />
+          <circle cx="50" cy="20" r="10" fill="currentColor" />
+        }
+      </svg>
+    }
+
+    <div
+      class="absolute -top-[10%] -right-[10%] w-[50vw] max-w-3xl aspect-square rounded-full bg-rose-200/20 blur-[120px] pointer-events-none"
+    ></div>
+    <div
+      class="absolute bottom-[10%] -left-[10%] w-[40vw] max-w-2xl aspect-square rounded-full bg-pink-300/10 blur-[100px] pointer-events-none"
+    ></div>
+  </div>
+
+  <div
+    class="max-w-7xl mx-auto w-full px-6 md:px-12 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-8 items-center relative z-10"
+  >
+    <div class="flex flex-col items-start text-left pt-10 lg:pt-0">
+      <h1
+        class="hero-title mb-6 leading-[1.15] text-[40px] md:text-[56px] lg:text-[64px] font-display font-bold text-text-main tracking-tight"
+      >
+        Lleva tus proyectos de costura al
+        <span
+          class="text-shimmer text-transparent bg-clip-text bg-[linear-gradient(90deg,var(--color-primary),#FF8C42,var(--color-primary))] bg-size-[200%_auto]"
+          >siguiente nivel</span
+        >
+      </h1>
+
+      <p class="hero-subtitle text-[16px] md:text-[18px] text-muted max-w-lg mb-10 leading-relaxed">
+        Needly es la plataforma definitiva para organizar tus patrones, aprender nuevas técnicas y
+        compartir tu progreso con una comunidad apasionada.
+      </p>
+
+      <div class="hero-cta flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+        <a
+          routerLink="/auth/register"
+          class="btn btn-primary btn-magnetic btn-press text-[16px] py-3.5 px-8 shadow-lg shadow-primary/30 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/40 transition-all duration-300"
+        >
+          Comenzar gratis
+        </a>
+        <a
+          href="#encontrar"
+          class="btn btn-secondary btn-press text-[16px] py-3.5 px-8 hover:bg-surface/80 hover:-translate-y-1 transition-all duration-300"
+        >
+          Descubrir proyectos
+        </a>
+      </div>
+    </div>
+
+    <div
+      class="hero-image-container relative w-full aspect-4/5 sm:aspect-square lg:aspect-4/5 rounded-4xl overflow-hidden shadow-2xl shadow-primary/10 border border-border-main/10 group"
+    >
+      @for (img of heroImages; track $index) {
+        <img
+          [src]="img"
+          alt="Proyecto de costura Needly"
+          class="absolute inset-0 w-full h-full object-cover carousel-image"
+          [ngClass]="{
+            active: currentImageIndex === $index,
+            inactive: currentImageIndex !== $index,
+          }"
+        />
+      }
+      <div
+        class="absolute inset-0 bg-linear-to-t from-black/60 via-transparent to-transparent z-20 pointer-events-none"
+      ></div>
+
+      <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2.5 z-30">
+        @for (img of heroImages; track $index) {
+          <button
+            (click)="setCurrentImage($index)"
+            class="dot-indicator h-2 rounded-full transition-all duration-500 focus-visible:outline-white cursor-pointer"
+            [ngClass]="
+              currentImageIndex === $index
+                ? 'w-8 bg-primary active'
+                : 'w-2 bg-white/50 hover:bg-white/90'
+            "
+            aria-label="Ir a la imagen"
+          ></button>
+        }
+      </div>
+    </div>
+  </div>
+</section>

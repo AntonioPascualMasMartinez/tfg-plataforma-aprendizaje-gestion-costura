@@ -1,0 +1,58 @@
+@reference "../../../../styles.css";
+
+// Necesario para el efecto 3D del carrusel
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+// ─── Tutorial carousel 3D ───────────────────────────────────
+.tutorial-carousel-item {
+  transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform, opacity, filter;
+
+  &.center {
+    transform: translateX(0) scale(1) rotateY(0deg);
+    opacity: 1;
+    filter: blur(0);
+    z-index: 30;
+  }
+
+  &.left {
+    transform: translateX(-65%) scale(0.88) rotateY(8deg);
+    opacity: 0.4;
+    filter: blur(2px);
+    z-index: 20;
+
+    @media (min-width: 768px) {
+      transform: translateX(-105%) scale(0.88) rotateY(8deg);
+    }
+
+    &:hover {
+      opacity: 0.65;
+      filter: blur(1px);
+    }
+  }
+
+  &.right {
+    transform: translateX(65%) scale(0.88) rotateY(-8deg);
+    opacity: 0.4;
+    filter: blur(2px);
+    z-index: 20;
+
+    @media (min-width: 768px) {
+      transform: translateX(105%) scale(0.88) rotateY(-8deg);
+    }
+
+    &:hover {
+      opacity: 0.65;
+      filter: blur(1px);
+    }
+  }
+
+  &.hidden-card {
+    transform: translateX(0) scale(0.7);
+    opacity: 0;
+    pointer-events: none;
+    z-index: 10;
+  }
+}

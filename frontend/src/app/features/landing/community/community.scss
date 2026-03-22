@@ -1,0 +1,60 @@
+@reference "../../../../styles.css";
+
+// ─── Envoltorio para Scroll Animation ─────────────────────────
+.scroll-anim-wrapper {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.7s ease-out,
+    transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform, opacity;
+
+  // Cuando appScrollAnimate le asigne la clase de visibilidad
+  &.animate-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ─── Polaroid community cards ───────────────────────────────
+.polaroid-card {
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+
+  &:hover {
+    z-index: 50;
+  }
+}
+
+// ─── Mantenemos las animaciones flotantes del fondo ──────────
+@keyframes float-element {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(2deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+
+@keyframes float-element-slow {
+  0% {
+    transform: translateY(0px) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-15px) rotate(1deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(-1deg);
+  }
+}
+
+.float-element {
+  animation: float-element 6s ease-in-out infinite;
+}
+
+.float-element-slow {
+  animation: float-element-slow 9s ease-in-out infinite;
+}

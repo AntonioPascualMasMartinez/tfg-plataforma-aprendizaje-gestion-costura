@@ -1,0 +1,44 @@
+// ─── Hero entrance choreography ─────────────────────────────
+.hero-badge {
+  animation: fadeInDown 0.7s ease-out 0.2s both;
+}
+
+.hero-title {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+}
+
+.hero-subtitle {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.5s both;
+}
+
+.hero-cta {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.65s both;
+}
+
+.hero-social-proof {
+  animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.8s both;
+}
+
+.hero-image-container {
+  animation: fadeInScale 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
+}
+
+// ─── Carousel images ────────────────────────────────────────
+.carousel-image {
+  transition:
+    opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 1.2s cubic-bezier(0.4, 0, 0.2, 1),
+    filter 1.2s ease;
+
+  &.active {
+    opacity: 1;
+    transform: scale(1);
+    filter: brightness(1);
+  }
+
+  &.inactive {
+    opacity: 0;
+    transform: scale(1.08);
+    filter: brightness(0.8);
+  }
+}

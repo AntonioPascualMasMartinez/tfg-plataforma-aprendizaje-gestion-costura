@@ -3,7 +3,6 @@ import { RouterLink } from '@angular/router';
 import { Project } from '../../models/project.model';
 import { User } from '../../models/user.model';
 
-// Exportamos la interfaz desde aquí para que el padre la pueda usar
 export interface CommunityProject extends Project {
   likesCount?: number;
   isLikedLocally?: boolean;
@@ -36,9 +35,14 @@ export class CommunityCardComponent {
   }
 
   getAuthorAvatar(ownerId: string | Partial<User>): string {
+    // Si el usuario tiene avatar propio, lo mostramos
     if (typeof ownerId === 'object' && ownerId !== null && 'avatar' in ownerId && ownerId.avatar) {
       return ownerId.avatar;
     }
-    return '/assets/default-avatar.png';
+
+    // Si NO tiene avatar, generamos uno cálido con sus iniciales dinámicamente
+    const name = this.getAuthorName(ownerId);
+    // Usamos colores de nuestra paleta: fondo anaranjado muy suave (ffedd5) y texto primario (ea580c)
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=ffedd5&color=ea580c&rounded=true&bold=true`;
   }
 }
