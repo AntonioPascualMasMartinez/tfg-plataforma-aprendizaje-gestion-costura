@@ -8,8 +8,6 @@ import { RouterLink } from '@angular/router';
   templateUrl: './auth-shell.html',
 })
 export class AuthShell {
-  // Permite personalizar la columna de la imagen desde los componentes hijos
   @Input() imageUrl: string = '/hero/hero-1.webp';
-  @Input() badgeText: string = 'Tu espacio creativo';
   @Input() quoteText: string = 'Cada puntada cuenta una historia.';
 }
