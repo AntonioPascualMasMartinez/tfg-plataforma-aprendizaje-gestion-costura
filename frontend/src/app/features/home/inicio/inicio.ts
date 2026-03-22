@@ -1,32 +1,38 @@
-import { Component, OnInit, inject, ChangeDetectorRef, ViewChild, ElementRef } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';
+import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Router } from '@angular/router';
+
+// Servicios y Modelos
 import { UserService } from '../../../core/services/user.service';
 import { ProjectService } from '../../../core/services/project.service';
-import { User } from '../../../shared/models/user.model';
-import { Project, ProjectStatus } from '../../../shared/models/project.model';
-import { CreateProjectModal } from '../../../shared/modals/create-project/create-project.modal';
 import { TutorialService } from '../../../core/services/tutorial.service';
+import { User } from '../../../shared/models/user.model';
+import { Project } from '../../../shared/models/project.model';
 import { Tutorial } from '../../../shared/models/tutorial.model';
 
-import { TutorialCardComponent } from '../../../shared/components/tutorial-card/tutorial-card';
+// Modales
+import { CreateProjectModal } from '../../../shared/modals/create-project/create-project.modal';
 import { TutorialDetailModalComponent } from '../../../shared/modals/tutorial-detail-modal/tutorial-detail-modal.component';
+
+// Nuevos Subcomponentes (Asumiendo que los crearás)
+import { MobileHeaderComponent } from './components/mobile-header/mobile-header.component';
+import { RecentProjectComponent } from './components/recent-project/recent-project.component';
+import { QuickActionsComponent } from './components/quick-actions/quick-actions.component';
+import { ProjectCollectionComponent } from './components/project-collection/project-collection.component';
+import { RecommendedTutorialComponent } from './components/recommended-tutorial/recommended-tutorial.component';
 
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [RouterLink, CreateProjectModal, TutorialCardComponent, TutorialDetailModalComponent],
-  templateUrl: './inicio.html',
-  styles: [
-    `
-      .hide-scrollbar::-webkit-scrollbar {
-        display: none;
-      }
-      .hide-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-    `,
+  imports: [
+    CreateProjectModal,
+    TutorialDetailModalComponent,
+    MobileHeaderComponent,
+    RecentProjectComponent,
+    QuickActionsComponent,
+    ProjectCollectionComponent,
+    RecommendedTutorialComponent,
   ],
+  templateUrl: './inicio.html',
 })
 export class Inicio implements OnInit {
   private userService = inject(UserService);
@@ -35,24 +41,21 @@ export class Inicio implements OnInit {
   private cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
 
+  // Estados
   user: User | null = null;
-  isLoadingUser = true;
-  isLoadingProjects = true;
   recentProject: Project | null = null;
-
-  isTutorialModalOpen = false;
+  myProjects: Project[] = [];
+  recommendedTutorial: Tutorial | null = null;
   selectedTutorial: Tutorial | null = null;
 
-  @ViewChild('carouselContainer') carouselContainer!: ElementRef;
-
-  myProjects: Project[] = [];
-  activeFilter: ProjectStatus | 'Todos' = 'Todos';
-  sortBy: 'nuevo' | 'nombre' = 'nuevo';
-
-  recommendedTutorial: Tutorial | null = null;
-
-  isCreateModalOpen = false;
+  // Loaders
+  isLoadingUser = true;
+  isLoadingProjects = true;
   isLoadingTutorial = true;
+
+  // Control de Modales
+  isCreateModalOpen = false;
+  isTutorialModalOpen = false;
 
   ngOnInit() {
     this.loadUserData();
@@ -60,55 +63,7 @@ export class Inicio implements OnInit {
     this.loadRandomTutorial();
   }
 
-  get filteredProjects(): Project[] {
-    let filtered = this.myProjects;
-
-    if (this.activeFilter !== 'Todos') {
-      filtered = filtered.filter((p) => p.status === this.activeFilter);
-    }
-
-    return [...filtered].sort((a, b) => {
-      if (this.sortBy === 'nombre') {
-        return a.title.localeCompare(b.title);
-      } else {
-        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-      }
-    });
-  }
-
-  countStatus(status: ProjectStatus | 'Todos'): number {
-    if (status === 'Todos') return this.myProjects.length;
-    return this.myProjects.filter((p) => p.status === status).length;
-  }
-
-  setFilter(filter: ProjectStatus | 'Todos') {
-    this.activeFilter = filter;
-  }
-
-  setSort(event: Event) {
-    this.sortBy = (event.target as HTMLSelectElement).value as 'nuevo' | 'nombre';
-  }
-
-  openCreateModal() {
-    this.isCreateModalOpen = true;
-  }
-
-  handleProjectCreated(project: Project) {
-    this.router.navigate(['/home/proyectos', project._id]);
-  }
-
-  openTutorialModal(tutorial: Tutorial) {
-    this.selectedTutorial = tutorial;
-    this.isTutorialModalOpen = true;
-  }
-
-  closeTutorialModal() {
-    this.isTutorialModalOpen = false;
-    setTimeout(() => {
-      this.selectedTutorial = null; // Limpiamos después de cerrar para evitar parpadeos
-    }, 300);
-  }
-
+  // --- MÉTODOS DE DATOS ---
   private loadUserData() {
     this.isLoadingUser = true;
     this.userService.getMe().subscribe({
@@ -129,14 +84,12 @@ export class Inicio implements OnInit {
     this.projectService.getMyProjects(1, 20).subscribe({
       next: (response) => {
         this.myProjects = response.data.docs;
-
         if (this.myProjects.length > 0) {
           const inProgress = this.myProjects.filter((p) => p.status === 'En curso');
           this.recentProject = inProgress.length > 0 ? inProgress[0] : this.myProjects[0];
         } else {
           this.recentProject = null;
         }
-
         this.isLoadingProjects = false;
         this.cdr.detectChanges();
       },
@@ -148,26 +101,12 @@ export class Inicio implements OnInit {
     });
   }
 
-  scrollLeft() {
-    if (this.carouselContainer) {
-      this.carouselContainer.nativeElement.scrollBy({ left: -320, behavior: 'smooth' });
-    }
-  }
-
-  scrollRight() {
-    if (this.carouselContainer) {
-      this.carouselContainer.nativeElement.scrollBy({ left: 320, behavior: 'smooth' });
-    }
-  }
-
   private loadRandomTutorial() {
     this.isLoadingTutorial = true;
-    // Pedimos la primera página con un límite generoso para tener variedad
     this.tutorialService.getCatalog(1, 20).subscribe({
       next: (response) => {
         const tutorials = response.data.docs;
         if (tutorials && tutorials.length > 0) {
-          // Elegimos un índice aleatorio del array devuelto
           const randomIndex = Math.floor(Math.random() * tutorials.length);
           this.recommendedTutorial = tutorials[randomIndex];
         } else {
@@ -184,12 +123,25 @@ export class Inicio implements OnInit {
     });
   }
 
-  // Utilidad para formatear los minutos (ej: 90 -> "1h 30m")
-  formatTime(minutes: number): string {
-    if (!minutes) return '0 min';
-    if (minutes < 60) return `${minutes} min`;
-    const h = Math.floor(minutes / 60);
-    const m = minutes % 60;
-    return m > 0 ? `${h}h ${m}m` : `${h}h`;
+  // --- MANEJO DE EVENTOS DE COMPONENTES HIJOS ---
+  openCreateModal() {
+    this.isCreateModalOpen = true;
+  }
+
+  handleProjectCreated(project: Project) {
+    this.isCreateModalOpen = false;
+    this.router.navigate(['/home/proyectos', project._id]);
+  }
+
+  openTutorialModal(tutorial: Tutorial) {
+    this.selectedTutorial = tutorial;
+    this.isTutorialModalOpen = true;
+  }
+
+  closeTutorialModal() {
+    this.isTutorialModalOpen = false;
+    setTimeout(() => {
+      this.selectedTutorial = null;
+    }, 300);
   }
 }

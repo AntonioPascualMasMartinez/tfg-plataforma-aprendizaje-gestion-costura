@@ -1,0 +1,359 @@
+<section
+  class="bg-surface rounded-[2.5rem] border border-border-main/10 p-5 md:p-6 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.03)] h-full flex flex-col transition-all duration-500 hover:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)]"
+>
+  <div
+    class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 md:mb-5 px-1"
+  >
+    <div class="flex items-center gap-2.5">
+      <div
+        class="w-8 h-8 rounded-lg bg-primary/5 border border-primary/10 flex items-center justify-center text-primary shrink-0 shadow-inner"
+      >
+        <svg
+          class="w-4.5 h-4.5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M6 6.878V6a2.25 2.25 0 012.25-2.25h7.5A2.25 2.25 0 0118 6v.878m-12 0c.235-.083.487-.128.75-.128h10.5c.263 0 .515.045.75.128m-12 0A2.25 2.25 0 004.5 9v.878m13.5-3A2.25 2.25 0 0119.5 9v.878m0 0a2.246 2.246 0 00-.75-.128H5.25c-.263 0-.515.045-.75.128m15 0A2.25 2.25 0 0121 12v6a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 18v-6c0-.98.626-1.813 1.5-2.122"
+          />
+        </svg>
+      </div>
+      <h2
+        class="text-[19px] md:text-[22px] font-display font-bold text-text-main tracking-tight leading-tight"
+      >
+        Mi colección
+      </h2>
+    </div>
+
+    <a
+      routerLink="/home/proyectos"
+      class="hidden sm:flex text-primary text-[13px] md:text-[14px] font-bold hover:underline items-center gap-1.5 cursor-pointer group"
+    >
+      Ver todo
+      <svg
+        class="w-3.5 h-3.5 md:w-4 md:h-4 group-hover:translate-x-1 transition-transform duration-300"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2.5"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+      </svg>
+    </a>
+  </div>
+
+  @if (isLoading) {
+    <div
+      class="flex flex-col items-center justify-center h-50 md:h-60 bg-bg rounded-[1.5rem] border border-border-main/10 shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)]"
+    >
+      <div class="relative flex items-center justify-center w-14 h-14 mb-4">
+        <div class="absolute inset-0 border-4 border-primary/20 rounded-full"></div>
+        <div
+          class="absolute inset-0 border-4 border-primary rounded-full border-t-transparent animate-spin"
+        ></div>
+      </div>
+      <p class="text-[14px] font-medium text-muted animate-pulse">Cargando tu taller...</p>
+    </div>
+  } @else if (projects.length > 0) {
+    <div class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 mb-6">
+      <div
+        class="flex bg-bg p-1.5 rounded-[1.25rem] border border-border-main/10 shadow-[inner_0_2px_4px_rgba(0,0,0,0.03)] overflow-x-auto w-full xl:w-auto custom-scrollbar"
+      >
+        <button
+          (click)="setFilter('Todos')"
+          [class.bg-surface]="activeFilter === 'Todos'"
+          [class.shadow-[0_2px_8px_rgba(0,0,0,0.06)]]="activeFilter === 'Todos'"
+          [class.text-text-main]="activeFilter === 'Todos'"
+          [class.text-muted]="activeFilter !== 'Todos'"
+          class="px-4 py-2 rounded-xl text-[13px] font-bold transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] whitespace-nowrap cursor-pointer hover:bg-surface/50"
+        >
+          Todos ({{ countStatus('Todos') }})
+        </button>
+        <button
+          (click)="setFilter('Planificado')"
+          [class.bg-surface]="activeFilter === 'Planificado'"
+          [class.shadow-[0_2px_8px_rgba(0,0,0,0.06)]]="activeFilter === 'Planificado'"
+          [class.text-text-main]="activeFilter === 'Planificado'"
+          [class.text-muted]="activeFilter !== 'Planificado'"
+          class="px-4 py-2 rounded-xl text-[13px] font-bold transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] whitespace-nowrap cursor-pointer hover:bg-surface/50"
+        >
+          Planificados ({{ countStatus('Planificado') }})
+        </button>
+        <button
+          (click)="setFilter('En curso')"
+          [class.bg-surface]="activeFilter === 'En curso'"
+          [class.shadow-[0_2px_8px_rgba(0,0,0,0.06)]]="activeFilter === 'En curso'"
+          [class.text-text-main]="activeFilter === 'En curso'"
+          [class.text-muted]="activeFilter !== 'En curso'"
+          class="px-4 py-2 rounded-xl text-[13px] font-bold transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] whitespace-nowrap cursor-pointer hover:bg-surface/50"
+        >
+          En curso ({{ countStatus('En curso') }})
+        </button>
+        <button
+          (click)="setFilter('Finalizado')"
+          [class.bg-surface]="activeFilter === 'Finalizado'"
+          [class.shadow-[0_2px_8px_rgba(0,0,0,0.06)]]="activeFilter === 'Finalizado'"
+          [class.text-text-main]="activeFilter === 'Finalizado'"
+          [class.text-muted]="activeFilter !== 'Finalizado'"
+          class="px-4 py-2 rounded-xl text-[13px] font-bold transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] whitespace-nowrap cursor-pointer hover:bg-surface/50"
+        >
+          Finalizados ({{ countStatus('Finalizado') }})
+        </button>
+      </div>
+
+      <div class="relative w-full xl:w-44 shrink-0 group">
+        <select
+          (change)="setSort($event)"
+          class="w-full h-10 pl-4 pr-10 rounded-[1.25rem] border border-border-main/15 bg-bg shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)] text-text-main text-[13px] font-bold outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 appearance-none cursor-pointer transition-all duration-300 group-hover:shadow-[inner_0_2px_8px_rgba(0,0,0,0.04)]"
+        >
+          <option value="nuevo">Más recientes</option>
+          <option value="nombre">Por nombre</option>
+        </select>
+        <div
+          class="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-muted group-hover:text-primary transition-colors"
+        >
+          <svg
+            class="w-4.5 h-4.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+            />
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative group/carousel mt-2">
+      <button
+        (click)="scrollLeft()"
+        class="absolute -left-5 top-[35%] z-20 w-11 h-11 bg-surface border border-border-main/15 rounded-full shadow-[0_8px_20px_rgba(0,0,0,0.08)] flex items-center justify-center text-text-main hover:text-primary hover:border-primary/30 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] opacity-0 -translate-x-2 group-hover/carousel:opacity-100 group-hover/carousel:translate-x-0 sm:flex outline-none cursor-pointer hover:scale-110 active:scale-95"
+      >
+        <svg
+          class="w-5 h-5 pr-0.5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2.5"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+      </button>
+
+      <div
+        #carouselContainer
+        class="flex overflow-x-auto gap-5 pb-4 pt-2 snap-x snap-mandatory hide-scrollbar scroll-smooth"
+      >
+        @for (project of filteredProjects; track project._id) {
+          <div
+            [routerLink]="['/home/proyectos', project._id]"
+            class="group relative flex flex-col bg-bg border border-border-main/10 rounded-[1.5rem] shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)] hover:border-primary/30 hover:shadow-[0_12px_30px_-10px_rgba(255,89,0,0.15)] hover:-translate-y-1.5 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer w-[75%] sm:w-64 lg:w-[270px] shrink-0 snap-start overflow-hidden"
+          >
+            <div
+              class="relative w-full aspect-2/1 bg-surface overflow-hidden flex items-center justify-center border-b border-border-main/5 shadow-[inner_0_-4px_10px_rgba(0,0,0,0.02)]"
+            >
+              @if (project.inspirationImageUrl) {
+                <img
+                  [src]="project.inspirationImageUrl"
+                  [alt]="project.title"
+                  class="w-full h-full object-cover group-hover:scale-110 group-hover:rotate-1 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                />
+              } @else {
+                <div
+                  class="w-full h-full bg-linear-to-br from-bg to-primary/5 flex items-center justify-center group-hover:scale-110 transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                >
+                  <svg
+                    class="w-10 h-10 text-primary/30"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="1.5"
+                      d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+                    />
+                  </svg>
+                </div>
+              }
+
+              <div
+                class="absolute inset-0 bg-linear-to-b from-black/20 via-transparent to-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+              ></div>
+
+              <span
+                class="absolute top-3 left-3 px-3 py-1 bg-surface/90 backdrop-blur-md text-[10px] font-bold rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.1)] uppercase text-text-main flex items-center gap-1.5 border border-border-main/10 z-10 transition-colors group-hover:border-primary/20"
+              >
+                <span
+                  class="w-1.5 h-1.5 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.5)]"
+                  [class.bg-success]="project.status === 'Finalizado'"
+                  [class.bg-warning]="project.status === 'En curso'"
+                  [class.bg-info]="project.status === 'Planificado'"
+                  [class.bg-muted]="project.status === 'Pausado'"
+                ></span>
+                {{ project.status }}
+              </span>
+
+              <div
+                class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 pointer-events-none"
+              >
+                <div
+                  class="w-12 h-12 bg-surface/95 backdrop-blur-xl rounded-full flex items-center justify-center text-primary shadow-[0_8px_20px_rgba(255,89,0,0.3)] transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+                >
+                  <svg
+                    class="w-5 h-5 ml-0.5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="3"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                    />
+                  </svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 md:p-5 flex flex-col flex-1 bg-bg rounded-b-[1.5rem]">
+              <div class="flex items-center justify-between gap-2 mb-2.5">
+                <span
+                  class="text-[10px] font-bold text-primary uppercase tracking-wider px-2 py-1 bg-primary/10 rounded-md"
+                  >{{ project.category || 'Proyecto' }}</span
+                >
+                <span
+                  class="text-[11px] font-semibold text-muted bg-surface px-2.5 py-1 rounded-md border border-border-main/5 shadow-sm"
+                  >{{ project.difficulty }}</span
+                >
+              </div>
+
+              <h3
+                class="font-display font-bold text-text-main text-[16px] md:text-[18px] leading-[1.2] line-clamp-2 group-hover:text-primary transition-colors duration-300 mb-3"
+              >
+                {{ project.title }}
+              </h3>
+
+              <div
+                class="mt-auto flex items-center gap-4 pt-3.5 border-t border-border-main/5 text-[12px] text-muted font-medium"
+              >
+                <div class="flex items-center gap-1.5">
+                  <svg
+                    class="w-4 h-4 text-muted/60"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H6.911a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661Z"
+                    />
+                  </svg>
+                  <span>{{ project.materials?.length || 0 }} mats.</span>
+                </div>
+                <div class="flex items-center gap-1.5">
+                  <svg
+                    class="w-4 h-4 text-muted/60"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0Z"
+                    />
+                  </svg>
+                  <span>{{ project.steps?.length || 0 }} pasos</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+
+        @if (filteredProjects.length === 0) {
+          <div class="w-full py-10 flex flex-col items-center justify-center text-center">
+            <svg
+              class="w-10 h-10 text-muted/30 mb-3"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.5"
+                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+              />
+            </svg>
+            <p class="text-muted text-[14px] font-medium">
+              No hay proyectos que coincidan con este filtro.
+            </p>
+          </div>
+        }
+      </div>
+
+      <button
+        (click)="scrollRight()"
+        class="absolute -right-5 top-[35%] z-20 w-11 h-11 bg-surface border border-border-main/15 rounded-full shadow-[0_8px_20px_rgba(0,0,0,0.08)] flex items-center justify-center text-text-main hover:text-primary hover:border-primary/30 transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] opacity-0 translate-x-2 group-hover/carousel:opacity-100 group-hover/carousel:translate-x-0 sm:flex outline-none cursor-pointer hover:scale-110 active:scale-95"
+      >
+        <svg
+          class="w-5 h-5 pl-0.5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2.5"
+        >
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+        </svg>
+      </button>
+    </div>
+
+    <a
+      routerLink="/home/proyectos"
+      class="sm:hidden mt-6 flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl bg-bg border border-border-main/15 text-text-main text-[14px] font-bold shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)] active:scale-95 transition-transform"
+    >
+      Explorar taller completo
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
+        />
+      </svg>
+    </a>
+  } @else {
+    <div
+      class="flex flex-col items-center justify-center flex-1 min-h-[280px] text-muted bg-surface rounded-[2rem] border border-border-main/5 shadow-[inner_0_2px_10px_rgba(0,0,0,0.02),_inner_0_10px_30px_rgba(0,0,0,0.03)] transition-all duration-300"
+    >
+      <div class="relative w-24 h-24 md:w-28 md:h-28 mb-4 flex items-center justify-center">
+        <div class="absolute inset-0 bg-primary/5 rounded-full blur-2xl"></div>
+        <img
+          src="/assets/empty.png"
+          alt="Máquina de coser ilustrativa"
+          class="relative w-full h-full object-contain opacity-70 drop-shadow-sm transition-transform duration-500 hover:scale-110"
+        />
+      </div>
+      <h3 class="text-[16px] md:text-[18px] font-bold text-text-main mb-1.5">Aún no hay diseños</h3>
+      <p
+        class="text-[13px] md:text-[14px] font-medium max-w-[260px] text-center px-4 leading-relaxed"
+      >
+        Tu biblioteca textil está lista para estrenarse.
+      </p>
+    </div>
+  }
+</section>
