@@ -1,43 +1,131 @@
-<div class="w-full space-y-8">
-  <header class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+<div class="w-full h-full flex flex-col gap-6 md:gap-8 pb-4">
+  <header class="flex flex-col md:flex-row md:items-end justify-between gap-5 px-1">
     <div>
-      <h1 class="text-3xl md:text-[36px] font-display font-bold text-text-main">Mis Proyectos</h1>
-      <p class="text-muted text-[16px]">Gestiona y organiza todas tus creaciones textiles.</p>
+      <div class="flex items-center gap-3.5 mb-2.5">
+        <div
+          class="w-11 h-11 rounded-xl bg-primary/5 border border-primary/10 flex items-center justify-center text-primary shadow-inner shrink-0"
+        >
+          <svg
+            class="w-5.5 h-5.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"
+            />
+          </svg>
+        </div>
+        <h1
+          class="text-[28px] md:text-[34px] font-display font-bold text-text-main tracking-tight leading-none"
+        >
+          Mis Proyectos
+        </h1>
+      </div>
+      <p class="text-muted text-[15px] md:text-[16px] pl-14 opacity-90">
+        Gestiona, filtra y organiza tu taller de costura.
+      </p>
     </div>
+
     <button
       (click)="openCreateModal()"
-      class="btn btn-primary shadow-sm flex items-center gap-2 w-fit cursor-pointer"
+      class="group flex items-center justify-center gap-2.5 bg-primary text-white px-6 py-3 rounded-xl shadow-[0_8px_20px_-6px_rgba(255,89,0,0.4)] hover:shadow-[0_12px_25px_-8px_rgba(255,89,0,0.5)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 active:scale-95 cursor-pointer outline-none w-full md:w-auto"
     >
-      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+      <svg
+        class="w-5 h-5 group-hover:rotate-90 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+        stroke-width="2.5"
+      >
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
       </svg>
-      Añadir patrón
+      <span class="font-bold text-[14px] md:text-[15px]">Crear Proyecto</span>
     </button>
   </header>
 
   <div
-    class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-surface p-4 rounded-2xl border border-border-main/20 shadow-sm"
+    class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-surface p-4 md:p-5 rounded-4xl border border-border-main/10 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.03)] transition-all duration-500 hover:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)]"
   >
-    <div class="relative w-full xl:w-96 shrink-0">
-      <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-muted">
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    <div class="relative w-full xl:w-88 shrink-0 group">
+      <div
+        class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-muted group-focus-within:text-primary transition-colors duration-300"
+      >
+        <svg
+          class="w-5 h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2.5"
+        >
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"
           />
         </svg>
-      </span>
+      </div>
       <input
         [formControl]="searchTerm"
         type="text"
         placeholder="Buscar en mis creaciones..."
-        class="w-full pl-10 pr-4 py-2.5 bg-bg/50 border border-border-main/20 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all text-[14px] font-medium placeholder:text-muted/70"
+        class="w-full pl-11 pr-10 py-3 bg-bg border border-border-main/15 shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)] rounded-[1.25rem] focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all duration-300 text-[14px] font-semibold text-text-main placeholder:text-muted/60 placeholder:font-medium"
       />
       @if (searchTerm.value) {
         <button
           (click)="searchTerm.setValue('')"
-          class="absolute inset-y-0 right-0 pr-3 flex items-center text-muted hover:text-text-main transition-colors outline-none cursor-pointer"
+          class="absolute inset-y-0 right-1.5 pr-2 flex items-center text-muted hover:text-danger hover:scale-110 transition-all outline-none cursor-pointer"
+          title="Limpiar búsqueda"
+        >
+          <div class="p-1 bg-surface rounded-full border border-border-main/10 shadow-sm">
+            <svg
+              class="w-3.5 h-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="3"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+        </button>
+      }
+    </div>
+
+    <div class="flex flex-wrap items-center gap-3 w-full xl:w-auto">
+      <div class="relative w-full sm:w-auto flex-1 sm:flex-none min-w-37.5 group">
+        <div
+          class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted group-focus-within:text-primary transition-colors duration-300 z-10"
+        >
+          <svg
+            class="w-4.5 h-4.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+        <select
+          [formControl]="statusFilter"
+          class="w-full h-11 pl-10 pr-9 rounded-[1.25rem] border border-border-main/15 bg-bg shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)] text-text-main text-[13.5px] font-bold outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 appearance-none cursor-pointer transition-all duration-300 group-hover:shadow-[inner_0_2px_8px_rgba(0,0,0,0.04)] hover:bg-surface-hover/50"
+        >
+          <option value="Todos">Todos los estados</option>
+          <option value="Planificado">Planificados</option>
+          <option value="En curso">En curso</option>
+          <option value="Pausado">Pausados</option>
+          <option value="Finalizado">Finalizados</option>
+        </select>
+        <div
+          class="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-muted group-hover:text-primary transition-colors"
         >
           <svg
             class="w-4 h-4"
@@ -46,25 +134,19 @@
             stroke="currentColor"
             stroke-width="2.5"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+            />
           </svg>
-        </button>
-      }
-    </div>
+        </div>
+      </div>
 
-    <div class="flex flex-wrap items-center gap-3 w-full xl:w-auto">
-      <div class="relative w-full sm:w-auto flex-1 sm:flex-none min-w-[140px]">
-        <select
-          [formControl]="statusFilter"
-          class="w-full h-10 pl-3 pr-8 rounded-xl border border-border-main/20 bg-bg/50 text-text-main text-[13px] font-semibold outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer hover:bg-surface-hover transition-colors"
+      <div class="relative w-full sm:w-auto flex-1 sm:flex-none min-w-37.5 group">
+        <div
+          class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted group-focus-within:text-primary transition-colors duration-300 z-10"
         >
-          <option value="Todos">Todos los estados</option>
-          <option value="Planificado">Planificados</option>
-          <option value="En curso">En curso</option>
-          <option value="Pausado">Pausados</option>
-          <option value="Finalizado">Finalizados</option>
-        </select>
-        <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-muted">
           <svg
             class="w-4 h-4"
             fill="none"
@@ -75,29 +157,28 @@
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
-              d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+              d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"
             />
           </svg>
         </div>
-      </div>
-
-      <div class="relative w-full sm:w-auto flex-1 sm:flex-none min-w-[140px]">
         <select
           [formControl]="difficultyFilter"
-          class="w-full h-10 pl-3 pr-8 rounded-xl border border-border-main/20 bg-bg/50 text-text-main text-[13px] font-semibold outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer hover:bg-surface-hover transition-colors"
+          class="w-full h-11 pl-10 pr-9 rounded-[1.25rem] border border-border-main/15 bg-bg shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)] text-text-main text-[13.5px] font-bold outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 appearance-none cursor-pointer transition-all duration-300 group-hover:shadow-[inner_0_2px_8px_rgba(0,0,0,0.04)] hover:bg-surface-hover/50"
         >
           <option value="Todas">Cualquier nivel</option>
           <option value="Fácil">Fácil</option>
           <option value="Intermedio">Intermedio</option>
           <option value="Avanzado">Avanzado</option>
         </select>
-        <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-muted">
+        <div
+          class="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-muted group-hover:text-primary transition-colors"
+        >
           <svg
             class="w-4 h-4"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
-            stroke-width="2"
+            stroke-width="2.5"
           >
             <path
               stroke-linecap="round"
@@ -108,23 +189,42 @@
         </div>
       </div>
 
-      <div class="relative w-full sm:w-auto flex-1 sm:flex-none min-w-[160px]">
+      <div class="relative w-full sm:w-auto flex-1 sm:flex-none min-w-45 group">
+        <div
+          class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted group-focus-within:text-primary transition-colors duration-300 z-10"
+        >
+          <svg
+            class="w-4.5 h-4.5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3 7.5L7.5 3m0 0L12 7.5M7.5 3v13.5m13.5 0L16.5 21m0 0L12 16.5m4.5 4.5V7.5"
+            />
+          </svg>
+        </div>
         <select
           [formControl]="sortByFilter"
-          class="w-full h-10 pl-3 pr-8 rounded-xl border border-border-main/20 bg-bg/50 text-text-main text-[13px] font-semibold outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 appearance-none cursor-pointer hover:bg-surface-hover transition-colors"
+          class="w-full h-11 pl-10 pr-9 rounded-[1.25rem] border border-border-main/15 bg-bg shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)] text-text-main text-[13.5px] font-bold outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 appearance-none cursor-pointer transition-all duration-300 group-hover:shadow-[inner_0_2px_8px_rgba(0,0,0,0.04)] hover:bg-surface-hover/50"
         >
           <option value="nuevo">Más recientes primero</option>
           <option value="antiguo">Más antiguos primero</option>
           <option value="nombre_asc">Nombre (A-Z)</option>
           <option value="nombre_desc">Nombre (Z-A)</option>
         </select>
-        <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-muted">
+        <div
+          class="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-muted group-hover:text-primary transition-colors"
+        >
           <svg
             class="w-4 h-4"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
-            stroke-width="2"
+            stroke-width="2.5"
           >
             <path
               stroke-linecap="round"
@@ -137,107 +237,138 @@
     </div>
   </div>
 
-  @if (isLoading) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      @for (i of [1, 2, 3, 4, 5, 6]; track i) {
-        <div class="bg-surface rounded-3xl border border-border-main/10 p-5 animate-pulse">
-          <div class="w-full h-48 bg-border-main/10 rounded-2xl mb-5"></div>
-          <div class="h-5 bg-border-main/10 rounded-lg w-3/4 mb-3"></div>
-          <div class="h-4 bg-border-main/10 rounded-lg w-1/2 mb-6"></div>
-          <div class="flex justify-between border-t border-border-main/10 pt-4">
-            <div class="h-6 bg-border-main/10 rounded-lg w-1/4"></div>
-            <div class="h-6 bg-border-main/10 rounded-lg w-8"></div>
+  <div class="flex-1 mt-2">
+    @if (isLoading) {
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        @for (i of [1, 2, 3, 4, 5, 6]; track i) {
+          <div
+            class="bg-surface rounded-4xl border border-border-main/10 p-5 shadow-[0_8px_30px_-10px_rgba(0,0,0,0.03)] animate-pulse flex flex-col h-full"
+          >
+            <div class="w-full aspect-video bg-border-main/10 rounded-2xl mb-5"></div>
+            <div class="flex items-center gap-2 mb-3">
+              <div class="h-4 bg-border-main/10 rounded-md w-16"></div>
+              <div class="h-4 bg-border-main/10 rounded-md w-20"></div>
+            </div>
+            <div class="h-5 bg-border-main/15 rounded-lg w-3/4 mb-3"></div>
+            <div class="h-4 bg-border-main/5 rounded-lg w-full mb-1"></div>
+            <div class="h-4 bg-border-main/5 rounded-lg w-2/3 mb-6"></div>
+            <div class="flex justify-between border-t border-border-main/5 pt-4 mt-auto">
+              <div class="h-6 bg-border-main/10 rounded-lg w-24"></div>
+              <div class="h-6 bg-border-main/10 rounded-lg w-8"></div>
+            </div>
+          </div>
+        }
+      </div>
+    } @else if (projects.length > 0) {
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        @for (project of projects; track project._id) {
+          <app-project-card [project]="project" (delete)="deleteProject($event)">
+          </app-project-card>
+        }
+      </div>
+
+      @if (totalPages > 1) {
+        <div class="flex justify-center items-center mt-12 mb-6">
+          <div
+            class="flex items-center gap-1.5 p-1.5 bg-surface rounded-3xl border border-border-main/15 shadow-[0_10px_30px_-10px_rgba(0,0,0,0.06)]"
+          >
+            <button
+              (click)="changePage(currentPage - 1)"
+              [disabled]="currentPage === 1"
+              class="w-11 h-11 rounded-2xl border border-transparent text-text-main flex items-center justify-center transition-all duration-300 outline-none disabled:opacity-30 disabled:cursor-not-allowed hover:bg-bg hover:border-border-main/10 hover:shadow-sm focus-visible:ring-2 focus-visible:ring-primary active:scale-90 cursor-pointer"
+            >
+              <svg
+                class="w-5.5 h-5.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+
+            <div class="px-5 py-2 flex flex-col items-center justify-center min-w-30">
+              <span class="text-[14px] font-bold text-text-main tracking-wide">
+                Página {{ currentPage }}
+              </span>
+              <span class="text-[11px] font-semibold text-muted tracking-wider uppercase">
+                de {{ totalPages }}
+              </span>
+            </div>
+
+            <button
+              (click)="changePage(currentPage + 1)"
+              [disabled]="currentPage === totalPages"
+              class="w-11 h-11 rounded-2xl border border-transparent text-text-main flex items-center justify-center transition-all duration-300 outline-none disabled:opacity-30 disabled:cursor-not-allowed hover:bg-bg hover:border-border-main/10 hover:shadow-sm focus-visible:ring-2 focus-visible:ring-primary active:scale-90 cursor-pointer"
+            >
+              <svg
+                class="w-5.5 h-5.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </button>
           </div>
         </div>
       }
-    </div>
-  } @else if (projects.length > 0) {
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      @for (project of projects; track project._id) {
-        <app-project-card [project]="project" (delete)="deleteProject($event)"> </app-project-card>
-      }
-    </div>
+    } @else {
+      <div
+        class="flex flex-col items-center justify-center py-16 md:py-24 mt-4 text-center bg-surface rounded-[3rem] border border-border-main/5 shadow-[inner_0_2px_10px_rgba(0,0,0,0.02),inner_0_10px_40px_rgba(0,0,0,0.03)] h-full min-h-[50vh]"
+      >
+        <div
+          class="relative w-32 h-32 md:w-36 md:h-36 mb-6 md:mb-8 flex items-center justify-center"
+        >
+          <div class="absolute inset-0 bg-primary/5 rounded-full blur-2xl scale-125"></div>
+          <img
+            src="/assets/empty.png"
+            alt="Máquina de coser ilustrativa"
+            class="relative w-full h-full object-contain opacity-80 drop-shadow-[0_4px_10px_rgba(0,0,0,0.1)] transition-transform duration-700 hover:scale-110"
+          />
+        </div>
+        <h2
+          class="text-[22px] md:text-[26px] font-display font-bold text-text-main mb-3 tracking-tight"
+        >
+          {{ searchTerm.value ? 'Sin resultados de búsqueda' : 'Tu colección está en blanco' }}
+        </h2>
+        <p class="text-[15px] md:text-[16px] text-muted max-w-[320px] mb-8 leading-relaxed px-4">
+          {{
+            searchTerm.value
+              ? 'Prueba con otras palabras, cambia los filtros o limpia la búsqueda actual.'
+              : 'Parece que aún no has documentado ninguna creación. ¿Qué te parece si empezamos ahora?'
+          }}
+        </p>
 
-    @if (totalPages > 1) {
-      <div class="flex justify-center items-center gap-4 mt-12">
-        <button
-          (click)="changePage(currentPage - 1)"
-          [disabled]="currentPage === 1"
-          class="p-2.5 rounded-xl border border-border-main/20 text-text-main disabled:opacity-30 disabled:cursor-not-allowed hover:bg-surface-hover transition-all focus-visible:ring-2 focus-visible:ring-primary outline-none"
-        >
-          <svg
-            class="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
+        @if (searchTerm.value) {
+          <button
+            (click)="searchTerm.setValue('')"
+            class="btn bg-bg text-text-main border border-border-main/15 shadow-sm hover:shadow-md hover:border-border-main/30 px-6 py-3 rounded-xl transition-all cursor-pointer font-bold outline-none focus:ring-2 focus:ring-primary/20"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-          </svg>
-        </button>
-        <span class="text-[15px] font-semibold text-text-main">
-          Página {{ currentPage }} de {{ totalPages }}
-        </span>
-        <button
-          (click)="changePage(currentPage + 1)"
-          [disabled]="currentPage === totalPages"
-          class="p-2.5 rounded-xl border border-border-main/20 text-text-main disabled:opacity-30 disabled:cursor-not-allowed hover:bg-surface-hover transition-all focus-visible:ring-2 focus-visible:ring-primary outline-none"
-        >
-          <svg
-            class="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
+            Limpiar filtros
+          </button>
+        } @else {
+          <button
+            (click)="openCreateModal()"
+            class="group flex items-center justify-center gap-2.5 bg-primary text-white px-7 py-3.5 rounded-2xl shadow-[0_8px_20px_-6px_rgba(255,89,0,0.4)] hover:shadow-[0_12px_25px_-8px_rgba(255,89,0,0.5)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 active:scale-95 cursor-pointer outline-none"
           >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        </button>
+            <svg
+              class="w-5 h-5 group-hover:rotate-90 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2.5"
+            >
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+            </svg>
+            <span class="font-bold text-[15px]">Crear mi primer patrón</span>
+          </button>
+        }
       </div>
     }
-  } @else {
-    <div
-      class="flex flex-col items-center justify-center py-20 text-center bg-surface rounded-[40px] border border-dashed border-border-main/30 shadow-sm"
-    >
-      <div class="relative w-32 h-32 mb-6 flex items-center justify-center">
-        <div class="absolute inset-0 bg-primary/5 rounded-full blur-xl scale-125"></div>
-        <img
-          src="/assets/empty.png"
-          alt="Máquina de coser ilustrativa"
-          class="relative w-full h-full object-contain opacity-80"
-        />
-      </div>
-      <h2 class="text-[22px] font-display font-bold text-text-main mb-2">
-        {{ searchTerm.value ? 'Sin resultados' : 'Tu colección está vacía' }}
-      </h2>
-      <p class="text-[15px] text-muted max-w-75 mb-8">
-        {{
-          searchTerm.value
-            ? 'Prueba con otras palabras o limpia la búsqueda.'
-            : 'Parece que aún no has documentado ninguna creación. ¡Empieza ahora!'
-        }}
-      </p>
-
-      @if (searchTerm.value) {
-        <button (click)="searchTerm.setValue('')" class="btn btn-secondary shadow-sm">
-          Limpiar búsqueda
-        </button>
-      } @else {
-        <button (click)="openCreateModal()" class="btn btn-primary shadow-sm gap-2 cursor-pointer">
-          <svg
-            class="w-5 h-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
-          </svg>
-          Crear mi primer patrón
-        </button>
-      }
-    </div>
-  }
+  </div>
 </div>
 
 @if (isCreateModalOpen) {
