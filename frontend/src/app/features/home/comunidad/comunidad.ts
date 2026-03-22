@@ -1,8 +1,9 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 import { ProjectService } from '../../../core/services/project.service';
 import { CommunityService } from '../../../core/services/community.service';
@@ -26,7 +27,7 @@ import { CommunityDetailModalComponent } from '../../../shared/modals/community-
   templateUrl: './comunidad.html',
   styleUrl: './comunidad.scss',
 })
-export class Comunidad implements OnInit {
+export class Comunidad implements OnInit, OnDestroy {
   private projectService = inject(ProjectService);
   private communityService = inject(CommunityService);
   private cdr = inject(ChangeDetectorRef);
@@ -40,6 +41,7 @@ export class Comunidad implements OnInit {
   hasMore = true;
 
   searchTerm = new FormControl('');
+  private searchSub?: Subscription; // Guardamos la suscripción para evitar memory leaks
 
   selectedProject: CommunityProject | null = null;
 
@@ -48,10 +50,19 @@ export class Comunidad implements OnInit {
     this.loadFeed(true);
   }
 
+  // Limpiamos la suscripción al destruir el componente
+  ngOnDestroy() {
+    if (this.searchSub) {
+      this.searchSub.unsubscribe();
+    }
+  }
+
   private setupSearch() {
-    this.searchTerm.valueChanges.pipe(debounceTime(400), distinctUntilChanged()).subscribe(() => {
-      this.loadFeed(true);
-    });
+    this.searchSub = this.searchTerm.valueChanges
+      .pipe(debounceTime(400), distinctUntilChanged())
+      .subscribe(() => {
+        this.loadFeed(true);
+      });
   }
 
   loadFeed(reset = false) {
