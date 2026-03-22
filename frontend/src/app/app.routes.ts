@@ -29,6 +29,12 @@ export const routes: Routes = [
       import('./features/auth/forgot-password/forgot-password').then((m) => m.ForgotPassword),
   },
 
+    {
+    path: 'auth/reset-password',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./features/auth/reset-password/reset-password').then((m) => m.ResetPassword),
+  },
   // 3. Hub Principal (Ruta Privada - Protegida por el Guard)
   {
     path: 'home',
