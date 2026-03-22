@@ -10,6 +10,26 @@ export const routes: Routes = [
     loadComponent: () => import('./features/landing/landing').then((m) => m.Landing),
   },
 
+  {
+    path: 'legal-notice',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./features/legal/legal-notice/legal-notice').then((m) => m.LegalNotice),
+  },
+
+  {
+    path: 'privacy-policy',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./features/legal/privacy-policy/privacy-policy').then((m) => m.PrivacyPolicy),
+  },
+
+  {
+    path: 'terms-of-use',
+    canActivate: [guestGuard],
+    loadComponent: () =>
+      import('./features/legal/terms-of-use/terms-of-use').then((m) => m.TermsOfUse),
+  },
   // 2. Rutas de Autenticación
   {
     path: 'auth/login',
@@ -29,7 +49,7 @@ export const routes: Routes = [
       import('./features/auth/forgot-password/forgot-password').then((m) => m.ForgotPassword),
   },
 
-    {
+  {
     path: 'auth/reset-password',
     canActivate: [guestGuard],
     loadComponent: () =>
