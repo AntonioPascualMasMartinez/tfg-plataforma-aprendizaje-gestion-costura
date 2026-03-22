@@ -1,75 +1,138 @@
-import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { merge, Subscription } from 'rxjs';
+
 import { TutorialCardComponent } from '../../../shared/components/tutorial-card/tutorial-card';
 import { TutorialService } from '../../../core/services/tutorial.service';
-import { Tutorial } from '../../../shared/models/tutorial.model';
+import { Tutorial, DifficultyLevel } from '../../../shared/models/tutorial.model';
 import { TutorialDetailModalComponent } from '../../../shared/modals/tutorial-detail-modal/tutorial-detail-modal.component';
 
 @Component({
   selector: 'app-tutoriales',
   standalone: true,
-  imports: [CommonModule, TutorialCardComponent, TutorialDetailModalComponent],
+  imports: [CommonModule, ReactiveFormsModule, TutorialCardComponent, TutorialDetailModalComponent],
   templateUrl: './tutoriales.html',
 })
-export class Tutoriales implements OnInit {
+export class Tutoriales implements OnInit, OnDestroy {
   private tutorialService = inject(TutorialService);
-  private cdr = inject(ChangeDetectorRef); // <-- Inyectamos el detector de cambios para mayor fluidez
+  private cdr = inject(ChangeDetectorRef);
 
-  tutorials: Tutorial[] = [];
+  // Estados
+  featuredTutorial: Tutorial | null = null;
+  gridTutorials: Tutorial[] = [];
+
   isLoading = true;
   errorMessage = '';
 
-  // Configuración de paginación
   currentPage = 1;
   totalPages = 1;
-  limit = 9; // Mostraremos 9 para encajar perfecto en el grid de 3 columnas (como proyectos)
+  limit = 10; // 1 Destacado + 9 Grid
 
   selectedTutorial: Tutorial | null = null;
   showDetailModal = false;
 
-  // Configuración de filtros
+  // Filtros interactivos
+  categoryFilter = new FormControl('Todos');
+  difficultyFilter = new FormControl('Todos');
+  timeFilter = new FormControl('Todos');
+
+  // Arrays de opciones basados estrictamente en tutorial.model.ts
   readonly categories = ['Todos', 'Bolsos', 'Monederos', 'Ropa', 'Hogar', 'Accesorios'];
-  activeCategory = 'Todos';
+  readonly difficulties: ('Todos' | DifficultyLevel)[] = [
+    'Todos',
+    'Principiante',
+    'Intermedio',
+    'Avanzado',
+  ];
+  readonly times = ['Todos', 'Menos de 30 min', '30 a 60 min', 'Más de 1 hora'];
+
+  private filterSubscription?: Subscription;
 
   ngOnInit() {
     this.loadTutorials();
+    this.setupFilters();
+  }
+
+  ngOnDestroy() {
+    if (this.filterSubscription) {
+      this.filterSubscription.unsubscribe();
+    }
+  }
+
+  private setupFilters() {
+    const cat$ = this.categoryFilter.valueChanges;
+    const diff$ = this.difficultyFilter.valueChanges;
+    const time$ = this.timeFilter.valueChanges;
+
+    this.filterSubscription = merge(cat$, diff$, time$).subscribe(() => {
+      this.currentPage = 1;
+      this.loadTutorials();
+    });
   }
 
   loadTutorials() {
     this.isLoading = true;
     this.errorMessage = '';
-    this.cdr.detectChanges(); // <-- Forzamos actualización visual inmediata
+    this.cdr.markForCheck();
 
-    const categoryFilter = this.activeCategory === 'Todos' ? undefined : this.activeCategory;
+    const category = this.categoryFilter.value === 'Todos' ? undefined : this.categoryFilter.value!;
 
-    this.tutorialService.getCatalog(this.currentPage, this.limit, categoryFilter).subscribe({
+    this.tutorialService.getCatalog(this.currentPage, this.limit, category).subscribe({
       next: (response) => {
         if (response.data) {
-          this.tutorials = response.data.docs;
+          let fetchedDocs = response.data.docs;
+
+          // Filtrado Local: Por difficultyLevel (según modelo)
+          const diff = this.difficultyFilter.value;
+          if (diff !== 'Todos') {
+            fetchedDocs = fetchedDocs.filter((t: Tutorial) => t.difficultyLevel === diff);
+          }
+
+          // Filtrado Local: Por estimatedTime (según modelo)
+          const time = this.timeFilter.value;
+          if (time !== 'Todos') {
+            fetchedDocs = fetchedDocs.filter((t: Tutorial) => {
+              const dur = t.estimatedTime || 0;
+              if (time === 'Menos de 30 min') return dur < 30;
+              if (time === '30 a 60 min') return dur >= 30 && dur <= 60;
+              if (time === 'Más de 1 hora') return dur > 60;
+              return true;
+            });
+          }
+
           this.totalPages = response.data.totalPages;
           this.currentPage = response.data.page;
+
+          // Separar Destacado vs Grid
+          if (this.currentPage === 1 && fetchedDocs.length > 0) {
+            this.featuredTutorial = fetchedDocs[0];
+            this.gridTutorials = fetchedDocs.slice(1);
+          } else {
+            this.featuredTutorial = null;
+            this.gridTutorials = fetchedDocs;
+          }
+        } else {
+          this.featuredTutorial = null;
+          this.gridTutorials = [];
         }
+
         this.isLoading = false;
-        this.cdr.detectChanges(); // <-- Actualizamos el DOM al recibir datos
+        this.cdr.markForCheck();
       },
       error: (err) => {
-        console.error('Error cargando el catálogo de tutoriales:', err);
+        console.error('Error cargando el catálogo:', err);
         this.errorMessage = 'No se pudieron cargar los tutoriales. Por favor, intenta de nuevo.';
         this.isLoading = false;
-        this.cdr.detectChanges(); // <-- Actualizamos el DOM en caso de error
+        this.cdr.markForCheck();
       },
     });
   }
 
-  setCategory(category: string) {
-    if (this.activeCategory !== category) {
-      this.activeCategory = category;
-      this.currentPage = 1;
-      this.loadTutorials();
-    }
+  setCategory(cat: string) {
+    this.categoryFilter.setValue(cat);
   }
 
-  // Misma función de paginación que en Proyectos, con scroll suave hacia arriba
   changePage(newPage: number) {
     if (newPage >= 1 && newPage <= this.totalPages) {
       this.currentPage = newPage;
@@ -85,6 +148,8 @@ export class Tutoriales implements OnInit {
 
   closeTutorialModal() {
     this.showDetailModal = false;
-    this.selectedTutorial = null;
+    setTimeout(() => {
+      this.selectedTutorial = null;
+    }, 300);
   }
 }
