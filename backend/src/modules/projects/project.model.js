@@ -63,6 +63,12 @@ const projectSchema = new mongoose.Schema(
     },
     materials: [materialSchema],
     steps: [stepSchema],
+    likes: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+      },
+    ],
     deletedAt: {
       type: Date,
       default: null,

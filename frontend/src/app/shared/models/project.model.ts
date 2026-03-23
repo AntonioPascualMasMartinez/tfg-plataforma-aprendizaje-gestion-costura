@@ -35,6 +35,7 @@ export interface Project {
   deletedAt: string | null;
   createdAt: string;
   updatedAt: string;
+  likes?: string[];
 }
 
 export interface CreateProjectPayload {

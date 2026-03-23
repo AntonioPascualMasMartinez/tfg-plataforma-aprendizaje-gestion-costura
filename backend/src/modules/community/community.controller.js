@@ -32,9 +32,12 @@ class CommunityController {
 
   static async likeProject(req, res, next) {
     try {
-      const project = await CommunityService.incrementProjectLikes(req.params.projectId);
-      return ResponseFormatter.success(res, 200, 'Like registrado con éxito', {
-        likesCount: project.likesCount,
+      // Ahora pasamos también req.user.id (disponible gracias al middleware authenticate)
+      const result = await CommunityService.toggleProjectLike(req.params.projectId, req.user.id);
+
+      return ResponseFormatter.success(res, 200, 'Like actualizado con éxito', {
+        likesCount: result.likesCount,
+        isLikedByMe: result.isLikedByMe,
       });
     } catch (error) {
       next(error);

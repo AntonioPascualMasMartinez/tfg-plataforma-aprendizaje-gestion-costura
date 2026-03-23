@@ -59,9 +59,10 @@ export class CommunityService {
    * Da "Me gusta" a un proyecto
    * POST /api/v1/community/projects/:projectId/like
    */
-  likeProject(projectId: string): Observable<ApiResponse<{ likesCount: number }>> {
-    // El cuerpo va vacío porque el backend usa el token y el params
-    return this.http.post<ApiResponse<{ likesCount: number }>>(
+  likeProject(
+    projectId: string,
+  ): Observable<ApiResponse<{ likesCount: number; isLikedByMe: boolean }>> {
+    return this.http.post<ApiResponse<{ likesCount: number; isLikedByMe: boolean }>>(
       `${this.apiUrl}/projects/${projectId}/like`,
       {},
     );

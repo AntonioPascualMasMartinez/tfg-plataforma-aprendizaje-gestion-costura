@@ -214,6 +214,10 @@
 </div>
 
 @if (selectedProject) {
-  <app-community-detail-modal [project]="selectedProject" (close)="closeModal()">
+  <app-community-detail-modal
+    [project]="selectedProject"
+    (close)="closeModal()"
+    (projectUpdated)="handleProjectUpdated($event)"
+  >
   </app-community-detail-modal>
 }

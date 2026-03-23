@@ -17,7 +17,7 @@ import { User } from '../../../shared/models/user.model';
 export class CommunityDetailModalComponent implements OnInit {
   @Input({ required: true }) project!: CommunityProject;
   @Output() close = new EventEmitter<void>();
-  
+
   // Si el like cambia dentro del modal, avisamos al padre para que actualice la tarjeta
   @Output() projectUpdated = new EventEmitter<CommunityProject>();
 
@@ -44,13 +44,13 @@ export class CommunityDetailModalComponent implements OnInit {
       },
       error: () => {
         this.isLoadingComments = false;
-      }
+      },
     });
   }
 
   postComment() {
     if (!this.newComment.trim()) return;
-    
+
     this.isSubmittingComment = true;
     this.communityService.addComment(this.project._id, { content: this.newComment }).subscribe({
       next: (res) => {
@@ -62,26 +62,32 @@ export class CommunityDetailModalComponent implements OnInit {
       error: () => {
         this.isSubmittingComment = false;
         this.toastService.error('Error al publicar el comentario');
-      }
+      },
     });
   }
 
   toggleLike() {
-    this.project.isLikedLocally = true;
-    this.project.likesCount = (this.project.likesCount || 0) + 1;
-    this.projectUpdated.emit(this.project); // Actualizamos la UI inmediatamente
+    // Lógica Toggle optimista
+    const wasLiked = this.project.isLikedLocally;
+    this.project.isLikedLocally = !wasLiked;
+    this.project.likesCount = (this.project.likesCount || 0) + (wasLiked ? -1 : 1);
+
+    // Emitimos el cambio inmediatamente para que la tarjeta del fondo se actualice
+    this.projectUpdated.emit(this.project);
 
     this.communityService.likeProject(this.project._id).subscribe({
       next: (res) => {
+        // Actualizamos con el dato real del servidor
         this.project.likesCount = res.data.likesCount;
         this.projectUpdated.emit(this.project);
       },
       error: () => {
-        this.project.isLikedLocally = false;
-        this.project.likesCount = (this.project.likesCount || 1) - 1;
+        // Revertir si hay error
+        this.project.isLikedLocally = wasLiked;
+        this.project.likesCount = (this.project.likesCount || 0) + (wasLiked ? 1 : -1);
         this.projectUpdated.emit(this.project);
         this.toastService.error('Error al procesar el Me gusta');
-      }
+      },
     });
   }
 
@@ -92,12 +98,13 @@ export class CommunityDetailModalComponent implements OnInit {
     const payload: CreateReportPayload = {
       targetType: 'Project',
       targetId: this.project._id,
-      reason: reason
+      reason: reason,
     };
 
     this.communityService.createReport(payload).subscribe({
-      next: () => this.toastService.success('Proyecto reportado correctamente. Nuestro equipo lo revisará.'),
-      error: () => this.toastService.error('Hubo un error al enviar el reporte.')
+      next: () =>
+        this.toastService.success('Proyecto reportado correctamente. Nuestro equipo lo revisará.'),
+      error: () => this.toastService.error('Hubo un error al enviar el reporte.'),
     });
   }
 

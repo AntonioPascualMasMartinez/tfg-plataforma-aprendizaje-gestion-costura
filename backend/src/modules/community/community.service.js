@@ -31,19 +31,38 @@ class CommunityService {
   }
 
   /**
-   * Operación ATÓMICA: Incrementa los "Me gusta" directamente en la DB.
-   * Evita que dos usuarios dando like al mismo tiempo sobreescriban el valor del otro.
+   * Alterna (Toggle) el "Me gusta" de un usuario en un proyecto.
+   * Si el usuario ya le dio like, se lo quita. Si no, se lo añade.
    */
-  static async incrementProjectLikes(projectId) {
-    // findByIdAndUpdate con $inc delega la suma al motor de MongoDB (C++), garantizando atomicidad
-    const updatedProject = await Project.findByIdAndUpdate(
-      projectId,
-      { $inc: { likesCount: 1 } },
-      { new: true }, // Retorna el documento ya actualizado
-    );
+  static async toggleProjectLike(projectId, userId) {
+    const project = await Project.findById(projectId);
 
-    if (!updatedProject) throw new ApiError(404, 'Proyecto no encontrado.');
-    return updatedProject;
+    if (!project) {
+      throw new ApiError(404, 'Proyecto no encontrado.');
+    }
+
+    // Comprobamos si el ID del usuario ya existe en el array de likes
+    const likeIndex = project.likes.indexOf(userId);
+    let isLiked = false;
+
+    if (likeIndex === -1) {
+      // No le ha dado like: lo añadimos
+      project.likes.push(userId);
+      isLiked = true;
+    } else {
+      // Ya le dio like: lo quitamos
+      project.likes.splice(likeIndex, 1);
+      isLiked = false;
+    }
+
+    // Guardamos el documento actualizado
+    await project.save();
+
+    // Devolvemos el conteo exacto y el nuevo estado
+    return {
+      likesCount: project.likes.length,
+      isLikedByMe: isLiked,
+    };
   }
 
   /**
