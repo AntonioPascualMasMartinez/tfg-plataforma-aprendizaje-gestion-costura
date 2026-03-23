@@ -17,7 +17,7 @@ export class TutorialCardComponent {
   // Extraemos la imagen del primer paso que contenga una
   get coverImage(): string | null {
     if (this.tutorial.steps && this.tutorial.steps.length > 0) {
-      const stepWithImage = this.tutorial.steps.find((step) => step.mediaUrl);
+      const stepWithImage = [...this.tutorial.steps].reverse().find((step) => step.mediaUrl);
       return stepWithImage ? stepWithImage.mediaUrl : null;
     }
     return null;

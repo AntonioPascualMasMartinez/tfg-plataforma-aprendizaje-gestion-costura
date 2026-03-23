@@ -152,4 +152,15 @@ export class Tutoriales implements OnInit, OnDestroy {
       this.selectedTutorial = null;
     }, 300);
   }
+
+  /**
+   * Obtiene dinámicamente la imagen de portada basada en el último paso del tutorial
+   */
+  getTutorialCover(tutorial: Tutorial): string | null {
+    if (!tutorial.steps || tutorial.steps.length === 0) return null;
+    
+    // Invertimos el array para encontrar el último mediaUrl disponible
+    const lastStepWithMedia = [...tutorial.steps].reverse().find(s => s.mediaUrl);
+    return lastStepWithMedia ? lastStepWithMedia.mediaUrl : null;
+  }
 }

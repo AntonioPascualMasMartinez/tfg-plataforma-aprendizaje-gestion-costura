@@ -46,8 +46,11 @@ class TutorialService {
 
       difficulty: difficultyMapping[tutorial.difficultyLevel] || 'Fácil',
 
-      inspirationImageUrl: tutorial.steps.find((s) => s.mediaUrl)?.mediaUrl || null,
-
+      inspirationImageUrl:
+        tutorial.steps
+          .slice()
+          .reverse()
+          .find((s) => s.mediaUrl)?.mediaUrl || null,
       materials: tutorial.materialsNeeded.map((m) => ({
         name: m.name,
         quantity: m.quantity,
