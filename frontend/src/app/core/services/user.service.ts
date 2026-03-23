@@ -28,17 +28,26 @@ export class UserService {
     return this.http.put<ApiResponse<User>>(`${this.apiUrl}/me`, data);
   }
 
+  // NUEVO: PUT /api/v1/users/me/password (Ajusta la ruta según tu backend)
+  updatePassword(data: { currentPassword: string; newPassword: string }): Observable<ApiResponse<null>> {
+    return this.http.put<ApiResponse<null>>(`${this.apiUrl}/me/password`, data);
+  }
+
+  // NUEVO: DELETE /api/v1/users/me (Ajusta la ruta según tu backend)
+  deleteMe(): Observable<ApiResponse<null>> {
+    return this.http.delete<ApiResponse<null>>(`${this.apiUrl}/me`);
+  }
+
   // ==========================================
   // Rutas Administrativas
   // ==========================================
-
+  
   // GET /api/v1/users/admin
   getAllUsers(
     page: number = 1,
     limit: number = 10,
   ): Observable<ApiResponse<PaginatedResult<User>>> {
     const params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
-
     return this.http.get<ApiResponse<PaginatedResult<User>>>(`${this.apiUrl}/admin`, { params });
   }
 

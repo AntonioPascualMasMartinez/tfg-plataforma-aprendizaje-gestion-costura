@@ -1,198 +1,23 @@
-<div class="w-full max-w-250 mx-auto pb-12 pt-4">
-  <header class="mb-8 md:mb-10">
-    <h1 class="text-3xl md:text-[36px] font-display font-bold text-text-main mb-2">Tu Perfil</h1>
-    <p class="text-muted text-[16px]">
-      Personaliza tu identidad en la comunidad y ajusta tus preferencias creativas.
-    </p>
-  </header>
-
-  @if (isLoading) {
-    <div class="space-y-8 animate-pulse">
-      <div
-        class="bg-surface rounded-3xl border border-border-main/10 p-8 flex flex-col md:flex-row gap-8"
-      >
-        <div class="w-32 h-32 bg-border-main/10 rounded-full shrink-0"></div>
-        <div class="space-y-4 flex-1 py-2">
-          <div class="h-8 bg-border-main/10 rounded-lg w-1/3"></div>
-          <div class="h-4 bg-border-main/10 rounded-lg w-1/4"></div>
-          <div class="h-10 bg-border-main/10 rounded-xl w-32 mt-4"></div>
-        </div>
-      </div>
-      <div class="bg-surface rounded-3xl border border-border-main/10 p-8 h-80"></div>
+<div class="w-full max-w-[98%] xl:max-w-[1400px] mx-auto py-6 px-2 sm:px-4">
+  <header
+    class="mb-6 border-b border-border-main/10 pb-4 flex flex-col md:flex-row justify-between md:items-end gap-4"
+  >
+    <div>
+      <h1 class="text-2xl md:text-[28px] font-display font-bold text-text-main mb-1">
+        Configuración de Cuenta
+      </h1>
+      <p class="text-muted text-[14px]">
+        Gestiona tu información pública, preferencias de costura y seguridad.
+      </p>
     </div>
-  } @else if (user) {
-    @if (successMessage) {
-      <div
-        class="mb-8 p-4 rounded-2xl bg-success/10 border border-success/20 text-success flex items-center gap-3 animate-in fade-in slide-in-from-top-4"
-      >
-        <svg
-          class="w-6 h-6 shrink-0"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <span class="font-medium text-[15px]">{{ successMessage }}</span>
-      </div>
-    }
-    @if (errorMessage) {
-      <div
-        class="mb-8 p-4 rounded-2xl bg-danger/10 border border-danger/20 text-danger flex items-center gap-3 animate-in fade-in slide-in-from-top-4"
-      >
-        <svg
-          class="w-6 h-6 shrink-0"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
-        </svg>
-        <span class="font-medium text-[15px]">{{ errorMessage }}</span>
-      </div>
-    }
 
-    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="space-y-8">
-      <section
-        class="bg-surface rounded-3xl border border-border-main/15 p-6 md:p-8 shadow-[0_4px_24px_rgba(0,0,0,0.02)] flex flex-col md:flex-row items-center md:items-start gap-8"
-      >
+    <div class="flex flex-col gap-2 text-[13px]">
+      @if (successMessage) {
         <div
-          class="relative w-32 h-32 shrink-0 group cursor-pointer"
-          (click)="!isUploadingAvatar && fileInput.click()"
-          [class.opacity-70]="isUploadingAvatar"
+          class="px-4 py-2 rounded-lg bg-success/10 border border-success/20 text-success flex items-center gap-2 animate-in fade-in"
         >
-          <input
-            type="file"
-            #fileInput
-            class="hidden"
-            accept="image/png, image/jpeg, image/webp"
-            (change)="onFileSelected($event)"
-            [disabled]="isUploadingAvatar"
-          />
-
-          @if (isUploadingAvatar) {
-            <div
-              class="w-full h-full rounded-full bg-surface border-4 border-surface shadow-md flex flex-col items-center justify-center text-primary"
-            >
-              <svg
-                class="animate-spin h-8 w-8 text-primary mb-1"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-              >
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-            </div>
-          } @else if (avatarPreview) {
-            <img
-              [src]="avatarPreview"
-              alt="Avatar"
-              class="w-full h-full rounded-full object-cover border-4 border-surface shadow-md transition-transform duration-300 group-hover:scale-105"
-            />
-          } @else {
-            <div
-              class="w-full h-full rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-4xl uppercase border-4 border-surface shadow-md transition-transform duration-300 group-hover:scale-105"
-            >
-              {{ user.displayName.charAt(0) || 'U' }}
-            </div>
-          }
-
-          @if (!isUploadingAvatar) {
-            <div
-              class="absolute inset-0 bg-text-main/60 rounded-full opacity-0 group-hover:opacity-100 group-hover:scale-105 flex flex-col items-center justify-center text-bg transition-all duration-300 backdrop-blur-sm"
-            >
-              <svg
-                class="w-8 h-8 mb-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z"
-                />
-              </svg>
-              <span class="text-[10px] font-bold uppercase tracking-wider">Cambiar</span>
-            </div>
-          }
-        </div>
-
-        <div class="text-center md:text-left flex-1 mt-2">
-          <h2 class="text-2xl font-display font-bold text-text-main">{{ user.displayName }}</h2>
-          <p class="text-muted text-[15px] mb-4">{{ user.email }}</p>
-
-          <div class="flex flex-wrap items-center justify-center md:justify-start gap-3">
-            <span
-              class="px-3.5 py-1.5 bg-primary/10 text-primary text-[12px] font-bold rounded-lg uppercase tracking-wider flex items-center gap-1.5"
-            >
-              <svg
-                class="w-4 h-4"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-                />
-              </svg>
-              {{ user.role }}
-            </span>
-
-            @if (user.googleId) {
-              <span
-                class="px-3.5 py-1.5 bg-surface border border-border-main/15 text-text-main text-[12px] font-bold rounded-lg flex items-center gap-2 shadow-sm"
-              >
-                <svg class="w-4 h-4" viewBox="0 0 24 24">
-                  <path
-                    fill="currentColor"
-                    d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
-                  />
-                </svg>
-                Vinculado a Google
-              </span>
-            }
-          </div>
-        </div>
-      </section>
-
-      <section
-        class="bg-surface rounded-3xl border border-border-main/15 p-6 md:p-8 shadow-[0_4px_24px_rgba(0,0,0,0.02)]"
-      >
-        <h3 class="text-xl font-display font-bold text-text-main mb-6 flex items-center gap-2">
           <svg
-            class="w-5 h-5 text-primary"
+            class="w-4 h-4 shrink-0"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -201,131 +26,399 @@
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
-              d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014-8.81c-2.246-2.246-5.879-2.246-8.125 0m8.125 0c2.246 2.246 2.246 5.879 0 8.125m-8.125 0c-2.246-2.246-5.879-2.246-8.125 0"
+              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
             />
           </svg>
-          Información personal
-        </h3>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          <div class="md:col-span-2">
-            <label class="block text-[15px] font-semibold text-text-main mb-2"
-              >Nombre público <span class="text-danger">*</span></label
-            >
-            <input
-              type="text"
-              formControlName="displayName"
-              class="w-full h-12 px-4 rounded-xl border border-border-main/20 bg-bg text-text-main font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted/60"
-              placeholder="¿Cómo quieres que te llamen en la comunidad?"
+          <span class="font-medium">{{ successMessage }}</span>
+        </div>
+      }
+      @if (errorMessage) {
+        <div
+          class="px-4 py-2 rounded-lg bg-danger/10 border border-danger/20 text-danger flex items-center gap-2 animate-in fade-in"
+        >
+          <svg
+            class="w-4 h-4 shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
             />
-            @if (
-              profileForm.get('displayName')?.invalid && profileForm.get('displayName')?.touched
-            ) {
-              <p class="mt-2 text-[13px] font-medium text-danger flex items-center gap-1">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          </svg>
+          <span class="font-medium">{{ errorMessage }}</span>
+        </div>
+      }
+    </div>
+  </header>
+
+  @if (isLoading) {
+    <div class="flex flex-col lg:flex-row gap-5 animate-pulse">
+      <div class="w-full lg:w-3/5 bg-surface rounded-2xl border border-border-main/10 h-64"></div>
+      <div class="w-full lg:w-2/5 bg-surface rounded-2xl border border-border-main/10 h-64"></div>
+    </div>
+  } @else if (user) {
+    <div class="flex flex-col lg:flex-row gap-6 items-start">
+      <div class="w-full lg:w-[60%] flex flex-col gap-5">
+        <section
+          class="bg-surface rounded-2xl border border-border-main/15 p-5 shadow-sm flex items-center gap-5"
+        >
+          <div
+            class="relative w-20 h-20 shrink-0 group cursor-pointer"
+            (click)="!isUploadingAvatar && fileInput.click()"
+            [class.opacity-70]="isUploadingAvatar"
+          >
+            <input
+              type="file"
+              #fileInput
+              class="hidden"
+              accept="image/png, image/jpeg, image/webp"
+              (change)="onFileSelected($event)"
+              [disabled]="isUploadingAvatar"
+            />
+
+            @if (isUploadingAvatar) {
+              <div
+                class="w-full h-full rounded-full bg-surface border-2 border-surface shadow-sm flex items-center justify-center"
+              >
+                <svg
+                  class="animate-spin h-6 w-6 text-primary"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
                   <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                  />
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  ></path>
                 </svg>
-                El nombre debe tener al menos 3 caracteres.
-              </p>
+              </div>
+            } @else if (avatarPreview) {
+              <img
+                [src]="avatarPreview"
+                alt="Avatar"
+                class="w-full h-full rounded-full object-cover border-2 border-surface shadow-sm transition-transform duration-300 group-hover:scale-105"
+              />
+            } @else {
+              <div
+                class="w-full h-full rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-3xl uppercase border-2 border-surface shadow-sm transition-transform duration-300 group-hover:scale-105"
+              >
+                {{ user.displayName.charAt(0) || 'U' }}
+              </div>
+            }
+
+            @if (!isUploadingAvatar) {
+              <div
+                class="absolute inset-0 bg-text-main/60 rounded-full opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-bg transition-all duration-300 backdrop-blur-sm"
+              >
+                <span class="text-[9px] font-bold uppercase tracking-wider">Cambiar</span>
+              </div>
             }
           </div>
 
-          <div>
-            <label class="block text-[15px] font-semibold text-text-main mb-2"
-              >Nivel de costura</label
-            >
-            <div class="relative">
-              <select
-                formControlName="sewingLevel"
-                class="w-full h-12 pl-4 pr-10 rounded-xl border border-border-main/20 bg-bg text-text-main font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
-              >
-                <option [ngValue]="null">Selecciona tu nivel</option>
-                @for (level of sewingLevels; track level) {
-                  <option [value]="level">{{ level }}</option>
-                }
-              </select>
-              <div
-                class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-muted"
+          <div class="flex-1">
+            <h2 class="text-xl font-display font-bold text-text-main">{{ user.displayName }}</h2>
+            <p class="text-muted text-[13px] mb-2">{{ user.email }}</p>
+
+            <div class="flex flex-wrap gap-2">
+              <span
+                class="px-2.5 py-1 bg-primary/10 text-primary text-[11px] font-bold rounded-md uppercase tracking-wider flex items-center gap-1"
               >
                 <svg
-                  class="w-5 h-5"
+                  class="w-3.5 h-3.5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
-                  stroke-width="2"
+                  stroke-width="2.5"
                 >
                   <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
-                    d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                    d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
                   />
                 </svg>
-              </div>
+                {{ user.role }}
+              </span>
+              @if (user.googleId) {
+                <span
+                  class="px-2.5 py-1 bg-surface border border-border-main/15 text-text-main text-[11px] font-bold rounded-md flex items-center gap-1 shadow-sm"
+                >
+                  <svg class="w-3.5 h-3.5" viewBox="0 0 24 24">
+                    <path
+                      fill="currentColor"
+                      d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"
+                    />
+                  </svg>
+                  Google
+                </span>
+              }
             </div>
           </div>
+        </section>
 
-          <div>
-            <label class="block text-[15px] font-semibold text-text-main mb-2">Tus intereses</label>
-            <input
-              type="text"
-              formControlName="interests"
-              class="w-full h-12 px-4 rounded-xl border border-border-main/20 bg-bg text-text-main font-medium outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all placeholder:text-muted/60"
-              placeholder="Ej: Bordado, Lino, Alta costura..."
-            />
-            <p class="mt-1.5 text-[12px] font-medium text-muted">Separados por comas.</p>
-          </div>
-        </div>
+        <section class="bg-surface rounded-2xl border border-border-main/15 p-5 shadow-sm">
+          <h3 class="text-lg font-display font-bold text-text-main mb-4 flex items-center gap-2">
+            <svg
+              class="w-5 h-5 text-primary"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M10.34 15.84c-.688-.06-1.386-.09-2.09-.09H7.5a4.5 4.5 0 110-9h.75c.704 0 1.402-.03 2.09-.09m0 9.18c.253.962.584 1.892.985 2.783.247.55.06 1.21-.463 1.511l-.657.38c-.551.318-1.26.117-1.527-.461a20.845 20.845 0 01-1.44-4.282m3.102.069a18.03 18.03 0 01-.59-4.59c0-1.586.205-3.124.59-4.59m0 9.18a23.848 23.848 0 018.835 2.535M10.34 6.66a23.847 23.847 0 008.835-2.535m0 0A23.74 23.74 0 0018.795 3m.38 1.125a23.91 23.91 0 011.014 5.395m-1.014-8.81c-2.246-2.246-5.879-2.246-8.125 0m8.125 0c2.246 2.246 2.246 5.879 0 8.125m-8.125 0c-2.246-2.246-5.879-2.246-8.125 0"
+              />
+            </svg>
+            Ajustes de Perfil
+          </h3>
 
-        <div class="pt-6 mt-4 border-t border-border-main/10 flex justify-end">
-          <button
-            type="submit"
-            [disabled]="
-              profileForm.invalid || isSaving || profileForm.pristine || isUploadingAvatar
-            "
-            class="btn btn-primary px-8 h-12 w-full sm:w-auto flex justify-center items-center gap-2 shadow-md hover:shadow-lg transition-all min-w-45"
-          >
-            @if (isSaving) {
-              <svg
-                class="animate-spin h-5 w-5 text-white"
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
+          <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-[13px] font-semibold text-text-main mb-1.5"
+                  >Nombre público <span class="text-danger">*</span></label
+                >
+                <input
+                  type="text"
+                  formControlName="displayName"
+                  class="w-full h-10 px-3 rounded-lg border border-border-main/20 bg-bg text-text-main text-sm font-medium outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all placeholder:text-muted/60"
+                />
+                @if (
+                  profileForm.get('displayName')?.invalid && profileForm.get('displayName')?.touched
+                ) {
+                  <p class="mt-1 text-[11px] font-medium text-danger">Mínimo 3 caracteres.</p>
+                }
+              </div>
+
+              <div>
+                <label class="block text-[13px] font-semibold text-text-main mb-1.5"
+                  >Nivel de costura</label
+                >
+                <div class="relative">
+                  <select
+                    formControlName="sewingLevel"
+                    class="w-full h-10 pl-3 pr-8 rounded-lg border border-border-main/20 bg-bg text-text-main text-sm font-medium outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
+                  >
+                    <option [ngValue]="null">Selecciona nivel</option>
+                    @for (level of sewingLevels; track level) {
+                      <option [value]="level">{{ level }}</option>
+                    }
+                  </select>
+                  <div
+                    class="absolute inset-y-0 right-3 flex items-center pointer-events-none text-muted"
+                  >
+                    <svg
+                      class="w-4 h-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+                      />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="block text-[13px] font-semibold text-text-main mb-1.5"
+                >Tus intereses (separados por comas)</label
               >
-                <circle
-                  class="opacity-25"
-                  cx="12"
-                  cy="12"
-                  r="10"
-                  stroke="currentColor"
-                  stroke-width="4"
-                ></circle>
-                <path
-                  class="opacity-75"
-                  fill="currentColor"
-                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                ></path>
-              </svg>
-              Guardando...
-            } @else {
+              <textarea
+                formControlName="interests"
+                class="w-full h-20 p-3 rounded-lg border border-border-main/20 bg-bg text-text-main text-sm font-medium outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all resize-none placeholder:text-muted/60"
+                placeholder="Ej: Bordado, Lino, Alta costura..."
+              ></textarea>
+            </div>
+
+            <div class="pt-2 flex justify-end">
+              <button
+                type="submit"
+                [disabled]="
+                  profileForm.invalid || isSaving || profileForm.pristine || isUploadingAvatar
+                "
+                class="btn btn-primary px-6 h-10 w-full sm:w-auto flex justify-center items-center gap-2 shadow-sm hover:shadow-md transition-all rounded-lg text-sm"
+              >
+                @if (isSaving) {
+                  <svg
+                    class="animate-spin h-4 w-4 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      class="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      stroke-width="4"
+                    ></circle>
+                    <path
+                      class="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    ></path>
+                  </svg>
+                  Guardando...
+                } @else {
+                  Guardar Cambios
+                }
+              </button>
+            </div>
+          </form>
+        </section>
+      </div>
+
+      <div class="w-full lg:w-[40%] flex flex-col gap-5">
+        <section class="bg-surface rounded-2xl border border-border-main/15 p-5 shadow-sm">
+          <h3
+            class="text-[16px] font-display font-bold text-text-main mb-4 flex items-center gap-2"
+          >
+            <svg
+              class="w-5 h-5 text-text-main"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+              />
+            </svg>
+            Seguridad
+          </h3>
+
+          <form [formGroup]="passwordForm" (ngSubmit)="onPasswordSubmit()" class="space-y-3">
+            <div>
+              <label class="block text-[12px] font-semibold text-text-main mb-1"
+                >Contraseña actual</label
+              >
+              <input
+                type="password"
+                formControlName="currentPassword"
+                class="w-full h-9 px-3 rounded-lg border border-border-main/20 bg-bg text-text-main text-[13px] outline-none focus:border-text-main focus:ring-1 focus:ring-text-main/20 transition-all"
+              />
+            </div>
+            <div>
+              <label class="block text-[12px] font-semibold text-text-main mb-1"
+                >Nueva contraseña</label
+              >
+              <input
+                type="password"
+                formControlName="newPassword"
+                class="w-full h-9 px-3 rounded-lg border border-border-main/20 bg-bg text-text-main text-[13px] outline-none focus:border-text-main focus:ring-1 focus:ring-text-main/20 transition-all"
+              />
+            </div>
+            <div>
+              <label class="block text-[12px] font-semibold text-text-main mb-1"
+                >Confirmar contraseña</label
+              >
+              <input
+                type="password"
+                formControlName="confirmPassword"
+                class="w-full h-9 px-3 rounded-lg border border-border-main/20 bg-bg text-text-main text-[13px] outline-none focus:border-text-main focus:ring-1 focus:ring-text-main/20 transition-all"
+              />
+              @if (
+                passwordForm.errors?.['mismatch'] && passwordForm.get('confirmPassword')?.touched
+              ) {
+                <p class="mt-1 text-[11px] text-danger">Las contraseñas no coinciden.</p>
+              }
+            </div>
+
+            <div class="pt-3">
+              <button
+                type="submit"
+                [disabled]="passwordForm.invalid || isSavingPassword"
+                class="w-full h-9 bg-text-main text-bg rounded-lg text-[13px] font-semibold hover:bg-text-main/90 transition-colors flex items-center justify-center gap-2"
+              >
+                @if (isSavingPassword) {
+                  Actualizando...
+                } @else {
+                  Actualizar contraseña
+                }
+              </button>
+            </div>
+          </form>
+
+          <div class="mt-4 pt-4 border-t border-border-main/10 text-center">
+            <button
+              type="button"
+              (click)="onRecoverPassword()"
+              class="text-[12px] font-medium text-primary hover:underline"
+            >
+              ¿Olvidaste tu contraseña?
+            </button>
+          </div>
+        </section>
+
+        <section
+          class="bg-surface rounded-2xl border border-danger/20 p-4 shadow-sm relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+        >
+          <div class="absolute top-0 left-0 w-1 h-full bg-danger"></div>
+          <div class="pl-2">
+            <h3
+              class="text-[15px] font-display font-bold text-danger flex items-center gap-1.5 mb-0.5"
+            >
               <svg
-                class="w-5 h-5"
+                class="w-4 h-4"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
                 stroke-width="2"
               >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
               </svg>
-              Guardar cambios
-            }
+              Zona de Peligro
+            </h3>
+            <p class="text-[12px] text-muted leading-tight">Esta acción es irreversible.</p>
+          </div>
+          <button
+            (click)="openDeleteModal()"
+            class="shrink-0 w-full sm:w-auto h-9 px-4 border border-danger/50 text-danger rounded-lg text-[12px] font-semibold hover:bg-danger hover:text-white transition-colors"
+          >
+            Eliminar cuenta
           </button>
-        </div>
-      </section>
-    </form>
+        </section>
+      </div>
+    </div>
   }
+  <app-confirm-modal
+    [isOpen]="isDeleteModalOpen"
+    [isLoading]="isDeletingAccount"
+    title="Eliminar cuenta"
+    message="¿Estás seguro de que deseas eliminar tu cuenta? Esta acción es irreversible y perderás todos tus proyectos y preferencias de costura."
+    confirmText="Eliminar permanentemente"
+    cancelText="Cancelar"
+    [isDestructive]="true"
+    (confirm)="confirmDeleteAccount()"
+    (cancel)="closeDeleteModal()"
+  ></app-confirm-modal>
 </div>
+
+
