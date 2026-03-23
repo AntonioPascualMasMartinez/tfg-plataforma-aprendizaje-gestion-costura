@@ -13,6 +13,9 @@ router.use(authenticate);
 router.get('/me', UserController.getMe);
 router.put('/me', UserController.updateMe);
 
+router.put('/me/password', UserController.updatePassword);
+router.delete('/me', UserController.deleteMe);
+
 // ==========================================
 // Rutas Administrativas (Requieren Rol 'Admin')
 // ==========================================

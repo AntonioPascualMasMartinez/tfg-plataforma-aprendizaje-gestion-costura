@@ -80,6 +80,47 @@ class UserController {
       next(error);
     }
   }
+
+  /**
+   * PUT /api/v1/users/me/password
+   * Actualiza la contraseña del usuario autenticado.
+   */
+  static async updatePassword(req, res, next) {
+    try {
+      // 1. Validar payload
+      const { error, value } = userValidator.updatePassword.validate(req.body, {
+        abortEarly: false,
+      });
+      if (error) {
+        throw new ApiError(400, 'Error de validación en los datos enviados', true, error.details);
+      }
+
+      // 2. Llamar al servicio
+      await UserService.updatePassword(req.user.id, value.currentPassword, value.newPassword);
+
+      // 3. Responder
+      return ResponseFormatter.success(res, 200, 'Contraseña actualizada con éxito', null);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * DELETE /api/v1/users/me
+   * Elimina la cuenta del usuario autenticado.
+   */
+  static async deleteMe(req, res, next) {
+    try {
+      await UserService.deleteUserAccount(req.user.id);
+
+      // Opcional: Podrías limpiar la cookie de sesión/refresh token aquí si la usas
+      res.clearCookie('jwt', { httpOnly: true, secure: true, sameSite: 'None' }); // Ajusta según tu config de cookies
+
+      return ResponseFormatter.success(res, 200, 'Cuenta eliminada con éxito', null);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = UserController;

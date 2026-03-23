@@ -22,6 +22,17 @@ const userValidator = {
       'any.required': 'El rol es obligatorio.',
     }),
   }),
+  updatePassword: Joi.object({
+    currentPassword: Joi.string().required().messages({
+      'any.required': 'La contraseña actual es obligatoria.',
+      'string.empty': 'La contraseña actual no puede estar vacía.',
+    }),
+    newPassword: Joi.string().min(6).required().messages({
+      'string.min': 'La nueva contraseña debe tener al menos 6 caracteres.',
+      'any.required': 'La nueva contraseña es obligatoria.',
+      'string.empty': 'La nueva contraseña no puede estar vacía.',
+    }),
+  }),
 };
 
 module.exports = userValidator;

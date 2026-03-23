@@ -1,5 +1,6 @@
 const User = require('./user.model');
 const ApiError = require('../../utils/apiError');
+const bcrypt = require('bcrypt');
 
 class UserService {
   /**
@@ -66,6 +67,48 @@ class UserService {
     }
 
     return updatedUser;
+  }
+
+  /**
+   * Actualiza la contraseña del usuario comprobando la actual.
+   */
+  static async updatePassword(userId, currentPassword, newPassword) {
+    // 1. Buscar al usuario y pedir explícitamente el campo password (que tiene select: false en el modelo)
+    const user = await User.findById(userId).select('+password');
+    if (!user) {
+      throw new ApiError(404, 'Usuario no encontrado.');
+    }
+
+    // 2. Si el usuario no tiene contraseña (ej. se registró con Google y nunca la estableció)
+    if (!user.password) {
+      throw new ApiError(
+        400,
+        'Este usuario no tiene una contraseña configurada (cuenta de Google).',
+      );
+    }
+
+    // 3. Comprobar que la contraseña actual es correcta
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) {
+      throw new ApiError(401, 'La contraseña actual es incorrecta.');
+    }
+
+    // 4. Hashear la nueva contraseña y guardarla
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(newPassword, salt);
+
+    await user.save();
+  }
+
+  /**
+   * Elimina la cuenta de un usuario.
+   */
+  static async deleteUserAccount(userId) {
+    const deletedUser = await User.findByIdAndDelete(userId);
+    if (!deletedUser) {
+      throw new ApiError(404, 'No se pudo eliminar. Usuario no encontrado.');
+    }
+    return deletedUser;
   }
 }
 
