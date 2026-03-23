@@ -1,11 +1,18 @@
 <div
   class="min-h-screen w-full font-sans bg-bg relative overflow-hidden transition-colors duration-300"
 >
+  <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+    <div
+      class="absolute inset-0 bg-[url('/bg/bg-2.jpg')] bg-cover bg-center bg-no-repeat blur-[2px] scale-105 opacity-100"
+    ></div>
+    <div class="absolute inset-0 bg-bg/50"></div>
+  </div>
+
   <div
-    class="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/5 blur-[120px] pointer-events-none z-0"
+    class="fixed top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[120px] pointer-events-none z-0"
   ></div>
   <div
-    class="fixed bottom-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-focus/5 blur-[100px] pointer-events-none z-0"
+    class="fixed bottom-[-10%] right-[-5%] w-[40%] h-[40%] rounded-full bg-focus/10 blur-[100px] pointer-events-none z-0"
   ></div>
 
   <app-sidebar class="relative z-20"></app-sidebar>
