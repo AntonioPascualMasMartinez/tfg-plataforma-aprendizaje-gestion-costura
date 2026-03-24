@@ -17,4 +17,7 @@ router.post('/reports', CommunityController.createReport);
 // Rutas Administrativas (Protegidas por RBAC)
 router.get('/admin/moderation', authorizeRoles('Admin'), CommunityController.getModerationQueue);
 
+router.put('/admin/moderation/:id', authorizeRoles('Admin'), CommunityController.resolveReport);
+router.delete('/admin/comments/:id', authorizeRoles('Admin'), CommunityController.adminDeleteComment);
+
 module.exports = router;

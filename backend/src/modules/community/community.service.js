@@ -93,6 +93,31 @@ class CommunityService {
       { page, limit, sort: { createdAt: 1 }, populate: 'reporterId targetId' },
     );
   }
+
+  /**
+   * (Admin) Resuelve un reporte actualizando su estado.
+   */
+  static async resolveReport(reportId, action) {
+    // action puede ser 'Dismissed' (ignorar) o 'Reviewed' (penalizar)
+    const report = await Report.findByIdAndUpdate(
+      reportId,
+      { status: action },
+      { new: true }
+    );
+    if (!report) throw new ApiError(404, 'Reporte no encontrado');
+    return report;
+  }
+
+  /**
+   * (Admin) Borrado forzado de un comentario (Moderación)
+   */
+  static async deleteCommentAsAdmin(commentId) {
+    const deleted = await Comment.findByIdAndDelete(commentId);
+    if (!deleted) throw new ApiError(404, 'Comentario no encontrado');
+    return true;
+  }
+  
+
 }
 
 module.exports = CommunityService;

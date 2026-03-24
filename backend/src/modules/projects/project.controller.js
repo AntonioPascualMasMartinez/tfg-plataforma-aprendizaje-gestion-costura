@@ -20,8 +20,14 @@ class ProjectController {
 
   static async getPublicFeed(req, res, next) {
     try {
-      const { page, limit, search } = req.query;
-      const projects = await ProjectService.getPublicProjects(page, limit, search);
+      const { page, limit, search, projectType, sortBy } = req.query;
+      const projects = await ProjectService.getPublicProjects(
+        page,
+        limit,
+        search,
+        projectType,
+        sortBy,
+      );
       return ResponseFormatter.success(res, 200, 'Feed de proyectos recuperado', projects);
     } catch (error) {
       next(error);
@@ -76,7 +82,7 @@ class ProjectController {
 
   static async getMyProjects(req, res, next) {
     try {
-      const { page, limit, status, sortBy, search } = req.query;
+      const { page, limit, status, sortBy, search, projectType } = req.query;
       const projects = await ProjectService.getMyProjects(
         req.user.id,
         page,
@@ -84,6 +90,7 @@ class ProjectController {
         status,
         sortBy,
         search,
+        projectType,
       );
       return ResponseFormatter.success(res, 200, 'Taller personal recuperado', projects);
     } catch (error) {

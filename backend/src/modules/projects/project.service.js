@@ -25,17 +25,25 @@ class ProjectService {
     return project;
   }
 
-  static async getPublicProjects(page = 1, limit = 10, search = '') {
+  static async getPublicProjects(page = 1, limit = 10, search = '', projectType, sortBy = 'fecha') {
     const query = { isPublic: true };
-    if (search) {
-      query.title = { $regex: search, $options: 'i' }; // Búsqueda insensible a mayúsculas
+
+    if (search) query.title = { $regex: search, $options: 'i' };
+    if (projectType) query.projectType = projectType; // Filtro por tipo
+
+    // Ordenamiento dinámico
+    const sortOptions = {};
+    if (sortBy === 'popularidad') {
+      sortOptions.likesCount = -1;
+    } else {
+      sortOptions.createdAt = -1; // Por defecto: fecha
     }
 
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
-      sort: { createdAt: -1 },
-      populate: { path: 'ownerId', select: 'displayName avatar' }, // Traer datos básicos del creador
+      sort: sortOptions,
+      populate: { path: 'ownerId', select: 'displayName avatar' },
     };
 
     return await Project.paginate(query, options);
@@ -92,6 +100,7 @@ class ProjectService {
     status = 'Todos',
     sortBy = 'nuevo',
     search = '',
+    projectType,
   ) {
     const query = { ownerId: userId };
 
@@ -99,7 +108,10 @@ class ProjectService {
       query.status = status;
     }
 
-    // Añadimos el filtro de búsqueda por título
+    if (projectType) {
+      query.projectType = projectType;
+    }
+
     if (search) {
       query.title = { $regex: search, $options: 'i' };
     }

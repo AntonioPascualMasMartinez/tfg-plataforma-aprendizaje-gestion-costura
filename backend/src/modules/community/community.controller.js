@@ -75,6 +75,25 @@ class CommunityController {
       next(error);
     }
   }
+
+  static async resolveReport(req, res, next) {
+    try {
+      const { action } = req.body; // 'Reviewed' o 'Dismissed'
+      const report = await CommunityService.resolveReport(req.params.id, action);
+      return ResponseFormatter.success(res, 200, 'Reporte resuelto', report);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async adminDeleteComment(req, res, next) {
+    try {
+      await CommunityService.deleteCommentAsAdmin(req.params.id);
+      return ResponseFormatter.success(res, 200, 'Comentario eliminado por moderación');
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = CommunityController;

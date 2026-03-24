@@ -7,9 +7,17 @@ class TutorialService {
   /**
    * Obtiene el catálogo de tutoriales disponibles (Paginado).
    */
-  static async getCatalog(page = 1, limit = 10, category) {
-    const query = category ? { category } : {};
-    return await Tutorial.paginate(query, { page, limit, sort: { createdAt: -1 } });
+  static async getCatalog(page = 1, limit = 10, category, difficultyLevel, maxTime) {
+    const query = {};
+    if (category) query.category = category;
+    if (difficultyLevel) query.difficultyLevel = difficultyLevel;
+    if (maxTime) query.estimatedTime = { $lte: parseInt(maxTime, 10) };
+
+    return await Tutorial.paginate(query, {
+      page: parseInt(page, 10),
+      limit: parseInt(limit, 10),
+      sort: { createdAt: -1 },
+    });
   }
 
   /**
@@ -28,8 +36,8 @@ class TutorialService {
 
     const difficultyMapping = {
       Principiante: 'Fácil',
-      Intermedio: 'Media',
-      Avanzado: 'Alta',
+      Intermedio: 'Intermedio',
+      Avanzado: 'Avanzado',
     };
 
     // 3. Clonar el modelo: Crear un Proyecto derivado en el espacio del usuario
@@ -104,6 +112,20 @@ class TutorialService {
 
     await progress.save();
     return progress;
+  }
+
+  static async getTutorialById(tutorialId) {
+    const tutorial = await Tutorial.findById(tutorialId);
+    if (!tutorial) throw new ApiError(404, 'Tutorial no encontrado.');
+    return tutorial;
+  }
+
+  /**
+   * Crea un nuevo tutorial maestro (Solo Administradores)
+   */
+  static async createTutorial(tutorialData) {
+    const newTutorial = await Tutorial.create(tutorialData);
+    return newTutorial;
   }
 }
 

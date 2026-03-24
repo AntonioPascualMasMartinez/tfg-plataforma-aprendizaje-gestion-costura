@@ -15,9 +15,14 @@ const projectValidator = {
         Joi.object({
           name: Joi.string().required(),
           quantity: Joi.string().required(),
+          notes: Joi.string().allow('', null).optional(),
+          isAcquired: Joi.boolean().optional(),
         }),
       )
       .optional(),
+    learningNotes: Joi.string().allow('', null).optional(),
+    estimatedTime: Joi.number().min(0).allow(null).optional(),
+    actualTime: Joi.number().min(0).allow(null).optional(),
   }),
 
   updateProject: Joi.object({
@@ -29,12 +34,26 @@ const projectValidator = {
     description: Joi.string().allow('', null).optional(),
     status: Joi.string().valid('Planificado', 'En curso', 'Pausado', 'Finalizado').optional(),
     isPublic: Joi.boolean().optional(),
+    materials: Joi.array()
+      .items(
+        Joi.object({
+          name: Joi.string().required(),
+          quantity: Joi.string().required(),
+          notes: Joi.string().allow('', null).optional(),
+          isAcquired: Joi.boolean().optional(),
+        }),
+      )
+      .optional(),
+    learningNotes: Joi.string().allow('', null).optional(),
+    estimatedTime: Joi.number().min(0).allow(null).optional(),
+    actualTime: Joi.number().min(0).allow(null).optional(),
   }).min(1),
 
   addStep: Joi.object({
     title: Joi.string().required(),
     description: Joi.string().required(),
     mediaUrl: Joi.string().uri().allow(null).optional(),
+    status: Joi.string().valid('Pendiente', 'Completado').optional(),
   }),
 };
 

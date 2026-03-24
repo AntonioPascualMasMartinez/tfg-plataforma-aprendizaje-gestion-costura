@@ -4,6 +4,7 @@ const mongoosePaginate = require('mongoose-paginate-v2');
 const materialSchema = new mongoose.Schema({
   name: { type: String, required: true },
   quantity: { type: String, required: true },
+  notes: { type: String, default: '' }, // <-- NUEVO (Req. 2)
   isAcquired: { type: Boolean, default: false },
 });
 
@@ -12,6 +13,11 @@ const stepSchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String, required: true },
   mediaUrl: { type: String, default: null },
+  status: {
+    type: String,
+    enum: ['Pendiente', 'Completado'],
+    default: 'Pendiente',
+  },
 });
 
 const projectSchema = new mongoose.Schema(
@@ -72,6 +78,19 @@ const projectSchema = new mongoose.Schema(
     deletedAt: {
       type: Date,
       default: null,
+    },
+    learningNotes: {
+      type: String,
+      trim: true,
+      default: '', // <-- NUEVO (Req. 5)
+    },
+    estimatedTime: {
+      type: Number, // Podría ser en minutos (ej: 120 para 2 horas)
+      default: null, // <-- NUEVO (Req. 6)
+    },
+    actualTime: {
+      type: Number, // Minutos reales invertidos
+      default: null, // <-- NUEVO (Req. 6)
     },
   },
   {
