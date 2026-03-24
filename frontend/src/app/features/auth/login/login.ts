@@ -39,7 +39,13 @@ export class Login implements OnInit {
           this.authService.googleAuth({ idToken: user.idToken }).subscribe({
             next: (response) => {
               localStorage.setItem('accessToken', response.data.accessToken);
-              this.router.navigate(['/home']);
+
+              // Verificamos el rol del usuario
+              if (response.data.user.role === 'Admin') {
+                this.router.navigate(['/admin']);
+              } else {
+                this.router.navigate(['/home']);
+              }
             },
             error: (err) => {
               this.isLoading = false;
@@ -60,7 +66,13 @@ export class Login implements OnInit {
     this.authService.login(this.loginForm.value).subscribe({
       next: (response) => {
         localStorage.setItem('accessToken', response.data.accessToken);
-        this.router.navigate(['/home']);
+
+        // Verificamos el rol del usuario
+        if (response.data.user.role === 'Admin') {
+          this.router.navigate(['/admin/dashboard']); // O la ruta raíz que decidas para admin
+        } else {
+          this.router.navigate(['/home']);
+        }
       },
       error: (err) => {
         this.isLoading = false;

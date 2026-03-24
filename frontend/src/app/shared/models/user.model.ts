@@ -18,6 +18,7 @@ export interface User {
 
   createdAt: string;
   updatedAt: string;
+  isActive: boolean;
 }
 
 export interface UpdateProfilePayload {

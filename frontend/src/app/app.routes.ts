@@ -1,6 +1,7 @@
 import { Routes } from '@angular/router';
 import { authGuard } from './core/guards/auth.guard';
 import { guestGuard } from './core/guards/guest.guard';
+import { adminGuard } from './core/guards/admin.guard';
 
 export const routes: Routes = [
   // 1. Landing Page (Ruta base pública)
@@ -94,6 +95,27 @@ export const routes: Routes = [
     ],
   },
 
+  // Rutas de Administrador
+  {
+    path: 'admin',
+    loadComponent: () => import('./features/admin/admin-layout').then(m => m.AdminLayout),
+    canActivate: [adminGuard], // <-- ¡Protegido!
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/admin/dashboard/dashboard.component').then(m => m.DashboardComponent)
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./features/admin/users/users.component').then(m => m.UsersComponent)
+      },
+      {
+        path: 'tutorials',
+        loadComponent: () => import('./features/admin/tutorials/tutorials.component').then(m => m.TutorialsComponent)
+      },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
+    ]
+  },
   // 4. Ruta comodín (Wildcard) para errores 404
   {
     path: '**',
