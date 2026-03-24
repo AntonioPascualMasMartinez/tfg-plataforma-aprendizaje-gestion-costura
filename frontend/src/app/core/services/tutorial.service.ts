@@ -30,14 +30,37 @@ export class TutorialService {
     page: number = 1,
     limit: number = 10,
     category?: string,
+    difficultyLevel?: string, // <-- NUEVO FILTRO
+    maxTime?: number, // <-- NUEVO FILTRO
   ): Observable<ApiResponse<PaginatedResult<Tutorial>>> {
     let params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
 
-    if (category) {
-      params = params.set('category', category);
-    }
+    if (category) params = params.set('category', category);
+    if (difficultyLevel) params = params.set('difficultyLevel', difficultyLevel);
+    if (maxTime) params = params.set('maxTime', maxTime.toString());
 
     return this.http.get<ApiResponse<PaginatedResult<Tutorial>>>(this.apiUrl, { params });
+  }
+
+  /**
+   * Obtiene los detalles de un tutorial específico (Modo Lectura)
+   * GET /api/v1/tutorials/:id
+   */
+  getTutorialById(tutorialId: string): Observable<ApiResponse<Tutorial>> {
+    return this.http.get<ApiResponse<Tutorial>>(`${this.apiUrl}/${tutorialId}`);
+  }
+
+  // ==========================================
+  // Rutas de Administración (Requieren Rol 'Admin')
+  // ==========================================
+
+  /**
+   * Crea un nuevo tutorial (Solo Admin)
+   * POST /api/v1/tutorials
+   */
+  createTutorial(payload: any): Observable<ApiResponse<Tutorial>> {
+    // Usamos 'any' por ahora, lo tiparemos luego con CreateTutorialPayload
+    return this.http.post<ApiResponse<Tutorial>>(this.apiUrl, payload);
   }
 
   // ==========================================

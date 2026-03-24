@@ -28,12 +28,14 @@ export class ProjectService {
     page: number = 1,
     limit: number = 10,
     search: string = '',
+    projectType?: string,
+    sortBy?: string,
   ): Observable<ApiResponse<PaginatedResult<Project>>> {
     let params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
 
-    if (search) {
-      params = params.set('search', search);
-    }
+    if (search) params = params.set('search', search);
+    if (projectType) params = params.set('projectType', projectType);
+    if (sortBy) params = params.set('sortBy', sortBy);
 
     return this.http.get<ApiResponse<PaginatedResult<Project>>>(this.apiUrl, { params });
   }
@@ -75,20 +77,14 @@ export class ProjectService {
     status: string = 'Todos',
     sortBy: string = 'nuevo',
     search: string = '',
+    projectType?: string,
   ): Observable<ApiResponse<PaginatedResult<Project>>> {
     let params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
 
-    if (status !== 'Todos') {
-      params = params.set('status', status);
-    }
-
-    if (sortBy) {
-      params = params.set('sortBy', sortBy);
-    }
-
-    if (search) {
-      params = params.set('search', search);
-    }
+    if (status !== 'Todos') params = params.set('status', status);
+    if (sortBy) params = params.set('sortBy', sortBy);
+    if (search) params = params.set('search', search);
+    if (projectType) params = params.set('projectType', projectType);
 
     return this.http.get<ApiResponse<PaginatedResult<Project>>>(`${this.apiUrl}/me`, { params });
   }

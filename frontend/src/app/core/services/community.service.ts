@@ -94,4 +94,25 @@ export class CommunityService {
       params,
     });
   }
+
+  /**
+   * Resuelve un reporte cambiando su estado (Reviewed o Dismissed)
+   * PUT /api/v1/community/admin/moderation/:id
+   */
+  resolveReport(
+    reportId: string,
+    action: 'Reviewed' | 'Dismissed',
+  ): Observable<ApiResponse<Report>> {
+    return this.http.put<ApiResponse<Report>>(`${this.apiUrl}/admin/moderation/${reportId}`, {
+      action,
+    });
+  }
+
+  /**
+   * Elimina un comentario a la fuerza como moderador
+   * DELETE /api/v1/community/admin/comments/:id
+   */
+  adminDeleteComment(commentId: string): Observable<ApiResponse<null>> {
+    return this.http.delete<ApiResponse<null>>(`${this.apiUrl}/admin/comments/${commentId}`);
+  }
 }
