@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { UpperCasePipe } from '@angular/common';
 import { UserService } from '../../../core/services/user.service';
-import { User } from '../../../shared/models/user.model';
+import { User, Role } from '../../../shared/models/user.model';
 // Asegúrate de ajustar la ruta del modal según la estructura real de tus carpetas
 import { ConfirmModalComponent } from '../../../shared/modals/confirm-modal/confirm-modal.component';
 
@@ -28,6 +28,8 @@ export class UsersComponent implements OnInit {
 
   // --- Variables para la acción pendiente ---
   selectedUser: User | null = null;
+  pendingAction: 'role' | 'status' | null = null;
+  pendingRole: Role | null = null;
   pendingStatus: boolean | null = null;
 
   ngOnInit() {
@@ -51,10 +53,24 @@ export class UsersComponent implements OnInit {
     });
   }
 
-  // Prepara el modal para banear/desbanear
+  // 1. Prepara el modal para cambiar rol
+  requestToggleRole(user: User) {
+    this.selectedUser = user;
+    this.pendingRole = user.role === 'Admin' ? 'User' : 'Admin';
+    this.pendingAction = 'role';
+
+    this.modalTitle = 'Cambiar Rol de Usuario';
+    this.modalMessage = `¿Estás seguro de cambiar el rol de ${user.displayName} a ${this.pendingRole}?`;
+    this.modalConfirmText = 'Sí, cambiar rol';
+    this.isModalDestructive = false; // Acción normal, botón primario
+    this.isModalOpen = true;
+  }
+
+  // 2. Prepara el modal para banear/desbanear
   requestToggleStatus(user: User) {
     this.selectedUser = user;
     this.pendingStatus = !user.isActive;
+    this.pendingAction = 'status';
 
     const actionText = this.pendingStatus ? 'desbanear' : 'banear';
 
@@ -65,30 +81,46 @@ export class UsersComponent implements OnInit {
     this.isModalOpen = true;
   }
 
-  // Ejecuta la acción confirmada desde el modal
+  // 3. Ejecuta la acción confirmada desde el modal
   executeAction() {
-    if (!this.selectedUser || this.pendingStatus === null) return;
+    if (!this.selectedUser || !this.pendingAction) return;
 
     this.isModalLoading = true;
     this.errorMessage = '';
 
-    this.userService.toggleUserStatus(this.selectedUser._id, this.pendingStatus).subscribe({
-      next: (response) => {
-        this.selectedUser!.isActive = response.data.isActive;
-        this.closeModal();
-      },
-      error: (err) => {
-        this.errorMessage = err.error?.message || 'Hubo un error al cambiar el estado del usuario.';
-        this.closeModal();
-      },
-    });
+    if (this.pendingAction === 'role' && this.pendingRole) {
+      this.userService.changeRole(this.selectedUser._id, this.pendingRole).subscribe({
+        next: (response) => {
+          this.selectedUser!.role = response.data.role;
+          this.closeModal();
+        },
+        error: (err) => {
+          this.errorMessage = err.error?.message || 'Hubo un error al cambiar el rol.';
+          this.closeModal();
+        },
+      });
+    } else if (this.pendingAction === 'status' && this.pendingStatus !== null) {
+      this.userService.toggleUserStatus(this.selectedUser._id, this.pendingStatus).subscribe({
+        next: (response) => {
+          this.selectedUser!.isActive = response.data.isActive;
+          this.closeModal();
+        },
+        error: (err) => {
+          this.errorMessage =
+            err.error?.message || 'Hubo un error al cambiar el estado del usuario.';
+          this.closeModal();
+        },
+      });
+    }
   }
 
-  // Cierra el modal y limpia las variables
+  // 4. Cierra el modal y limpia las variables
   closeModal() {
     this.isModalOpen = false;
     this.isModalLoading = false;
     this.selectedUser = null;
+    this.pendingAction = null;
+    this.pendingRole = null;
     this.pendingStatus = null;
   }
 }
