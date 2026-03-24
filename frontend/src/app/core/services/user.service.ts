@@ -57,4 +57,10 @@ export class UserService {
       role: newRole,
     });
   }
+
+  toggleUserStatus(userId: string, isActive: boolean): Observable<ApiResponse<User>> {
+    return this.http.put<ApiResponse<User>>(`${this.apiUrl}/admin/${userId}/status`, {
+      isActive,
+    });
+  }
 }

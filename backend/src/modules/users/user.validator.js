@@ -22,6 +22,12 @@ const userValidator = {
       'any.required': 'El rol es obligatorio.',
     }),
   }),
+  toggleStatus: Joi.object({
+    isActive: Joi.boolean().required().messages({
+      'any.required': 'El estado de activación es obligatorio.',
+      'boolean.base': 'El estado debe ser un valor booleano (true o false).',
+    }),
+  }),
   updatePassword: Joi.object({
     currentPassword: Joi.string().required().messages({
       'any.required': 'La contraseña actual es obligatoria.',

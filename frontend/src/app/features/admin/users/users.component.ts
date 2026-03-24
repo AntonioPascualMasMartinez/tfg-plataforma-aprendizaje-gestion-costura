@@ -1,15 +1,94 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
+import { UpperCasePipe } from '@angular/common';
+import { UserService } from '../../../core/services/user.service';
+import { User } from '../../../shared/models/user.model';
+// Asegúrate de ajustar la ruta del modal según la estructura real de tus carpetas
+import { ConfirmModalComponent } from '../../../shared/modals/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-admin-users',
   standalone: true,
+  imports: [UpperCasePipe, ConfirmModalComponent],
   templateUrl: './users.component.html',
 })
-export class UsersComponent {
-  // Datos estáticos (Mock)
-  mockUsers = [
-    { id: '1', name: 'Ana García', email: 'ana@ejemplo.com', role: 'User', level: 'Intermedio', isActive: true },
-    { id: '2', name: 'Carlos Admin', email: 'carlos@needly.com', role: 'Admin', level: 'Experto', isActive: true },
-    { id: '3', name: 'Laura Costurera', email: 'laura@ejemplo.com', role: 'User', level: 'Principiante', isActive: false },
-  ];
+export class UsersComponent implements OnInit {
+  private userService = inject(UserService);
+
+  users: User[] = [];
+  isLoading = false;
+  errorMessage = '';
+
+  // --- Estados del Modal ---
+  isModalOpen = false;
+  modalTitle = '';
+  modalMessage = '';
+  modalConfirmText = '';
+  isModalDestructive = false;
+  isModalLoading = false;
+
+  // --- Variables para la acción pendiente ---
+  selectedUser: User | null = null;
+  pendingStatus: boolean | null = null;
+
+  ngOnInit() {
+    this.loadUsers();
+  }
+
+  loadUsers() {
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    this.userService.getAllUsers(1, 50).subscribe({
+      next: (response) => {
+        this.users = (response.data as any).docs || response.data;
+        this.isLoading = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar usuarios:', err);
+        this.errorMessage = 'No se pudieron cargar los usuarios.';
+        this.isLoading = false;
+      },
+    });
+  }
+
+  // Prepara el modal para banear/desbanear
+  requestToggleStatus(user: User) {
+    this.selectedUser = user;
+    this.pendingStatus = !user.isActive;
+
+    const actionText = this.pendingStatus ? 'desbanear' : 'banear';
+
+    this.modalTitle = this.pendingStatus ? 'Desbanear Usuario' : 'Banear Usuario';
+    this.modalMessage = `¿Estás seguro de que deseas ${actionText} a ${user.displayName}?`;
+    this.modalConfirmText = this.pendingStatus ? 'Sí, desbanear' : 'Sí, banear';
+    this.isModalDestructive = !this.pendingStatus; // Si lo vamos a banear, el botón será rojo
+    this.isModalOpen = true;
+  }
+
+  // Ejecuta la acción confirmada desde el modal
+  executeAction() {
+    if (!this.selectedUser || this.pendingStatus === null) return;
+
+    this.isModalLoading = true;
+    this.errorMessage = '';
+
+    this.userService.toggleUserStatus(this.selectedUser._id, this.pendingStatus).subscribe({
+      next: (response) => {
+        this.selectedUser!.isActive = response.data.isActive;
+        this.closeModal();
+      },
+      error: (err) => {
+        this.errorMessage = err.error?.message || 'Hubo un error al cambiar el estado del usuario.';
+        this.closeModal();
+      },
+    });
+  }
+
+  // Cierra el modal y limpia las variables
+  closeModal() {
+    this.isModalOpen = false;
+    this.isModalLoading = false;
+    this.selectedUser = null;
+    this.pendingStatus = null;
+  }
 }

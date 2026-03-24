@@ -121,6 +121,32 @@ class UserController {
       next(error);
     }
   }
+
+  /**
+   * PUT /api/v1/users/admin/:id/status
+   * Banea o desbanea a un usuario.
+   */
+  static async toggleUserStatus(req, res, next) {
+    try {
+      const { id: targetUserId } = req.params;
+
+      const { error, value } = userValidator.toggleStatus.validate(req.body);
+      if (error) throw new ApiError(400, 'Datos de estado inválidos', true, error.details);
+
+      // req.user.id es el ID del administrador que hace la petición
+      const updatedUser = await UserService.toggleUserStatus(
+        req.user.id,
+        targetUserId,
+        value.isActive,
+      );
+
+      const actionText = value.isActive ? 'desbaneado/activado' : 'baneado/desactivado';
+
+      return ResponseFormatter.success(res, 200, `Usuario ${actionText} con éxito`, updatedUser);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = UserController;

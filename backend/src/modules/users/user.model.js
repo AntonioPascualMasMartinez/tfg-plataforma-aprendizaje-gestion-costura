@@ -47,6 +47,10 @@ const userSchema = new mongoose.Schema(
       unique: true,
       sparse: true, // Permite múltiples valores null sin violar la restricción unique
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
     resetPasswordToken: {
       type: String,
       select: false,

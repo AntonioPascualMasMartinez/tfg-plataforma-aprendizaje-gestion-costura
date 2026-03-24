@@ -110,6 +110,28 @@ class UserService {
     }
     return deletedUser;
   }
+
+  /**
+   * Cambia el estado de cuenta de un usuario (Banear/Desbanear)
+   */
+  static async toggleUserStatus(adminId, targetUserId, isActiveStatus) {
+    // Regla de negocio: Un admin no debería poder banearse a sí mismo
+    if (adminId.toString() === targetUserId.toString()) {
+      throw new ApiError(400, 'No puedes banear o desbanear tu propia cuenta.');
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      targetUserId,
+      { $set: { isActive: isActiveStatus } },
+      { new: true, runValidators: true, select: '-password' },
+    );
+
+    if (!updatedUser) {
+      throw new ApiError(404, 'Usuario no encontrado.');
+    }
+
+    return updatedUser;
+  }
 }
 
 module.exports = UserService;

@@ -33,4 +33,6 @@ router.get('/admin', authorizeRoles('Admin'), UserController.getAllUsers);
 // Nueva ruta para RF7
 router.put('/admin/:id/role', authorizeRoles('Admin'), UserController.changeRole);
 
+router.put('/admin/:id/status', authorizeRoles('Admin'), UserController.toggleUserStatus);
+
 module.exports = router;
