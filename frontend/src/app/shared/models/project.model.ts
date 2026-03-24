@@ -3,11 +3,13 @@ import { User } from './user.model';
 export type ProjectStatus = 'Planificado' | 'En curso' | 'Pausado' | 'Finalizado';
 export type ProjectType = 'Nuevo' | 'Comenzado desde Tutorial';
 export type ProjectDifficulty = 'Fácil' | 'Intermedio' | 'Avanzado';
+export type StepStatus = 'Pendiente' | 'Completado'; // <-- NUEVO
 
 export interface ProjectMaterial {
   _id?: string;
   name: string;
   quantity: string;
+  notes?: string; // <-- NUEVO
   isAcquired: boolean;
 }
 
@@ -17,6 +19,7 @@ export interface ProjectStep {
   title: string;
   description: string;
   mediaUrl: string | null;
+  status: StepStatus; // <-- NUEVO
 }
 
 export interface Project {
@@ -30,6 +33,9 @@ export interface Project {
   description: string;
   status: ProjectStatus;
   isPublic: boolean;
+  learningNotes: string;
+  estimatedTime: number | null;
+  actualTime: number | null;
   materials: ProjectMaterial[];
   steps: ProjectStep[];
   deletedAt: string | null;
@@ -47,6 +53,9 @@ export interface CreateProjectPayload {
   description?: string;
   status?: ProjectStatus;
   isPublic?: boolean;
+  learningNotes?: string | null;
+  estimatedTime?: number | null;
+  actualTime?: number | null;
   materials?: Omit<ProjectMaterial, '_id' | 'isAcquired'>[];
 }
 
@@ -56,4 +65,5 @@ export interface AddStepPayload {
   title: string;
   description: string;
   mediaUrl?: string | null;
+  status?: StepStatus;
 }

@@ -8,6 +8,7 @@ import {
   Tutorial,
   TutorialProgress,
   StartTutorialResponse,
+  CreateTutorialPayload,
 } from '../../shared/models/tutorial.model';
 
 @Injectable({
@@ -58,7 +59,7 @@ export class TutorialService {
    * Crea un nuevo tutorial (Solo Admin)
    * POST /api/v1/tutorials
    */
-  createTutorial(payload: any): Observable<ApiResponse<Tutorial>> {
+  createTutorial(payload: CreateTutorialPayload): Observable<ApiResponse<Tutorial>> {
     // Usamos 'any' por ahora, lo tiparemos luego con CreateTutorialPayload
     return this.http.post<ApiResponse<Tutorial>>(this.apiUrl, payload);
   }

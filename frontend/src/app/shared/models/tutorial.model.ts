@@ -47,3 +47,13 @@ export interface StartTutorialResponse {
   progress: TutorialProgress;
   clonedProject: Project;
 }
+
+export interface CreateTutorialPayload {
+  title: string;
+  description: string;
+  difficultyLevel?: DifficultyLevel;
+  category: string;
+  estimatedTime?: number;
+  materialsNeeded?: Omit<TutorialMaterial, '_id'>[];
+  steps: Omit<TutorialStep, '_id'>[];
+}
