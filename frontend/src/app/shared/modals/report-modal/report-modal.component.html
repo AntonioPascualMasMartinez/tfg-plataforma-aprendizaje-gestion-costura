@@ -1,0 +1,183 @@
+<div
+  class="fixed inset-0 bg-black/70 z-[100] transition-opacity duration-300 backdrop-blur-sm flex items-center justify-center p-4"
+  (click)="closeModal()"
+  (keydown.escape)="closeModal()"
+  tabindex="0"
+>
+  <div
+    class="bg-surface border border-border-main/10 rounded-2xl shadow-xl w-full max-w-lg p-6 md:p-8 transform transition-all scale-100 relative overflow-y-auto max-h-[90vh]"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="flex items-center justify-between mb-6 pb-4 border-b border-border-main/10">
+      <div class="flex items-center gap-3">
+        <div class="p-2.5 rounded-xl bg-danger/10 text-danger">
+          <svg
+            class="w-6 h-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M3 3v1.5M3 21v-6m0 0l2.77-.693a9 9 0 016.208.682l.108.054a9 9 0 006.086.71l3.114-.732a48.524 48.524 0 01-.005-10.499l-3.11.732a9 9 0 01-6.085-.711l-.108-.054a9 9 0 00-6.208-.682L3 4.5M3 15V4.5"
+            />
+          </svg>
+        </div>
+        <h2 class="font-display font-bold text-xl text-text-main">
+          Reportar {{ targetType === 'Project' ? 'Proyecto' : 'Comentario' }}
+        </h2>
+      </div>
+      <button
+        (click)="closeModal()"
+        class="text-muted hover:text-text-main p-1 rounded-full transition-colors"
+      >
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+
+    @if (targetTitle) {
+      <p
+        class="text-sm text-muted mb-6 bg-surface-hover p-4 rounded-xl border border-border-main/5"
+      >
+        Estás reportando: <span class="font-semibold text-text-main">{{ targetTitle }}</span>
+      </p>
+    }
+
+    <div class="space-y-3 mb-8">
+      <label class="block text-base font-semibold text-text-main mb-3"
+        >Selecciona el motivo principal:</label
+      >
+
+      @for (reason of predefinedReasons; track reason) {
+        <button
+          (click)="selectReason(reason)"
+          class="w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left group"
+          [class.border-danger]="selectedReason === reason"
+          [class.bg-danger/5]="selectedReason === reason"
+          [class.border-border-main/10]="selectedReason !== reason"
+          [class.bg-surface]="selectedReason !== reason"
+          [class.hover:border-danger/30]="selectedReason !== reason"
+        >
+          <span
+            class="text-[15px] font-medium"
+            [class.text-danger]="selectedReason === reason"
+            [class.text-text-main]="selectedReason !== reason"
+          >
+            {{ reason }}
+          </span>
+          <div
+            class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors"
+            [class.border-danger]="selectedReason === reason"
+            [class.bg-danger]="selectedReason === reason"
+            [class.border-border-main/30]="selectedReason !== reason"
+            [class.group-hover:border-danger/50]="selectedReason !== reason"
+          >
+            @if (selectedReason === reason) {
+              <div class="w-2.5 h-2.5 rounded-full bg-white"></div>
+            }
+          </div>
+        </button>
+      }
+
+      <button
+        (click)="selectReason('Otro')"
+        class="w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left group"
+        [class.border-danger]="isOtherSelected"
+        [class.bg-danger/5]="isOtherSelected"
+        [class.border-border-main/10]="!isOtherSelected"
+        [class.bg-surface]="!isOtherSelected"
+        [class.hover:border-danger/30]="!isOtherSelected"
+      >
+        <span
+          class="text-[15px] font-medium"
+          [class.text-danger]="isOtherSelected"
+          [class.text-text-main]="!isOtherSelected"
+        >
+          Otro motivo
+        </span>
+        <div
+          class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors"
+          [class.border-danger]="isOtherSelected"
+          [class.bg-danger]="isOtherSelected"
+          [class.border-border-main/30]="!isOtherSelected"
+          [class.group-hover:border-danger/50]="!isOtherSelected"
+        >
+          @if (isOtherSelected) {
+            <div class="w-2.5 h-2.5 rounded-full bg-white"></div>
+          }
+        </div>
+      </button>
+
+      <div
+        class="transition-all duration-300 overflow-hidden"
+        [class.max-h-0]="!isOtherSelected"
+        [class.opacity-0]="!isOtherSelected"
+        [class.max-h-40]="isOtherSelected"
+        [class.opacity-100]="isOtherSelected"
+        [class.mt-2]="isOtherSelected"
+      >
+        <textarea
+          [(ngModel)]="otherReason"
+          rows="3"
+          placeholder="Describe brevemente el motivo del reporte..."
+          class="w-full p-4 rounded-xl border border-border-main/10 bg-bg focus:ring-2 focus:ring-danger/20 focus:border-danger outline-none transition text-[14px]"
+          [disabled]="!isOtherSelected"
+          #otherInput
+        ></textarea>
+        <p class="text-[12px] text-muted mt-1.5 ml-1">Mínimo 10 caracteres requeridos.</p>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-3 pt-5 border-t border-border-main/10">
+      <button
+        (click)="closeModal()"
+        [disabled]="isSubmitting"
+        class="px-6 py-2.5 rounded-xl text-[14px] font-semibold text-text-main hover:bg-surface-hover transition disabled:opacity-50"
+      >
+        Cancelar
+      </button>
+      <button
+        (click)="onSubmit()"
+        [disabled]="
+          !canSubmit || isSubmitting || (isOtherSelected && otherReason.trim().length < 10)
+        "
+        class="flex items-center gap-2 px-6 py-2.5 rounded-xl text-[14px] font-semibold bg-danger text-white hover:bg-danger/90 transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed relative"
+      >
+        @if (isSubmitting) {
+          <svg
+            class="animate-spin h-4 w-4 text-white"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+          >
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          Enviando...
+        } @else {
+          Enviar Reporte
+        }
+      </button>
+    </div>
+  </div>
+</div>

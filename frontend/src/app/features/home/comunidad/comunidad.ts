@@ -7,13 +7,16 @@ import { Subscription } from 'rxjs';
 
 import { ProjectService } from '../../../core/services/project.service';
 import { CommunityService } from '../../../core/services/community.service';
-import { UserService } from '../../../core/services/user.service'; // Asegúrate de importarlo
+import { UserService } from '../../../core/services/user.service';
 import {
   CommunityCardComponent,
   CommunityProject,
 } from '../../../shared/components/community-card/community-card.component';
 import { CommunityDetailModalComponent } from '../../../shared/modals/community-detail-modal/community-detail-modal.component';
 
+import { CreateReportPayload } from '../../../shared/models/community.model';
+import { ReportModalComponent } from '../../../shared/modals/report-modal/report-modal.component';
+import { ToastService } from '../../../core/services/toast.service';
 @Component({
   selector: 'app-comunidad',
   standalone: true,
@@ -23,6 +26,7 @@ import { CommunityDetailModalComponent } from '../../../shared/modals/community-
     ReactiveFormsModule,
     CommunityCardComponent,
     CommunityDetailModalComponent,
+    ReportModalComponent,
   ],
   templateUrl: './comunidad.html',
   styleUrl: './comunidad.scss',
@@ -32,8 +36,10 @@ export class Comunidad implements OnInit, OnDestroy {
   private communityService = inject(CommunityService);
   private userService = inject(UserService);
   private cdr = inject(ChangeDetectorRef);
+  private toastService = inject(ToastService);
 
   projects: CommunityProject[] = [];
+  projectToReport: CommunityProject | null = null;
   currentPage = 1;
   limit = 12;
 
@@ -159,6 +165,13 @@ export class Comunidad implements OnInit, OnDestroy {
     });
   }
 
+  handleReport(payload: { project: CommunityProject; event: Event }) {
+    payload.event.stopPropagation();
+    payload.event.preventDefault();
+    // Guardamos el proyecto que queremos reportar para pasárselo al modal
+    this.projectToReport = payload.project;
+  }
+
   handleProjectUpdated(updatedProject: CommunityProject) {
     const index = this.projects.findIndex((p) => p._id === updatedProject._id);
     if (index !== -1) {
@@ -173,5 +186,19 @@ export class Comunidad implements OnInit, OnDestroy {
 
   closeModal() {
     this.selectedProject = null;
+  }
+  onReportSubmitted(payload: CreateReportPayload) {
+    this.communityService.createReport(payload).subscribe({
+      next: () => {
+        this.toastService.success('Proyecto reportado correctamente. Gracias por ayudarnos.');
+        this.projectToReport = null; // Cerramos el modal
+      },
+      error: (err) => {
+        console.error('Error al reportar', err);
+        this.toastService.error('Hubo un error al enviar el reporte.');
+        // Opcional: Podrías resetear el estado isSubmitting del modal hijo usando un ViewChild
+        // pero por simplicidad, si falla, el usuario puede reintentar en el modal abierto.
+      },
+    });
   }
 }

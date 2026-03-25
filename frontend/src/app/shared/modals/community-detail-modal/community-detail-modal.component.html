@@ -145,19 +145,41 @@
             <div class="text-center text-muted text-sm py-4">Sé el primero en comentar.</div>
           } @else {
             @for (comment of comments; track comment._id) {
-              <div class="flex gap-3">
+              <div class="flex gap-3 group/comment relative">
                 <img
                   [src]="getAuthorAvatar(comment.authorId)"
-                  class="w-8 h-8 rounded-full border border-border-main/20"
+                  class="w-8 h-8 rounded-full border border-border-main/20 shrink-0"
                 />
-                <div
-                  class="flex-1 bg-surface-hover p-3 rounded-2xl rounded-tl-none border border-border-main/5"
-                >
-                  <span class="text-[12px] font-bold text-text-main block mb-1">{{
-                    getAuthorName(comment.authorId)
-                  }}</span>
-                  <p class="text-[14px] text-muted">{{ comment.content }}</p>
+                <div class="flex-1">
+                  <div
+                    class="bg-surface-hover p-3 rounded-2xl rounded-tl-none border border-border-main/5 inline-block"
+                  >
+                    <span class="text-[12px] font-bold text-text-main block mb-1">{{
+                      getAuthorName(comment.authorId)
+                    }}</span>
+                    <p class="text-[14px] text-muted">{{ comment.content }}</p>
+                  </div>
+
+                  <button
+                    (click)="reportComment(comment)"
+                    class="ml-2 text-[11px] font-semibold text-muted opacity-0 group-hover/comment:opacity-100 transition-opacity hover:text-danger"
+                    title="Reportar comentario"
+                  >
+                    Reportar
+                  </button>
                 </div>
+              </div>
+            }
+
+            @if (hasMoreComments) {
+              <div class="flex justify-center pt-2">
+                <button
+                  (click)="loadMoreComments()"
+                  [disabled]="isLoadingMoreComments"
+                  class="text-[13px] font-bold text-primary hover:text-primary/80 transition-colors disabled:opacity-50"
+                >
+                  {{ isLoadingMoreComments ? 'Cargando...' : 'Cargar más comentarios' }}
+                </button>
               </div>
             }
           }
@@ -217,3 +239,13 @@
     </div>
   </div>
 </div>
+
+@if (reportingData) {
+  <app-report-modal
+    [targetType]="reportingData.type"
+    [targetId]="reportingData.id"
+    [targetTitle]="reportingData.title"
+    (close)="reportingData = null"
+    (submitted)="onReportSubmitted($event)"
+  ></app-report-modal>
+}

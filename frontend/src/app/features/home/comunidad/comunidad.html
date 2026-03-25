@@ -103,6 +103,7 @@
           <app-community-card
             [project]="project"
             (like)="handleLike($event)"
+            (report)="handleReport($event)"
             (viewDetails)="openModal($event)"
           >
           </app-community-card>
@@ -220,4 +221,14 @@
     (projectUpdated)="handleProjectUpdated($event)"
   >
   </app-community-detail-modal>
+}
+
+@if (projectToReport) {
+  <app-report-modal
+    targetType="Project"
+    [targetId]="projectToReport._id"
+    [targetTitle]="projectToReport.title"
+    (close)="projectToReport = null"
+    (submitted)="onReportSubmitted($event)"
+  ></app-report-modal>
 }

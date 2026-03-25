@@ -47,6 +47,20 @@
       </span>
     </div>
 
+    <button
+      (click)="onReportClick($event)"
+      class="absolute top-3 right-3 z-20 p-1.5 bg-surface/70 hover:bg-surface/90 backdrop-blur-md rounded-full text-muted hover:text-red-500 transition-all shadow-sm opacity-0 group-hover:opacity-100 focus:opacity-100"
+      title="Reportar proyecto"
+    >
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M3 3v1.5M3 21v-6m0 0l2.77-.693a9 9 0 016.208.682l.108.054a9 9 0 006.086.71l3.114-.732a48.524 48.524 0 01-.005-10.499l-3.11.732a9 9 0 01-6.085-.711l-.108-.054a9 9 0 00-6.208-.682L3 4.5M3 15V4.5"
+        />
+      </svg>
+    </button>
+
     <div
       class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10 pointer-events-none"
     >
@@ -87,7 +101,7 @@
 
       <button
         (click)="onLikeClick($event)"
-        class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-like/5 transition-colors focus:outline-none focus:ring-2 focus:ring-like/30 group/like shrink-0"
+        class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg hover:bg-like/5 transition-colors focus:outline-none focus:ring-2 focus:ring-like/30 group/like shrink-0 z-20"
         title="Me gusta"
       >
         <svg
@@ -113,7 +127,7 @@
           [class.text-like]="project.isLikedLocally"
           [class.text-muted]="!project.isLikedLocally"
         >
-          {{ project.likesCount }}
+          {{ project.likesCount || 0 }}
         </span>
       </button>
     </div>

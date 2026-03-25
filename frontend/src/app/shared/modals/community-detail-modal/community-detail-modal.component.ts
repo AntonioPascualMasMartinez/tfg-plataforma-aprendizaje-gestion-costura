@@ -5,20 +5,24 @@ import { Router } from '@angular/router';
 import { CommunityService } from '../../../core/services/community.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { CommunityProject } from '../../components/community-card/community-card.component';
-import { Comment, CreateReportPayload } from '../../../shared/models/community.model';
+import {
+  Comment,
+  CreateReportPayload,
+  ReportTargetType,
+} from '../../../shared/models/community.model';
 import { User } from '../../../shared/models/user.model';
+
+import { ReportModalComponent } from '../report-modal/report-modal.component'; // Importar
 
 @Component({
   selector: 'app-community-detail-modal',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ReportModalComponent],
   templateUrl: './community-detail-modal.component.html',
 })
 export class CommunityDetailModalComponent implements OnInit {
   @Input({ required: true }) project!: CommunityProject;
   @Output() close = new EventEmitter<void>();
-
-  // Si el like cambia dentro del modal, avisamos al padre para que actualice la tarjeta
   @Output() projectUpdated = new EventEmitter<CommunityProject>();
 
   private communityService = inject(CommunityService);
@@ -27,25 +31,56 @@ export class CommunityDetailModalComponent implements OnInit {
 
   comments: Comment[] = [];
   newComment = '';
+
+  // Variables para la paginación de comentarios
+  commentPage = 1;
+  hasMoreComments = false;
   isLoadingComments = true;
+  isLoadingMoreComments = false;
+
   isSubmittingComment = false;
   isCloning = false;
 
+  reportingData: { type: ReportTargetType; id: string; title?: string } | null = null;
+
   ngOnInit() {
-    this.loadComments();
+    this.loadComments(true);
   }
 
-  loadComments() {
-    this.isLoadingComments = true;
-    this.communityService.getProjectComments(this.project._id).subscribe({
+  loadComments(reset = false) {
+    if (reset) {
+      this.commentPage = 1;
+      this.isLoadingComments = true;
+    } else {
+      this.isLoadingMoreComments = true;
+    }
+
+    this.communityService.getProjectComments(this.project._id, this.commentPage).subscribe({
       next: (res) => {
-        this.comments = res.data.docs;
+        if (reset) {
+          this.comments = res.data.docs;
+        } else {
+          this.comments = [...this.comments, ...res.data.docs];
+        }
+
+        // Verificamos si hay más páginas según tu paginated result
+        this.hasMoreComments = res.data.hasNextPage;
         this.isLoadingComments = false;
+        this.isLoadingMoreComments = false;
       },
       error: () => {
         this.isLoadingComments = false;
+        this.isLoadingMoreComments = false;
+        this.toastService.error('Error al cargar los comentarios');
       },
     });
+  }
+
+  loadMoreComments() {
+    if (this.hasMoreComments && !this.isLoadingMoreComments) {
+      this.commentPage++;
+      this.loadComments(false);
+    }
   }
 
   postComment() {
@@ -54,6 +89,7 @@ export class CommunityDetailModalComponent implements OnInit {
     this.isSubmittingComment = true;
     this.communityService.addComment(this.project._id, { content: this.newComment }).subscribe({
       next: (res) => {
+        // Añadimos el comentario nuevo al principio de la lista
         this.comments.unshift(res.data);
         this.newComment = '';
         this.isSubmittingComment = false;
@@ -67,22 +103,17 @@ export class CommunityDetailModalComponent implements OnInit {
   }
 
   toggleLike() {
-    // Lógica Toggle optimista
     const wasLiked = this.project.isLikedLocally;
     this.project.isLikedLocally = !wasLiked;
     this.project.likesCount = (this.project.likesCount || 0) + (wasLiked ? -1 : 1);
-
-    // Emitimos el cambio inmediatamente para que la tarjeta del fondo se actualice
     this.projectUpdated.emit(this.project);
 
     this.communityService.likeProject(this.project._id).subscribe({
       next: (res) => {
-        // Actualizamos con el dato real del servidor
         this.project.likesCount = res.data.likesCount;
         this.projectUpdated.emit(this.project);
       },
       error: () => {
-        // Revertir si hay error
         this.project.isLikedLocally = wasLiked;
         this.project.likesCount = (this.project.likesCount || 0) + (wasLiked ? 1 : -1);
         this.projectUpdated.emit(this.project);
@@ -92,30 +123,25 @@ export class CommunityDetailModalComponent implements OnInit {
   }
 
   reportProject() {
-    const reason = prompt('Por favor, indica el motivo del reporte:');
-    if (!reason) return;
-
-    const payload: CreateReportPayload = {
-      targetType: 'Project',
-      targetId: this.project._id,
-      reason: reason,
+    this.reportingData = {
+      type: 'Project',
+      id: this.project._id,
+      title: this.project.title,
     };
-
-    this.communityService.createReport(payload).subscribe({
-      next: () =>
-        this.toastService.success('Proyecto reportado correctamente. Nuestro equipo lo revisará.'),
-      error: () => this.toastService.error('Hubo un error al enviar el reporte.'),
-    });
   }
 
+  // NUEVO: Método para reportar un comentario individual
+  reportComment(comment: Comment) {
+    this.reportingData = {
+      type: 'Comment',
+      id: comment._id,
+      title: `Comentario de ${this.getAuthorName(comment.authorId)}`,
+    };
+  }
   startProject() {
     this.isCloning = true;
-    // AQUÍ DEBERÍAS LLAMAR A TU PROJECT SERVICE PARA CLONAR EL PROYECTO
-    // this.projectService.cloneProject(this.project._id).subscribe(...)
     this.toastService.success('Proyecto añadido a tu colección.');
     this.closeModal();
-    // Redirigirías al proyecto clonado
-    // this.router.navigate(['/home/proyectos', newId]);
   }
 
   closeModal() {
@@ -133,6 +159,19 @@ export class CommunityDetailModalComponent implements OnInit {
     if (ownerId && typeof ownerId === 'object' && 'avatar' in ownerId && ownerId.avatar) {
       return ownerId.avatar;
     }
-    return '/assets/default-avatar.png';
+    const name = this.getAuthorName(ownerId);
+    return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=ffedd5&color=ea580c&rounded=true&bold=true`;
+  }
+
+  onReportSubmitted(payload: CreateReportPayload) {
+    this.communityService.createReport(payload).subscribe({
+      next: () => {
+        this.toastService.success('Reporte enviado correctamente.');
+        this.reportingData = null; // Cerramos el modal de reporte
+      },
+      error: () => {
+        this.toastService.error('Error al enviar el reporte.');
+      },
+    });
   }
 }
