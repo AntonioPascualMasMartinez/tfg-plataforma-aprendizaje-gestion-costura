@@ -69,8 +69,8 @@
 
     <div class="absolute top-3 right-3 z-10">
       <span
-        class="px-2.5 py-1 text-[10px] font-bold rounded-full shadow-sm uppercase tracking-wide border flex items-center justify-center"
-        [ngClass]="difficultyColorClass"
+        class="bg-white px-2.5 py-1 text-[10px] font-bold rounded-full shadow-sm uppercase tracking-wide border flex items-center justify-center"
+        [ngClass]="difficultyTextColorClass"
       >
         {{ project.difficulty || 'N/A' }}
       </span>
@@ -167,7 +167,7 @@
 
       <button
         (click)="onDeleteRequest($event)"
-        class="p-1.5 text-muted hover:bg-danger/10 hover:text-danger rounded-md transition-all duration-300 md:opacity-0 md:group-hover:opacity-100"
+        class="cursor-pointer p-1.5 text-muted hover:bg-danger/10 hover:text-danger rounded-md transition-all duration-300 md:opacity-0 md:group-hover:opacity-100"
         title="Eliminar proyecto"
       >
         <svg

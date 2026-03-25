@@ -27,33 +27,32 @@ export class ProjectCardComponent {
     return null;
   }
 
-  // NUEVO: Verifica si viene de un tutorial
   get isFromTutorial(): boolean {
     return this.project.projectType === 'Comenzado desde Tutorial';
   }
 
-  // NUEVO: Calcula pasos completados
   get completedSteps(): number {
     if (!this.project.steps) return 0;
     return this.project.steps.filter((step) => step.status === 'Completado').length;
   }
 
-  // NUEVO: Calcula materiales adquiridos
   get acquiredMaterials(): number {
     if (!this.project.materials) return 0;
     return this.project.materials.filter((mat) => mat.isAcquired).length;
   }
 
-  get difficultyColorClass(): string {
+  // RENAMED GETTER Y CLASES ACTUALIZADAS
+  // Ahora solo definimos colores de texto y borde. El fondo lo definimos estático en el HTML.
+  get difficultyTextColorClass(): string {
     switch (this.project.difficulty) {
-      case 'Fácil':
-        return 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50';
-      case 'Intermedio':
-        return 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50';
-      case 'Avanzado':
-        return 'bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800/50';
-      default:
-        return 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:border-gray-700';
+      case 'Fácil': // Verde
+        return 'text-emerald-700 border-emerald-200 dark:text-emerald-400 dark:border-emerald-800/50';
+      case 'Intermedio': // Amarillo
+        return 'text-amber-800 border-amber-200 dark:text-amber-400 dark:border-amber-800/50';
+      case 'Avanzado': // Rosa/Rojo
+        return 'text-rose-700 border-rose-200 dark:text-rose-400 dark:border-rose-800/50';
+      default: // Gris por defecto
+        return 'text-gray-700 border-gray-200 dark:text-gray-300 dark:border-gray-700';
     }
   }
 
