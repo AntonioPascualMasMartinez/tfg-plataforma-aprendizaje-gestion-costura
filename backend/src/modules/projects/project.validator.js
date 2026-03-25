@@ -13,6 +13,7 @@ const projectValidator = {
     materials: Joi.array()
       .items(
         Joi.object({
+          _id: Joi.any().optional(), // <-- NUEVO: Permitir el _id si viene
           name: Joi.string().required(),
           quantity: Joi.string().required(),
           notes: Joi.string().allow('', null).optional(),
@@ -37,10 +38,23 @@ const projectValidator = {
     materials: Joi.array()
       .items(
         Joi.object({
+          _id: Joi.any().optional(),
           name: Joi.string().required(),
           quantity: Joi.string().required(),
           notes: Joi.string().allow('', null).optional(),
           isAcquired: Joi.boolean().optional(),
+        }),
+      )
+      .optional(),
+    steps: Joi.array()
+      .items(
+        Joi.object({
+          _id: Joi.any().optional(),
+          order: Joi.number().required(),
+          title: Joi.string().required(),
+          description: Joi.string().required(),
+          mediaUrl: Joi.string().uri().allow('', null).optional(),
+          status: Joi.string().valid('Pendiente', 'Completado').optional(),
         }),
       )
       .optional(),

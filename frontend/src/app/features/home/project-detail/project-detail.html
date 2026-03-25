@@ -163,23 +163,45 @@
               <div class="space-y-3">
                 @for (mat of project.materials; track mat._id; let i = $index) {
                   <div
-                    class="relative flex items-start gap-4 p-4 rounded-2xl hover:bg-border-main/5 border border-border-main/10 hover:border-border-main/30 transition-all group"
+                    class="relative flex items-start gap-4 p-4 rounded-2xl border transition-all group cursor-pointer"
+                    [ngClass]="
+                      mat.isAcquired
+                        ? 'bg-surface border-transparent opacity-60'
+                        : 'bg-surface hover:bg-border-main/5 border-border-main/10 hover:border-border-main/30'
+                    "
+                    (click)="toggleMaterial(i)"
                   >
                     <div class="flex items-center h-6 mt-0.5">
                       <input
                         [id]="'material-' + i"
                         type="checkbox"
+                        [checked]="mat.isAcquired"
+                        (change)="toggleMaterial(i); $event.stopPropagation()"
                         class="w-5 h-5 rounded border-border-main/40 text-primary focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface accent-primary cursor-pointer transition-all"
                       />
                     </div>
-                    <label [for]="'material-' + i" class="flex-1 cursor-pointer">
+                    <div class="flex-1">
                       <p
-                        class="text-[16px] font-bold text-text-main group-hover:text-primary transition-colors leading-tight mb-1"
+                        class="text-[16px] font-bold transition-colors leading-tight mb-1"
+                        [ngClass]="
+                          mat.isAcquired
+                            ? 'text-muted line-through'
+                            : 'text-text-main group-hover:text-primary'
+                        "
                       >
                         {{ mat.name }}
                       </p>
-                      <p class="text-[14px] text-muted">{{ mat.quantity }}</p>
-                    </label>
+                      <div class="flex flex-wrap items-center gap-2 mt-1">
+                        <span class="text-[14px] text-muted">{{ mat.quantity }}</span>
+                        @if (mat.notes) {
+                          <span
+                            class="text-[12px] bg-border-main/10 text-muted px-2 py-0.5 rounded-md font-medium"
+                          >
+                            {{ mat.notes }}
+                          </span>
+                        }
+                      </div>
+                    </div>
                   </div>
                 }
                 @if (!project.materials.length) {
@@ -220,12 +242,23 @@
           @if (project.steps.length) {
             <div class="w-full mb-6" aria-live="polite">
               <div class="flex justify-between items-center mb-2 text-[13px] font-bold text-muted">
-                <span class="text-text-main"
-                  >Paso {{ activeStepIndex + 1 }} de {{ project.steps.length }}</span
-                >
-                <span class="text-primary"
-                  >{{ progressPercentage | number: '1.0-0' }}% Completado</span
-                >
+                <span class="text-text-main">
+                  Paso {{ activeStepIndex + 1 }} de {{ project.steps.length }}
+                </span>
+                <span class="text-primary flex items-center gap-1.5">
+                  @if (progressPercentage === 100) {
+                    <svg class="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                      <path
+                        fill-rule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clip-rule="evenodd"
+                      />
+                    </svg>
+                  }
+                  {{ completedStepsCount }} de {{ project.steps.length }} Completados ({{
+                    progressPercentage | number: '1.0-0'
+                  }}%)
+                </span>
               </div>
               <div class="w-full h-2 bg-border-main/10 rounded-full overflow-hidden">
                 <div
@@ -236,54 +269,106 @@
             </div>
 
             <div
-              class="flex flex-col lg:flex-row gap-6 flex-1 min-h-[50vh] animate-in zoom-in-95 duration-300"
+              class="bg-surface rounded-2xl border border-border-main/10 shadow-sm flex-1 flex flex-col min-h-0 relative animate-in fade-in duration-300"
             >
-              @if (project.steps[activeStepIndex].mediaUrl) {
-                <div
-                  class="w-full lg:w-3/5 bg-surface border border-border-main/15 rounded-3xl overflow-hidden shadow-sm relative group flex items-center justify-center min-h-75 lg:min-h-0"
-                >
-                  <img
-                    [src]="project.steps[activeStepIndex].mediaUrl"
-                    [alt]="'Paso ' + (activeStepIndex + 1)"
-                    class="absolute inset-0 w-full h-full object-contain bg-bg"
-                  />
-                </div>
-              }
-
-              <div
-                class="w-full flex flex-col justify-between bg-surface border border-border-main/15 rounded-3xl shadow-sm overflow-hidden"
-                [class.lg:w-2/5]="project.steps[activeStepIndex].mediaUrl"
-                [class.lg:w-full]="!project.steps[activeStepIndex].mediaUrl"
-              >
-                <div class="p-6 md:p-8 overflow-y-auto custom-scrollbar flex-1">
-                  <div class="flex items-start gap-4 mb-4">
+              <header class="p-5 md:p-6 border-b border-border-main/10 shrink-0">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div class="flex items-start gap-4">
                     <span
-                      class="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center font-display font-bold text-xl shrink-0"
+                      class="w-11 h-11 rounded-lg flex items-center justify-center font-display font-bold text-[20px] shrink-0 transition-all shadow-inner"
+                      [ngClass]="
+                        project.steps[activeStepIndex].status === 'Completado'
+                          ? 'bg-success/20 text-success'
+                          : 'bg-primary/20 text-primary'
+                      "
                     >
                       {{ project.steps[activeStepIndex].order }}
                     </span>
                     <h2
-                      class="text-xl md:text-2xl font-display font-bold text-text-main leading-snug mt-1"
+                      class="text-[19px] md:text-2xl font-display font-bold text-text-main leading-snug"
                     >
                       {{ project.steps[activeStepIndex].title }}
                     </h2>
                   </div>
-                  <p class="text-[16px] text-muted leading-relaxed whitespace-pre-line mt-4">
-                    {{ project.steps[activeStepIndex].description }}
-                  </p>
+
+                  <button
+                    (click)="toggleStepStatus(activeStepIndex)"
+                    class="shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-xl text-[13px] font-bold border transition-all duration-300 shadow-sm outline-none cursor-pointer"
+                    [ngClass]="
+                      project.steps[activeStepIndex].status === 'Completado'
+                        ? 'bg-success text-white border-success hover:bg-success/90'
+                        : 'bg-surface text-text-main border-border-main/30 hover:bg-primary/5 hover:border-primary/40 hover:text-primary'
+                    "
+                  >
+                    @if (project.steps[activeStepIndex].status === 'Completado') {
+                      <svg
+                        class="w-4.5 h-4.5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M4.5 12.75l6 6 9-13.5"
+                        />
+                      </svg>
+                      Completado
+                    } @else {
+                      <svg
+                        class="w-4.5 h-4.5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="2.5"
+                      >
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                        />
+                      </svg>
+                      Marcar listo
+                    }
+                  </button>
                 </div>
+              </header>
+
+              <div class="p-6 md:p-8 flex-1 flex flex-col min-h-0">
+                @if (project.steps[activeStepIndex].mediaUrl) {
+                  <div
+                    class="aspect-video w-full rounded-2xl overflow-hidden border border-border-main/15 mb-6 shrink-0 bg-surface-hover shadow-inner"
+                  >
+                    <img
+                      [src]="project.steps[activeStepIndex].mediaUrl"
+                      [alt]="project.steps[activeStepIndex].title"
+                      class="w-full h-full object-contain"
+                    />
+                  </div>
+                }
+
+                <p
+                  class="text-[15px] text-text-main leading-relaxed mb-6 font-medium whitespace-pre-wrap"
+                >
+                  {{ project.steps[activeStepIndex].description }}
+                </p>
 
                 <div
-                  class="p-4 md:p-6 bg-surface-hover/50 border-t border-border-main/10 flex gap-3"
+                  class="mt-auto pt-6 border-t border-border-main/10 grid grid-cols-2 gap-4 shrink-0"
                 >
                   <button
                     (click)="prevStep()"
                     [disabled]="activeStepIndex === 0"
-                    aria-label="Anterior"
-                    class="flex-1 btn bg-surface border-2 border-border-main/20 hover:border-primary/50 hover:text-primary hover:bg-primary/5 text-text-main gap-2 py-3 disabled:opacity-30 disabled:hover:border-border-main/20 disabled:hover:text-text-main disabled:hover:bg-surface disabled:cursor-not-allowed cursor-pointer transition-all duration-300"
+                    class="flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-[14px] font-bold transition-all outline-none"
+                    [ngClass]="
+                      activeStepIndex === 0
+                        ? 'bg-border-main/5 text-muted opacity-60 cursor-not-allowed'
+                        : 'bg-surface-hover text-text-main border border-border-main/10 hover:bg-border-main/20 cursor-pointer'
+                    "
                   >
                     <svg
-                      class="w-5 h-5"
+                      class="w-4 h-4"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -292,21 +377,24 @@
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
-                        d="M6.75 15.75L3 12m0 0l3.75-3.75M3 12h18"
+                        d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
                       />
                     </svg>
-                    <span class="hidden sm:inline">Anterior</span>
+                    Atrás
                   </button>
                   <button
                     (click)="nextStep()"
                     [disabled]="activeStepIndex === project.steps.length - 1"
-                    aria-label="Siguiente"
-                    class="flex-1 btn btn-primary gap-2 py-3 shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/40 disabled:opacity-40 disabled:hover:translate-y-0 disabled:hover:shadow-md disabled:cursor-not-allowed cursor-pointer hover:-translate-y-0.5 transition-all duration-300"
+                    class="flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-[14px] font-bold transition-all outline-none"
+                    [ngClass]="
+                      activeStepIndex === project.steps.length - 1
+                        ? 'bg-border-main/5 text-muted opacity-60 cursor-not-allowed'
+                        : 'bg-primary text-white hover:bg-primary/90 cursor-pointer'
+                    "
                   >
-                    <span class="hidden sm:inline">Siguiente paso</span>
-                    <span class="sm:hidden">Siguiente</span>
+                    Siguiente
                     <svg
-                      class="w-5 h-5"
+                      class="w-4 h-4"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -315,7 +403,7 @@
                       <path
                         stroke-linecap="round"
                         stroke-linejoin="round"
-                        d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3"
+                        d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"
                       />
                     </svg>
                   </button>
@@ -484,7 +572,7 @@
                         type="button"
                         (click)="removeStepImage()"
                         aria-label="Eliminar imagen"
-                        class="text-danger hover:bg-danger/10 p-2 rounded-lg transition-colors"
+                        class="text-danger hover:bg-danger/10 p-2 rounded-lg transition-colors cursor-pointer"
                       >
                         <svg
                           class="w-5 h-5"
@@ -600,6 +688,7 @@
                 </div>
               </div>
             }
+
             @if (!project.steps.length && !isAddingStep) {
               <div
                 class="text-center py-12 px-4 bg-bg rounded-2xl border border-dashed border-border-main/20"

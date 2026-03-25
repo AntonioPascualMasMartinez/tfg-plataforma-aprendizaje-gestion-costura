@@ -4,7 +4,11 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ProjectService } from '../../../core/services/project.service';
 import { UploadService } from '../../../core/services/upload.service';
-import { Project, AddStepPayload } from '../../../shared/models/project.model';
+import {
+  Project,
+  AddStepPayload,
+  UpdateProjectPayload,
+} from '../../../shared/models/project.model';
 
 type ViewMode = 'taller' | 'edicion';
 type TallerTab = 'materiales' | 'pasos';
@@ -50,7 +54,6 @@ export class ProjectDetail implements OnInit {
     }
   }
 
-  // --- NUEVA FUNCIONALIDAD: Navegación por Teclado ---
   @HostListener('window:keydown', ['$event'])
   handleKeyDown(event: KeyboardEvent) {
     if (this.viewMode === 'taller' && this.tallerTab === 'pasos') {
@@ -89,9 +92,16 @@ export class ProjectDetail implements OnInit {
     this.tallerTab = tab;
   }
 
+  // NUEVO: Calculamos cuántos pasos están completados
+  get completedStepsCount(): number {
+    if (!this.project || !this.project.steps) return 0;
+    return this.project.steps.filter((step) => step.status === 'Completado').length;
+  }
+
+  // ACTUALIZADO: El progreso ahora se basa en el estado real de los pasos
   get progressPercentage(): number {
     if (!this.project || !this.project.steps || this.project.steps.length === 0) return 0;
-    return ((this.activeStepIndex + 1) / this.project.steps.length) * 100;
+    return (this.completedStepsCount / this.project.steps.length) * 100;
   }
 
   nextStep() {
@@ -104,6 +114,36 @@ export class ProjectDetail implements OnInit {
     if (this.activeStepIndex > 0) {
       this.activeStepIndex--;
     }
+  }
+
+  // NUEVO: Método para alternar el estado de un material y guardarlo
+  toggleMaterial(index: number) {
+    if (!this.project) return;
+
+    const material = this.project.materials[index];
+    material.isAcquired = !material.isAcquired;
+
+    // Hacemos cast a 'any' para eludir la restricción de Omit en UpdateProjectPayload
+    // y permitir enviar el array completo con _id e isAcquired
+    this.projectService
+      .updateProject(this.project._id, { materials: this.project.materials } as any)
+      .subscribe({
+        error: (err) => console.error('Error al actualizar material', err),
+      });
+  }
+
+  // NUEVO: Método para alternar el estado de un paso y guardarlo
+  toggleStepStatus(index: number) {
+    if (!this.project) return;
+
+    const step = this.project.steps[index];
+    step.status = step.status === 'Completado' ? 'Pendiente' : 'Completado';
+
+    this.projectService
+      .updateProject(this.project._id, { steps: this.project.steps } as any)
+      .subscribe({
+        error: (err) => console.error('Error al actualizar paso', err),
+      });
   }
 
   toggleAddStep() {
@@ -144,7 +184,11 @@ export class ProjectDetail implements OnInit {
   onAddStep() {
     if (this.stepForm.invalid || !this.project) return;
 
-    const payload: AddStepPayload = this.stepForm.value;
+    // ACTUALIZADO: Añadimos el status por defecto al crear
+    const payload: AddStepPayload = {
+      ...this.stepForm.value,
+      status: 'Pendiente',
+    };
 
     this.projectService.addStepToProject(this.project._id, payload).subscribe({
       next: (res) => {
