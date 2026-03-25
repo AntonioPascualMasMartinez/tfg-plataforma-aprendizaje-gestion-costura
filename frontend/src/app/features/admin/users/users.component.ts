@@ -2,7 +2,6 @@ import { Component, inject, OnInit } from '@angular/core';
 import { UpperCasePipe } from '@angular/common';
 import { UserService } from '../../../core/services/user.service';
 import { User, Role } from '../../../shared/models/user.model';
-// Asegúrate de ajustar la ruta del modal según la estructura real de tus carpetas
 import { ConfirmModalComponent } from '../../../shared/modals/confirm-modal/confirm-modal.component';
 
 @Component({
@@ -40,9 +39,11 @@ export class UsersComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
+    // Solicitamos la página 1 con un límite de 50 usuarios
     this.userService.getAllUsers(1, 50).subscribe({
       next: (response) => {
-        this.users = (response.data as any).docs || response.data;
+        // Gracias a tus interfaces, TypeScript ya sabe que data tiene la propiedad 'docs'
+        this.users = response.data.docs;
         this.isLoading = false;
       },
       error: (err) => {
@@ -62,7 +63,7 @@ export class UsersComponent implements OnInit {
     this.modalTitle = 'Cambiar Rol de Usuario';
     this.modalMessage = `¿Estás seguro de cambiar el rol de ${user.displayName} a ${this.pendingRole}?`;
     this.modalConfirmText = 'Sí, cambiar rol';
-    this.isModalDestructive = false; // Acción normal, botón primario
+    this.isModalDestructive = false; 
     this.isModalOpen = true;
   }
 
@@ -77,7 +78,7 @@ export class UsersComponent implements OnInit {
     this.modalTitle = this.pendingStatus ? 'Desbanear Usuario' : 'Banear Usuario';
     this.modalMessage = `¿Estás seguro de que deseas ${actionText} a ${user.displayName}?`;
     this.modalConfirmText = this.pendingStatus ? 'Sí, desbanear' : 'Sí, banear';
-    this.isModalDestructive = !this.pendingStatus; // Si lo vamos a banear, el botón será rojo
+    this.isModalDestructive = !this.pendingStatus; 
     this.isModalOpen = true;
   }
 
@@ -106,8 +107,7 @@ export class UsersComponent implements OnInit {
           this.closeModal();
         },
         error: (err) => {
-          this.errorMessage =
-            err.error?.message || 'Hubo un error al cambiar el estado del usuario.';
+          this.errorMessage = err.error?.message || 'Hubo un error al cambiar el estado del usuario.';
           this.closeModal();
         },
       });
