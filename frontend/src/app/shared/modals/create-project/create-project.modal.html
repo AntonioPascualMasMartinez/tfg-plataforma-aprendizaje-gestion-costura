@@ -21,7 +21,7 @@
         </div>
         <button
           (click)="closeModal()"
-          class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-hover hover:bg-danger/10 text-muted hover:text-danger transition-colors outline-none"
+          class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-hover hover:bg-danger/10 text-muted hover:text-danger transition-colors outline-none cursor-pointer"
         >
           <svg
             class="w-5 h-5"
@@ -44,11 +44,21 @@
       </div>
     </header>
 
-    <div class="p-6 md:p-8 overflow-y-auto custom-scrollbar flex-1 bg-surface/30">
-      <form [formGroup]="projectForm" id="projectForm" (ngSubmit)="onSubmit()" class="h-full">
+    <div
+      class="p-5 md:p-6 flex-1 bg-surface/30"
+      [class.overflow-y-auto]="currentStep === 2"
+      [class.overflow-hidden]="currentStep === 1"
+      [class.custom-scrollbar]="currentStep === 2"
+    >
+      <form
+        [formGroup]="projectForm"
+        id="projectForm"
+        (ngSubmit)="onSubmit()"
+        class="h-full flex flex-col"
+      >
         @if (errorMessage) {
           <div
-            class="mb-6 p-4 rounded-xl bg-danger/10 border border-danger/20 text-danger text-[14px] font-bold flex items-center gap-3 animate-in fade-in slide-in-from-top-2"
+            class="mb-4 p-3 rounded-xl bg-danger/10 border border-danger/20 text-danger text-[14px] font-bold flex items-center gap-3 animate-in fade-in slide-in-from-top-2 shrink-0"
           >
             <svg
               class="w-5 h-5 shrink-0"
@@ -69,12 +79,12 @@
 
         <div
           [class.hidden]="currentStep !== 1"
-          class="animate-in slide-in-from-right-4 duration-300 h-full"
+          class="animate-in slide-in-from-right-4 duration-300 h-full flex flex-col"
         >
-          <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 h-full">
-            <div class="lg:col-span-7 flex flex-col gap-6">
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 h-full min-h-0">
+            <div class="lg:col-span-7 flex flex-col gap-4">
               <div>
-                <label for="title" class="block text-[14px] font-bold text-text-main mb-2">
+                <label for="title" class="block text-[14px] font-bold text-text-main mb-1.5">
                   Título del proyecto <span class="text-danger">*</span>
                 </label>
                 <input
@@ -82,7 +92,7 @@
                   id="title"
                   formControlName="title"
                   placeholder="Ej: Cartera de cuero minimalista"
-                  class="w-full h-12 px-4 rounded-xl border border-border-main/20 bg-surface text-[15px] text-text-main outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-medium placeholder:text-muted/50"
+                  class="w-full h-10 px-4 rounded-xl border border-border-main/20 bg-surface text-[14px] text-text-main outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-medium placeholder:text-muted/50"
                   [class.border-danger]="
                     projectForm.get('title')?.invalid && projectForm.get('title')?.touched
                   "
@@ -90,16 +100,16 @@
               </div>
 
               <div>
-                <label class="block text-[14px] font-bold text-text-main mb-2"
+                <label class="block text-[14px] font-bold text-text-main mb-1.5"
                   >Origen del diseño</label
                 >
                 <div
-                  class="flex p-1.5 bg-surface-hover rounded-xl border border-border-main/10 relative"
+                  class="flex p-1 bg-surface-hover rounded-xl border border-border-main/10 relative"
                 >
                   <button
                     type="button"
                     (click)="setControlValue('projectType', 'Nuevo')"
-                    class="flex-1 py-2.5 text-[14px] font-bold rounded-lg transition-all duration-300 z-10"
+                    class="flex-1 py-1.5 text-[13px] font-bold rounded-lg transition-all duration-300 z-10 cursor-pointer"
                     [ngClass]="
                       projectForm.get('projectType')?.value === 'Nuevo'
                         ? 'bg-primary text-white shadow-md'
@@ -111,7 +121,7 @@
                   <button
                     type="button"
                     (click)="setControlValue('projectType', 'Comenzado desde Tutorial')"
-                    class="flex-1 py-2.5 text-[14px] font-bold rounded-lg transition-all duration-300 z-10"
+                    class="flex-1 py-1.5 text-[13px] font-bold rounded-lg transition-all duration-300 z-10 cursor-pointer"
                     [ngClass]="
                       projectForm.get('projectType')?.value === 'Comenzado desde Tutorial'
                         ? 'bg-primary text-white shadow-md'
@@ -122,16 +132,17 @@
                   </button>
                 </div>
               </div>
+
               <div>
-                <label class="block text-[14px] font-bold text-text-main mb-2">
+                <label class="block text-[14px] font-bold text-text-main mb-1.5">
                   Categoría <span class="text-danger">*</span>
                 </label>
-                <div class="grid grid-cols-3 gap-3">
+                <div class="grid grid-cols-3 gap-2">
                   @for (cat of categories; track cat) {
                     <button
                       type="button"
                       (click)="setControlValue('category', cat)"
-                      class="py-3 px-2 rounded-xl text-[14px] font-bold transition-all duration-200"
+                      class="py-2 px-2 rounded-xl text-[13px] font-bold transition-all duration-200 cursor-pointer"
                       [ngClass]="
                         projectForm.get('category')?.value === cat
                           ? 'border-2 border-primary bg-primary/10 text-primary shadow-sm'
@@ -142,25 +153,20 @@
                     </button>
                   }
                 </div>
-                @if (projectForm.get('category')?.invalid && projectForm.get('category')?.touched) {
-                  <span class="text-danger text-[12px] font-bold mt-1.5 block"
-                    >Selecciona una categoría.</span
-                  >
-                }
               </div>
 
               <div>
-                <label class="block text-[14px] font-bold text-text-main mb-2">
+                <label class="block text-[14px] font-bold text-text-main mb-1.5">
                   Nivel de Dificultad <span class="text-danger">*</span>
                 </label>
-                <div class="grid grid-cols-3 gap-3">
+                <div class="grid grid-cols-3 gap-2">
                   <button
                     type="button"
                     (click)="setControlValue('difficulty', 'Fácil')"
-                    class="py-3 px-2 rounded-xl text-[13px] font-bold border transition-all duration-300"
+                    class="py-2 px-2 rounded-xl text-[13px] font-bold border transition-all duration-300 cursor-pointer"
                     [ngClass]="
                       projectForm.get('difficulty')?.value === 'Fácil'
-                        ? 'border-emerald-500 bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 -translate-y-0.5'
+                        ? 'border-emerald-500 bg-emerald-500 text-white shadow-md shadow-emerald-500/20 -translate-y-px'
                         : 'border-border-main/20 bg-surface text-muted hover:border-emerald-500/40 hover:bg-emerald-500/5 hover:text-emerald-600'
                     "
                   >
@@ -169,10 +175,10 @@
                   <button
                     type="button"
                     (click)="setControlValue('difficulty', 'Intermedio')"
-                    class="py-3 px-2 rounded-xl text-[13px] font-bold border transition-all duration-300"
+                    class="py-2 px-2 rounded-xl text-[13px] font-bold border transition-all duration-300 cursor-pointer"
                     [ngClass]="
                       projectForm.get('difficulty')?.value === 'Intermedio'
-                        ? 'border-amber-600 bg-amber-600 text-white shadow-lg shadow-amber-600/30 -translate-y-0.5'
+                        ? 'border-amber-600 bg-amber-600 text-white shadow-md shadow-amber-600/20 -translate-y-px'
                         : 'border-border-main/20 bg-surface text-muted hover:border-amber-600/40 hover:bg-amber-600/5 hover:text-amber-700'
                     "
                   >
@@ -181,27 +187,20 @@
                   <button
                     type="button"
                     (click)="setControlValue('difficulty', 'Avanzado')"
-                    class="py-3 px-2 rounded-xl text-[13px] font-bold border transition-all duration-300"
+                    class="py-2 px-2 rounded-xl text-[13px] font-bold border transition-all duration-300 cursor-pointer"
                     [ngClass]="
                       projectForm.get('difficulty')?.value === 'Avanzado'
-                        ? 'border-rose-500 bg-rose-500 text-white shadow-lg shadow-rose-500/30 -translate-y-0.5'
+                        ? 'border-rose-500 bg-rose-500 text-white shadow-md shadow-rose-500/20 -translate-y-px'
                         : 'border-border-main/20 bg-surface text-muted hover:border-rose-500/40 hover:bg-rose-500/5 hover:text-rose-600'
                     "
                   >
                     Avanzado
                   </button>
                 </div>
-                @if (
-                  projectForm.get('difficulty')?.invalid && projectForm.get('difficulty')?.touched
-                ) {
-                  <span class="text-danger text-[12px] font-bold mt-1.5 block"
-                    >Selecciona una dificultad.</span
-                  >
-                }
               </div>
 
               <div>
-                <label class="block text-[14px] font-bold text-text-main mb-2"
+                <label class="block text-[14px] font-bold text-text-main mb-1.5"
                   >Estado inicial</label
                 >
                 <div class="flex flex-wrap gap-2">
@@ -209,10 +208,10 @@
                     <button
                       type="button"
                       (click)="setControlValue('status', status)"
-                      class="px-4 py-2.5 rounded-full text-[13px] font-bold border transition-all duration-200"
+                      class="px-3 py-1.5 rounded-full text-[12px] font-bold border transition-all duration-200 cursor-pointer"
                       [ngClass]="
                         projectForm.get('status')?.value === status
-                          ? 'border-text-main bg-text-main text-bg shadow-md'
+                          ? 'border-text-main bg-text-main text-bg shadow-sm'
                           : 'border-border-main/20 bg-surface text-muted hover:border-text-main/40 hover:text-text-main'
                       "
                     >
@@ -223,47 +222,27 @@
               </div>
             </div>
 
-            <div class="lg:col-span-5 flex flex-col gap-6">
-              <div class="flex flex-col min-h-48">
-                <label class="block text-[14px] font-bold text-text-main mb-2"
+            <div class="lg:col-span-5 flex flex-col gap-4">
+              <div class="flex flex-col flex-1 min-h-0">
+                <label class="block text-[14px] font-bold text-text-main mb-1.5"
                   >Foto de Inspiración</label
                 >
 
                 @if (!imagePreview) {
                   <label
-                    class="flex-1 flex flex-col items-center justify-center w-full px-4 transition bg-surface border-2 border-border-main/20 border-dashed rounded-2xl cursor-pointer hover:border-primary/40 hover:bg-primary/5 focus:outline-none"
+                    class="flex-1 flex flex-col items-center justify-center w-full px-4 transition bg-surface border-2 border-border-main/20 border-dashed rounded-2xl cursor-pointer hover:border-primary/40 hover:bg-primary/5 focus:outline-none min-h-[120px]"
                     [class.opacity-50]="isUploadingImage"
                     [class.cursor-not-allowed]="isUploadingImage"
                   >
                     <div class="flex flex-col items-center text-center">
                       @if (isUploadingImage) {
-                        <svg
-                          class="animate-spin h-8 w-8 text-primary mb-3"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            class="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            stroke-width="4"
-                          ></circle>
-                          <path
-                            class="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                          ></path>
-                        </svg>
                         <span class="text-[14px] font-bold text-text-main">Subiendo imagen...</span>
                       } @else {
                         <div
-                          class="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-3"
+                          class="w-10 h-10 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-2"
                         >
                           <svg
-                            class="w-6 h-6"
+                            class="w-5 h-5"
                             fill="none"
                             viewBox="0 0 24 24"
                             stroke="currentColor"
@@ -276,11 +255,8 @@
                             />
                           </svg>
                         </div>
-                        <span class="text-[14px] font-bold text-text-main"
+                        <span class="text-[13px] font-bold text-text-main"
                           >Haz clic para buscar</span
-                        >
-                        <span class="text-[12px] font-medium text-muted mt-1"
-                          >Soporta JPG, PNG o WEBP</span
                         >
                       }
                     </div>
@@ -294,7 +270,7 @@
                   </label>
                 } @else {
                   <div
-                    class="flex-1 relative w-full rounded-2xl border border-border-main/20 overflow-hidden group"
+                    class="flex-1 relative w-full rounded-2xl border border-border-main/20 overflow-hidden group min-h-[120px]"
                   >
                     <img
                       [src]="imagePreview"
@@ -302,15 +278,15 @@
                       class="w-full h-full object-cover absolute inset-0"
                     />
                     <div
-                      class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-sm"
+                      class="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center backdrop-blur-sm cursor-pointer"
+                      (click)="removeImage()"
                     >
                       <button
                         type="button"
-                        (click)="removeImage()"
-                        class="bg-white/10 hover:bg-danger text-white border border-white/20 px-4 py-2 rounded-xl text-[13px] font-bold flex items-center gap-2 transition-colors shadow-xl backdrop-blur-md"
+                        class="bg-white/10 hover:bg-danger text-white border border-white/20 px-3 py-1.5 rounded-lg text-[12px] font-bold flex items-center gap-2 transition-colors shadow-xl backdrop-blur-md cursor-pointer"
                       >
                         <svg
-                          class="w-4 h-4"
+                          class="w-3.5 h-3.5"
                           fill="none"
                           viewBox="0 0 24 24"
                           stroke="currentColor"
@@ -328,8 +304,12 @@
                   </div>
                 }
               </div>
+
               <div>
-                <label for="estimatedTime" class="block text-[14px] font-bold text-text-main mb-2">
+                <label
+                  for="estimatedTime"
+                  class="block text-[14px] font-bold text-text-main mb-1.5"
+                >
                   Tiempo estimado <span class="text-muted font-normal">(en minutos, opcional)</span>
                 </label>
                 <div class="relative">
@@ -339,7 +319,7 @@
                     formControlName="estimatedTime"
                     placeholder="Ej: 120"
                     min="1"
-                    class="w-full h-12 pl-4 pr-12 rounded-xl border border-border-main/20 bg-surface text-[15px] text-text-main outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-medium placeholder:text-muted/50"
+                    class="w-full h-10 pl-4 pr-12 rounded-xl border border-border-main/20 bg-surface text-[14px] text-text-main outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-medium placeholder:text-muted/50"
                   />
                   <span
                     class="absolute right-4 top-1/2 -translate-y-1/2 text-muted text-[13px] font-bold pointer-events-none"
@@ -348,33 +328,34 @@
                   </span>
                 </div>
               </div>
+
               <div>
-                <label for="description" class="block text-[14px] font-bold text-text-main mb-2"
+                <label for="description" class="block text-[14px] font-bold text-text-main mb-1.5"
                   >Descripción o Notas</label
                 >
                 <textarea
                   id="description"
                   formControlName="description"
-                  placeholder="Añade aquí las medidas iniciales, ideas de fornituras o recordatorios..."
-                  rows="4"
-                  class="w-full p-4 text-[14px] rounded-xl border border-border-main/20 bg-surface text-text-main outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all resize-none placeholder:text-muted/50 font-medium custom-scrollbar"
+                  placeholder="Añade aquí medidas iniciales o ideas..."
+                  rows="2"
+                  class="w-full p-3 text-[14px] rounded-xl border border-border-main/20 bg-surface text-text-main outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all resize-none placeholder:text-muted/50 font-medium custom-scrollbar"
                 ></textarea>
               </div>
 
-              <div class="mt-auto pt-4 border-t border-border-main/10">
+              <div class="mt-auto pt-3 border-t border-border-main/10">
                 <label
-                  class="flex items-center justify-between p-4 rounded-xl border border-border-main/20 bg-surface cursor-pointer hover:border-primary/40 transition-colors group"
+                  class="flex items-center justify-between p-3 rounded-xl border border-border-main/20 bg-surface cursor-pointer hover:border-primary/40 transition-colors group"
                 >
                   <div class="flex flex-col">
-                    <span class="text-[14px] text-text-main font-bold">Proyecto Público</span>
-                    <span class="text-[12px] text-muted font-medium"
-                      >Otros usuarios podrán ver tu diseño</span
+                    <span class="text-[13px] text-text-main font-bold">Proyecto Público</span>
+                    <span class="text-[11px] text-muted font-medium"
+                      >Otros usuarios podrán verlo</span
                     >
                   </div>
                   <div class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" formControlName="isPublic" class="sr-only peer" />
                     <div
-                      class="w-11 h-6 bg-border-main/30 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary shadow-inner"
+                      class="w-10 h-5 bg-border-main/30 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary shadow-inner"
                     ></div>
                   </div>
                 </label>
@@ -397,7 +378,7 @@
             <button
               type="button"
               (click)="addMaterial()"
-              class="text-primary text-[14px] font-bold flex items-center gap-1.5 bg-primary/10 hover:bg-primary/20 px-4 py-2.5 rounded-xl transition-colors shrink-0"
+              class="cursor-pointer text-primary text-[14px] font-bold flex items-center gap-1.5 bg-primary/10 hover:bg-primary/20 px-4 py-2.5 rounded-xl transition-colors shrink-0"
             >
               <svg
                 class="w-4 h-4"
@@ -412,9 +393,9 @@
             </button>
           </div>
 
-          <div class="mb-6 p-4 rounded-xl bg-surface border border-border-main/10 shrink-0">
+          <div class="mb-4 p-4 rounded-xl bg-surface border border-border-main/10 shrink-0">
             <h4
-              class="text-[12px] font-bold text-text-main uppercase tracking-wider mb-3 flex items-center gap-2"
+              class="text-[12px] font-bold text-text-main uppercase tracking-wider mb-2.5 flex items-center gap-2"
             >
               <svg class="w-4 h-4 text-warning" fill="currentColor" viewBox="0 0 24 24">
                 <path
@@ -423,12 +404,12 @@
               </svg>
               Sugerencias rápidas
             </h4>
-            <div class="flex flex-wrap gap-2.5">
+            <div class="flex flex-wrap gap-2">
               @for (mat of popularMaterials; track mat.name) {
                 <button
                   type="button"
                   (click)="addPredefinedMaterial(mat.name, mat.defaultQuantity)"
-                  class="group flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-bold border border-border-main/15 bg-bg text-muted hover:text-primary hover:border-primary/40 hover:bg-primary/5 transition-all shadow-sm"
+                  class="cursor-pointer group flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[13px] font-bold border border-border-main/15 bg-bg text-muted hover:text-primary hover:border-primary/40 hover:bg-primary/5 transition-all shadow-sm"
                   title="Añadir {{ mat.name }}"
                 >
                   <svg
@@ -450,10 +431,7 @@
             </div>
           </div>
 
-          <div
-            formArrayName="materials"
-            class="space-y-3 overflow-y-auto custom-scrollbar flex-1 pb-2"
-          >
+          <div formArrayName="materials" class="space-y-3 flex-1 pb-2">
             @for (material of materials.controls; track $index) {
               <div
                 [formGroupName]="$index"
@@ -491,7 +469,7 @@
                 <button
                   type="button"
                   (click)="removeMaterial($index)"
-                  class="w-full sm:w-11 h-11 shrink-0 flex items-center justify-center rounded-lg border border-danger/20 text-danger hover:bg-danger hover:text-white transition-all outline-none mt-2 sm:mt-0"
+                  class="cursor-pointer w-full sm:w-11 h-11 shrink-0 flex items-center justify-center rounded-lg border border-danger/20 text-danger hover:bg-danger hover:text-white transition-all outline-none mt-2 sm:mt-0"
                   title="Eliminar este material"
                 >
                   <span class="sm:hidden font-bold text-[13px] mr-2">Eliminar material</span>
@@ -511,48 +489,19 @@
                 </button>
               </div>
             }
-
-            @if (materials.length === 0) {
-              <div
-                class="flex flex-col items-center justify-center py-10 bg-surface rounded-2xl border-2 border-dashed border-border-main/20 text-center"
-              >
-                <div
-                  class="w-12 h-12 bg-border-main/10 rounded-full flex items-center justify-center text-muted mb-3"
-                >
-                  <svg
-                    class="w-6 h-6"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"
-                    />
-                  </svg>
-                </div>
-                <h4 class="font-bold text-text-main text-[15px] mb-1">Sin materiales añadidos</h4>
-                <p class="text-[13px] font-medium text-muted max-w-sm mx-auto">
-                  Selecciona una de las sugerencias de arriba o añade tus propios materiales
-                  manualmente.
-                </p>
-              </div>
-            }
           </div>
         </div>
       </form>
     </div>
 
     <footer
-      class="px-6 md:px-8 py-5 border-t border-border-main/10 bg-surface rounded-b-[28px] flex items-center justify-between shrink-0"
+      class="px-6 md:px-8 py-4 border-t border-border-main/10 bg-surface rounded-b-[28px] flex items-center justify-between shrink-0"
     >
       @if (currentStep === 1) {
         <button
           type="button"
           (click)="closeModal()"
-          class="px-6 py-2.5 rounded-xl text-[15px] font-bold text-muted hover:bg-danger/10 hover:text-danger transition-colors outline-none"
+          class="cursor-pointer px-6 py-2 rounded-xl text-[14px] font-bold text-muted hover:bg-danger/10 hover:text-danger transition-colors outline-none"
         >
           Cancelar
         </button>
@@ -560,7 +509,7 @@
         <button
           type="button"
           (click)="previousStep()"
-          class="px-6 py-2.5 rounded-xl text-[15px] font-bold text-text-main bg-surface-hover border border-border-main/10 hover:bg-border-main/20 flex items-center gap-2 transition-colors outline-none"
+          class="cursor-pointer px-6 py-2 rounded-xl text-[14px] font-bold text-text-main bg-surface-hover border border-border-main/10 hover:bg-border-main/20 flex items-center gap-2 transition-colors outline-none"
         >
           <svg
             class="w-4 h-4"
@@ -583,7 +532,7 @@
         <button
           type="button"
           (click)="nextStep()"
-          class="btn btn-primary px-8 py-3 text-[15px] font-bold flex items-center gap-2 shadow-lg hover:shadow-primary/25 hover:-translate-y-0.5 transition-all"
+          class="cursor-pointer btn btn-primary px-8 py-2.5 text-[14px] font-bold flex items-center gap-2 shadow-md hover:shadow-primary/25 hover:-translate-y-0.5 transition-all"
         >
           Siguiente
           <svg
@@ -605,42 +554,9 @@
           type="submit"
           form="projectForm"
           [disabled]="projectForm.invalid || isLoading"
-          class="btn btn-primary px-8 py-3 text-[15px] font-bold flex items-center justify-center min-w-40 shadow-lg hover:shadow-primary/25 hover:-translate-y-0.5 transition-all disabled:hover:translate-y-0 disabled:shadow-none"
+          class="cursor-pointer btn btn-primary px-8 py-2.5 text-[14px] font-bold flex items-center justify-center min-w-[140px] shadow-md hover:shadow-primary/25 hover:-translate-y-0.5 transition-all disabled:hover:translate-y-0 disabled:shadow-none"
         >
-          @if (isLoading) {
-            <svg
-              class="animate-spin h-5 w-5 text-white mr-2"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-            >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
-            </svg>
-            Creando...
-          } @else {
-            <svg
-              class="w-5 h-5 mr-2"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2.5"
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
-            </svg>
-            Crear proyecto
-          }
+          Crear proyecto
         </button>
       }
     </footer>
