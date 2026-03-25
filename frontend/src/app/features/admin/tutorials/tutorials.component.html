@@ -123,3 +123,11 @@
     </table>
   </div>
 </div>
+
+<app-create-tutorial-modal
+  [isOpen]="isCreateModalOpen"
+  [isLoading]="isSavingTutorial"
+  (close)="isCreateModalOpen = false"
+  (save)="handleCreateTutorial($event)"
+>
+</app-create-tutorial-modal>
