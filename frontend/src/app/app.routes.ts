@@ -98,23 +98,37 @@ export const routes: Routes = [
   // Rutas de Administrador
   {
     path: 'admin',
-    loadComponent: () => import('./features/admin/admin-layout').then(m => m.AdminLayout),
+    loadComponent: () => import('./features/admin/admin-layout').then((m) => m.AdminLayout),
     canActivate: [adminGuard], // <-- ¡Protegido!
     children: [
       {
         path: 'dashboard',
-        loadComponent: () => import('./features/admin/dashboard/dashboard.component').then(m => m.DashboardComponent)
+        loadComponent: () =>
+          import('./features/admin/dashboard/dashboard.component').then(
+            (m) => m.DashboardComponent,
+          ),
       },
       {
         path: 'users',
-        loadComponent: () => import('./features/admin/users/users.component').then(m => m.UsersComponent)
+        loadComponent: () =>
+          import('./features/admin/users/users.component').then((m) => m.UsersComponent),
       },
       {
         path: 'tutorials',
-        loadComponent: () => import('./features/admin/tutorials/tutorials.component').then(m => m.TutorialsComponent)
+        loadComponent: () =>
+          import('./features/admin/tutorials/tutorials.component').then(
+            (m) => m.TutorialsComponent,
+          ),
       },
-      { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
-    ]
+      {
+        path: 'moderation',
+        loadComponent: () =>
+          import('./features/admin/moderation/moderation.component').then(
+            (m) => m.ModerationComponent,
+          ),
+      },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+    ],
   },
   // 4. Ruta comodín (Wildcard) para errores 404
   {
