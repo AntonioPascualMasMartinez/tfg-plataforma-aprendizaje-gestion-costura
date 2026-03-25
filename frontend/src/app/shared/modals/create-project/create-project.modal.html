@@ -122,7 +122,6 @@
                   </button>
                 </div>
               </div>
-
               <div>
                 <label class="block text-[14px] font-bold text-text-main mb-2">
                   Categoría <span class="text-danger">*</span>
@@ -329,7 +328,26 @@
                   </div>
                 }
               </div>
-
+              <div>
+                <label for="estimatedTime" class="block text-[14px] font-bold text-text-main mb-2">
+                  Tiempo estimado <span class="text-muted font-normal">(en minutos, opcional)</span>
+                </label>
+                <div class="relative">
+                  <input
+                    type="number"
+                    id="estimatedTime"
+                    formControlName="estimatedTime"
+                    placeholder="Ej: 120"
+                    min="1"
+                    class="w-full h-12 pl-4 pr-12 rounded-xl border border-border-main/20 bg-surface text-[15px] text-text-main outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all font-medium placeholder:text-muted/50"
+                  />
+                  <span
+                    class="absolute right-4 top-1/2 -translate-y-1/2 text-muted text-[13px] font-bold pointer-events-none"
+                  >
+                    min
+                  </span>
+                </div>
+              </div>
               <div>
                 <label for="description" class="block text-[14px] font-bold text-text-main mb-2"
                   >Descripción o Notas</label
@@ -439,10 +457,10 @@
             @for (material of materials.controls; track $index) {
               <div
                 [formGroupName]="$index"
-                class="flex items-center gap-3 bg-surface p-3 rounded-xl border border-border-main/20 shadow-sm animate-in slide-in-from-left-4 duration-200"
+                class="flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-surface p-3 rounded-xl border border-border-main/20 shadow-sm animate-in slide-in-from-left-4 duration-200"
               >
-                <div class="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div class="relative">
+                <div class="flex-1 w-full grid grid-cols-1 md:grid-cols-12 gap-3">
+                  <div class="relative md:col-span-5">
                     <label class="sr-only">Nombre del material</label>
                     <input
                       type="text"
@@ -451,7 +469,7 @@
                       class="w-full h-11 px-4 text-[14px] rounded-lg border border-border-main/20 bg-bg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium"
                     />
                   </div>
-                  <div class="relative">
+                  <div class="relative md:col-span-3">
                     <label class="sr-only">Cantidad</label>
                     <input
                       type="text"
@@ -460,13 +478,23 @@
                       class="w-full h-11 px-4 text-[14px] rounded-lg border border-border-main/20 bg-bg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium"
                     />
                   </div>
+                  <div class="relative md:col-span-4">
+                    <label class="sr-only">Notas</label>
+                    <input
+                      type="text"
+                      formControlName="notes"
+                      placeholder="Notas (ej: hilo torzal)"
+                      class="w-full h-11 px-4 text-[14px] rounded-lg border border-border-main/20 bg-bg outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all font-medium text-muted placeholder:text-muted/50"
+                    />
+                  </div>
                 </div>
                 <button
                   type="button"
                   (click)="removeMaterial($index)"
-                  class="w-11 h-11 shrink-0 flex items-center justify-center rounded-lg text-muted hover:bg-danger hover:text-white transition-all outline-none"
+                  class="w-full sm:w-11 h-11 shrink-0 flex items-center justify-center rounded-lg border border-danger/20 text-danger hover:bg-danger hover:text-white transition-all outline-none mt-2 sm:mt-0"
                   title="Eliminar este material"
                 >
+                  <span class="sm:hidden font-bold text-[13px] mr-2">Eliminar material</span>
                   <svg
                     class="w-5 h-5"
                     fill="none"

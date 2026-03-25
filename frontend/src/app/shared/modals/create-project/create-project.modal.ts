@@ -29,12 +29,10 @@ export class CreateProjectModal implements OnInit {
   currentStep = 1;
   totalSteps = 2;
 
-  // Opciones predefinidas
   readonly categories = ['Bolsos', 'Carteras', 'Monederos'];
   readonly difficulties = ['Fácil', 'Intermedio', 'Avanzado'];
   readonly statuses = ['Planificado', 'En curso', 'Pausado'];
 
-  // NUEVO: Materiales populares para sugerencias rápidas
   readonly popularMaterials = [
     { name: 'Hilo de poliéster', defaultQuantity: '1 bobina' },
     { name: 'Entretela termoadhesiva', defaultQuantity: '1/2 metro' },
@@ -49,6 +47,7 @@ export class CreateProjectModal implements OnInit {
     projectType: ['Nuevo', [Validators.required]],
     category: ['', [Validators.required]],
     difficulty: ['', [Validators.required]],
+    estimatedTime: [null, [Validators.min(1)]], // NUEVO: Tiempo estimado en minutos
     inspirationImageUrl: [null],
     description: [''],
     status: ['Planificado'],
@@ -74,15 +73,16 @@ export class CreateProjectModal implements OnInit {
     const materialForm = this.fb.group({
       name: ['', Validators.required],
       quantity: ['', Validators.required],
+      notes: [''], // NUEVO: Campo opcional para notas del material
     });
     this.materials.push(materialForm);
   }
 
-  // NUEVO: Método para añadir material desde las sugerencias
   addPredefinedMaterial(name: string, quantity: string) {
     const materialForm = this.fb.group({
       name: [name, Validators.required],
       quantity: [quantity, Validators.required],
+      notes: [''], // NUEVO: Campo opcional para notas del material
     });
     this.materials.push(materialForm);
   }
@@ -121,7 +121,16 @@ export class CreateProjectModal implements OnInit {
   }
 
   nextStep() {
-    const step1Controls = ['title', 'projectType', 'category', 'difficulty', 'status', 'isPublic'];
+    // ACTUALIZADO: Añadimos estimatedTime a las validaciones del paso 1 si fuera estricto, aunque es opcional
+    const step1Controls = [
+      'title',
+      'projectType',
+      'category',
+      'difficulty',
+      'status',
+      'isPublic',
+      'estimatedTime',
+    ];
     let isStep1Valid = true;
 
     step1Controls.forEach((controlName) => {
