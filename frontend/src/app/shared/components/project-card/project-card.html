@@ -34,7 +34,7 @@
       </div>
     }
 
-    <div class="absolute top-3 left-3 z-10">
+    <div class="absolute top-3 left-3 z-10 flex flex-col gap-2">
       <div
         class="flex items-center gap-1.5 px-2.5 py-1 bg-surface rounded-full shadow-sm border border-border-main/5"
       >
@@ -43,6 +43,28 @@
           {{ project.status || 'Planificado' }}
         </span>
       </div>
+
+      @if (isFromTutorial) {
+        <div
+          class="flex items-center gap-1 px-2.5 py-1 bg-primary/90 text-white rounded-full shadow-sm w-fit"
+          title="Creado desde un tutorial"
+        >
+          <svg
+            class="w-3 h-3"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+            />
+          </svg>
+          <span class="text-[9px] font-bold uppercase tracking-wide">Tutorial</span>
+        </div>
+      }
     </div>
 
     <div class="absolute top-3 right-3 z-10">
@@ -60,9 +82,23 @@
       <span class="text-[10px] font-bold text-primary uppercase tracking-widest">
         {{ project.category || 'Sin categoría' }}
       </span>
-      <span class="text-[11px] font-medium text-muted">
-        {{ project.createdAt | date: 'MMM d, yyyy' }}
-      </span>
+      <div class="flex items-center gap-2">
+        @if (project.estimatedTime) {
+          <span class="text-[11px] font-medium text-muted flex items-center gap-0.5">
+            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            {{ project.estimatedTime }} min
+          </span>
+        }
+        <span class="text-[11px] font-medium text-muted">
+          {{ project.createdAt | date: 'MMM d, yyyy' }}
+        </span>
+      </div>
     </div>
 
     <a [routerLink]="['/home/proyectos', project._id]" class="block mb-1.5 group/title">
@@ -84,7 +120,7 @@
       <div class="flex items-center gap-4">
         <div
           class="flex items-center gap-1.5 text-muted group-hover:text-text-main transition-colors"
-          title="Pasos del proyecto"
+          title="Progreso de pasos"
         >
           <svg
             class="w-4 h-4 text-primary/80"
@@ -99,15 +135,15 @@
               d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
             />
           </svg>
-          <span class="text-[12px] font-semibold"
-            >{{ project.steps.length || 0 }}
-            <span class="font-normal hidden sm:inline">pasos</span></span
-          >
+          <span class="text-[12px] font-semibold">
+            {{ completedSteps }}/{{ project.steps?.length || 0 }}
+            <span class="font-normal hidden sm:inline">pasos</span>
+          </span>
         </div>
 
         <div
           class="flex items-center gap-1.5 text-muted group-hover:text-text-main transition-colors"
-          title="Materiales necesarios"
+          title="Materiales adquiridos"
         >
           <svg
             class="w-4 h-4 text-primary/80"
@@ -122,10 +158,10 @@
               d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"
             />
           </svg>
-          <span class="text-[12px] font-semibold"
-            >{{ project.materials.length || 0 }}
-            <span class="font-normal hidden sm:inline">mat.</span></span
-          >
+          <span class="text-[12px] font-semibold">
+            {{ acquiredMaterials }}/{{ project.materials?.length || 0 }}
+            <span class="font-normal hidden sm:inline">mat.</span>
+          </span>
         </div>
       </div>
 

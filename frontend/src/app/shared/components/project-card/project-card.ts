@@ -1,14 +1,13 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Project } from '../../models/project.model';
-import { DatePipe, NgClass } from '@angular/common'; // Asegúrate de tener DatePipe aquí
+import { DatePipe, NgClass, NgIf } from '@angular/common';
 import { ConfirmModalComponent } from '../../modals/confirm-modal/confirm-modal.component';
 
 @Component({
   selector: 'app-project-card',
   standalone: true,
-  // ¡IMPORTANTE! Añade DatePipe a los imports
-  imports: [RouterLink, NgClass, ConfirmModalComponent, DatePipe],
+  imports: [RouterLink, NgClass, NgIf, ConfirmModalComponent, DatePipe],
   templateUrl: './project-card.html',
 })
 export class ProjectCardComponent {
@@ -28,7 +27,23 @@ export class ProjectCardComponent {
     return null;
   }
 
-  // Colores mejorados para dificultad con fondo suave y borde
+  // NUEVO: Verifica si viene de un tutorial
+  get isFromTutorial(): boolean {
+    return this.project.projectType === 'Comenzado desde Tutorial';
+  }
+
+  // NUEVO: Calcula pasos completados
+  get completedSteps(): number {
+    if (!this.project.steps) return 0;
+    return this.project.steps.filter((step) => step.status === 'Completado').length;
+  }
+
+  // NUEVO: Calcula materiales adquiridos
+  get acquiredMaterials(): number {
+    if (!this.project.materials) return 0;
+    return this.project.materials.filter((mat) => mat.isAcquired).length;
+  }
+
   get difficultyColorClass(): string {
     switch (this.project.difficulty) {
       case 'Fácil':
@@ -42,7 +57,6 @@ export class ProjectCardComponent {
     }
   }
 
-  // NUEVO: Configuración visual para el Estado del proyecto
   get statusConfig() {
     switch (this.project.status) {
       case 'En curso':
