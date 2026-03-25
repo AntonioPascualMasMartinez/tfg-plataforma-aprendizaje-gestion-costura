@@ -1,7 +1,13 @@
 import { HttpInterceptorFn } from '@angular/common/http';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const accessToken = localStorage.getItem('accessToken');
+  const platformId = inject(PLATFORM_ID);
+
+  // Solo leemos el localStorage si estamos en el navegador
+  const accessToken = isPlatformBrowser(platformId) ? localStorage.getItem('accessToken') : null;
+
   const isApiUrl = req.url.startsWith('http://localhost:3000') || req.url.includes('api/v1');
 
   if (accessToken && isApiUrl) {
@@ -12,6 +18,5 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     });
   }
 
-  // Pasamos la petición directamente. Si falla, el error.interceptor se encargará.
   return next(req);
 };

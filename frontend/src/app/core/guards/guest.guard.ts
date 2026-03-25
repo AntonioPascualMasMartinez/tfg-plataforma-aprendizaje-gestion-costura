@@ -10,11 +10,15 @@ export const guestGuard: CanActivateFn = (route, state) => {
     const token = localStorage.getItem('accessToken');
 
     if (token) {
-      // Si ya está logueado, lo mandamos a su home
-      router.navigate(['/home']);
-      return false;
+      // Miramos si la URL trae el parámetro de redirección
+      // 'route' nos da acceso a los queryParams de la ruta a la que intentamos entrar
+      const returnUrl = route.queryParams['returnUrl'] || '/home/inicio';
+
+      // Lo mandamos a la ruta original (o a inicio si no había ninguna)
+      return router.createUrlTree([returnUrl]);
     }
   }
 
-  return true; // Si es un visitante, le dejamos ver el login/landing
+  // Si no hay token o es el servidor, le dejamos ver la vista pública (login/landing)
+  return true;
 };
