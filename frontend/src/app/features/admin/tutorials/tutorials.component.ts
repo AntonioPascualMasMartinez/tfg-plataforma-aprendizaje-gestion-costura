@@ -1,24 +1,23 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core'; // <-- 1. Importar
 import { DatePipe } from '@angular/common';
 import { TutorialService } from '../../../core/services/tutorial.service';
 import { Tutorial, CreateTutorialPayload } from '../../../shared/models/tutorial.model';
-// Asegúrate de ajustar la ruta según dónde hayas guardado el componente del modal
 import { CreateTutorialModalComponent } from '../../../shared/modals/create-tutorial-modal/create-tutorial-modal.component';
 
 @Component({
   selector: 'app-admin-tutorials',
   standalone: true,
-  // AÑADIDO: Importamos el modal aquí
   imports: [DatePipe, CreateTutorialModalComponent],
   templateUrl: './tutorials.component.html',
 })
 export class TutorialsComponent implements OnInit {
   private tutorialService = inject(TutorialService);
+  private cdr = inject(ChangeDetectorRef); // <-- 2. Inyectar
 
   tutorials: Tutorial[] = [];
   isLoading = false;
   errorMessage = '';
-  successMessage = ''; // Añadido para dar feedback al usuario
+  successMessage = '';
 
   // Variables de paginación
   currentPage = 1;
@@ -37,6 +36,7 @@ export class TutorialsComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
+    this.cdr.detectChanges(); // <-- Actualizamos al inicio de la carga
 
     this.tutorialService.getCatalog(page, 10).subscribe({
       next: (response) => {
@@ -45,11 +45,13 @@ export class TutorialsComponent implements OnInit {
         this.totalPages = response.data.totalPages;
         this.totalDocs = response.data.totalDocs;
         this.isLoading = false;
+        this.cdr.detectChanges(); // <-- 3. Refrescar tabla de tutoriales
       },
       error: (err) => {
         console.error('Error al cargar tutoriales:', err);
         this.errorMessage = 'No se pudo cargar el catálogo de tutoriales.';
         this.isLoading = false;
+        this.cdr.detectChanges(); // <-- 3. Refrescar al fallar
       },
     });
   }
@@ -63,6 +65,7 @@ export class TutorialsComponent implements OnInit {
   handleCreateTutorial(payload: CreateTutorialPayload) {
     this.isSavingTutorial = true;
     this.errorMessage = '';
+    this.cdr.detectChanges(); // <-- Mostrar estado de carga en el modal
 
     this.tutorialService.createTutorial(payload).subscribe({
       next: (response) => {
@@ -70,13 +73,13 @@ export class TutorialsComponent implements OnInit {
         this.isCreateModalOpen = false;
         this.successMessage = '¡Tutorial creado con éxito!';
 
-        // Recargamos la primera página para ver el nuevo tutorial en la lista
-        this.loadTutorials(1);
+        this.loadTutorials(1); // La recarga interna llamará a su propio detectChanges
       },
       error: (err) => {
         console.error('Error al crear el tutorial:', err);
         this.isSavingTutorial = false;
         this.errorMessage = err.error?.message || 'Ocurrió un error al guardar el tutorial.';
+        this.cdr.detectChanges(); // <-- Mostrar mensaje de error en el modal
       },
     });
   }

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core'; // <-- 1. Importar
 import { UpperCasePipe } from '@angular/common';
 import { UserService } from '../../../core/services/user.service';
 import { User, Role } from '../../../shared/models/user.model';
@@ -12,6 +12,7 @@ import { ConfirmModalComponent } from '../../../shared/modals/confirm-modal/conf
 })
 export class UsersComponent implements OnInit {
   private userService = inject(UserService);
+  private cdr = inject(ChangeDetectorRef); // <-- 2. Inyectar
 
   users: User[] = [];
   isLoading = false;
@@ -38,18 +39,19 @@ export class UsersComponent implements OnInit {
   loadUsers() {
     this.isLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges(); // <-- Notificar inicio de carga
 
-    // Solicitamos la página 1 con un límite de 50 usuarios
     this.userService.getAllUsers(1, 50).subscribe({
       next: (response) => {
-        // Gracias a tus interfaces, TypeScript ya sabe que data tiene la propiedad 'docs'
         this.users = response.data.docs;
         this.isLoading = false;
+        this.cdr.detectChanges(); // <-- 3. Refrescar lista de usuarios
       },
       error: (err) => {
         console.error('Error al cargar usuarios:', err);
         this.errorMessage = 'No se pudieron cargar los usuarios.';
         this.isLoading = false;
+        this.cdr.detectChanges(); // <-- 3. Refrescar tras error
       },
     });
   }
@@ -63,7 +65,7 @@ export class UsersComponent implements OnInit {
     this.modalTitle = 'Cambiar Rol de Usuario';
     this.modalMessage = `¿Estás seguro de cambiar el rol de ${user.displayName} a ${this.pendingRole}?`;
     this.modalConfirmText = 'Sí, cambiar rol';
-    this.isModalDestructive = false; 
+    this.isModalDestructive = false;
     this.isModalOpen = true;
   }
 
@@ -78,7 +80,7 @@ export class UsersComponent implements OnInit {
     this.modalTitle = this.pendingStatus ? 'Desbanear Usuario' : 'Banear Usuario';
     this.modalMessage = `¿Estás seguro de que deseas ${actionText} a ${user.displayName}?`;
     this.modalConfirmText = this.pendingStatus ? 'Sí, desbanear' : 'Sí, banear';
-    this.isModalDestructive = !this.pendingStatus; 
+    this.isModalDestructive = !this.pendingStatus;
     this.isModalOpen = true;
   }
 
@@ -88,16 +90,19 @@ export class UsersComponent implements OnInit {
 
     this.isModalLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges(); // <-- Actualiza estado del botón modal a "Cargando"
 
     if (this.pendingAction === 'role' && this.pendingRole) {
       this.userService.changeRole(this.selectedUser._id, this.pendingRole).subscribe({
         next: (response) => {
           this.selectedUser!.role = response.data.role;
           this.closeModal();
+          this.cdr.detectChanges(); // <-- 3. Actualizar fila tras cambio de rol
         },
         error: (err) => {
           this.errorMessage = err.error?.message || 'Hubo un error al cambiar el rol.';
           this.closeModal();
+          this.cdr.detectChanges(); // <-- Notificar error
         },
       });
     } else if (this.pendingAction === 'status' && this.pendingStatus !== null) {
@@ -105,10 +110,13 @@ export class UsersComponent implements OnInit {
         next: (response) => {
           this.selectedUser!.isActive = response.data.isActive;
           this.closeModal();
+          this.cdr.detectChanges(); // <-- 3. Actualizar fila tras banear/desbanear
         },
         error: (err) => {
-          this.errorMessage = err.error?.message || 'Hubo un error al cambiar el estado del usuario.';
+          this.errorMessage =
+            err.error?.message || 'Hubo un error al cambiar el estado del usuario.';
           this.closeModal();
+          this.cdr.detectChanges(); // <-- Notificar error
         },
       });
     }

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core'; // <-- 1. Importar
 import { DatePipe } from '@angular/common';
 import { CommunityService } from '../../../core/services/community.service';
 import { Report, ReportStatus } from '../../../shared/models/community.model';
@@ -12,6 +12,7 @@ import { ConfirmModalComponent } from '../../../shared/modals/confirm-modal/conf
 })
 export class ModerationComponent implements OnInit {
   private communityService = inject(CommunityService);
+  private cdr = inject(ChangeDetectorRef); // <-- 2. Inyectar
 
   reports: Report[] = [];
   isLoading = false;
@@ -38,16 +39,19 @@ export class ModerationComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
+    this.cdr.detectChanges(); // <-- Forzamos actualización al iniciar la carga
 
     this.communityService.getModerationQueue(page, 20).subscribe({
       next: (response) => {
         this.reports = response.data.docs;
         this.isLoading = false;
+        this.cdr.detectChanges(); // <-- 3. Actualizar al recibir datos
       },
       error: (err) => {
         console.error('Error al cargar reportes:', err);
         this.errorMessage = 'No se pudo cargar la cola de moderación.';
         this.isLoading = false;
+        this.cdr.detectChanges(); // <-- 3. Actualizar en caso de error
       },
     });
   }
@@ -58,7 +62,8 @@ export class ModerationComponent implements OnInit {
     this.selectedReport = report;
     this.pendingAction = 'dismiss';
     this.modalTitle = 'Desestimar Reporte';
-    this.modalMessage = '¿Estás seguro de que deseas ignorar este reporte? Se marcará como desestimado.';
+    this.modalMessage =
+      '¿Estás seguro de que deseas ignorar este reporte? Se marcará como desestimado.';
     this.modalConfirmText = 'Desestimar';
     this.isModalDestructive = false;
     this.isModalOpen = true;
@@ -78,7 +83,8 @@ export class ModerationComponent implements OnInit {
     this.selectedReport = report;
     this.pendingAction = 'delete_comment';
     this.modalTitle = 'Eliminar Comentario Reportado';
-    this.modalMessage = '¿Estás seguro de que deseas borrar este comentario de la plataforma? Esta acción no se puede deshacer y el reporte se marcará como revisado.';
+    this.modalMessage =
+      '¿Estás seguro de que deseas borrar este comentario de la plataforma? Esta acción no se puede deshacer y el reporte se marcará como revisado.';
     this.modalConfirmText = 'Sí, eliminar comentario';
     this.isModalDestructive = true;
     this.isModalOpen = true;
@@ -90,19 +96,21 @@ export class ModerationComponent implements OnInit {
     if (!this.selectedReport || !this.pendingAction) return;
     this.isModalLoading = true;
     this.errorMessage = '';
+    this.cdr.detectChanges(); // <-- Mostrar estado de carga en el modal
 
     if (this.pendingAction === 'dismiss' || this.pendingAction === 'review') {
-      const actionToTake: 'Reviewed' | 'Dismissed' = this.pendingAction === 'dismiss' ? 'Dismissed' : 'Reviewed';
-      
+      const actionToTake: 'Reviewed' | 'Dismissed' =
+        this.pendingAction === 'dismiss' ? 'Dismissed' : 'Reviewed';
+
       this.communityService.resolveReport(this.selectedReport._id, actionToTake).subscribe({
         next: (response) => {
           this.updateLocalReport(response.data);
           this.successMessage = `Reporte marcado como ${actionToTake}.`;
           this.closeModal();
+          this.cdr.detectChanges(); // <-- 3. Actualizar al finalizar la acción
         },
-        error: (err) => this.handleError(err)
+        error: (err) => this.handleError(err),
       });
-
     } else if (this.pendingAction === 'delete_comment') {
       // 1. Borramos el comentario
       this.communityService.adminDeleteComment(this.selectedReport.targetId).subscribe({
@@ -113,17 +121,18 @@ export class ModerationComponent implements OnInit {
               this.updateLocalReport(response.data);
               this.successMessage = 'Comentario eliminado y reporte resuelto.';
               this.closeModal();
+              this.cdr.detectChanges(); // <-- 3. Actualizar al finalizar la acción compleja
             },
-            error: (err) => this.handleError(err)
+            error: (err) => this.handleError(err),
           });
         },
-        error: (err) => this.handleError(err)
+        error: (err) => this.handleError(err),
       });
     }
   }
 
   private updateLocalReport(updatedReport: Report) {
-    const index = this.reports.findIndex(r => r._id === updatedReport._id);
+    const index = this.reports.findIndex((r) => r._id === updatedReport._id);
     if (index !== -1) {
       this.reports[index] = updatedReport;
     }
@@ -132,6 +141,7 @@ export class ModerationComponent implements OnInit {
   private handleError(err: any) {
     this.errorMessage = err.error?.message || 'Hubo un error al procesar la acción.';
     this.closeModal();
+    this.cdr.detectChanges(); // <-- Actualizar vista con el mensaje de error
   }
 
   closeModal() {

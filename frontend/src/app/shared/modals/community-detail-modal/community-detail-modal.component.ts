@@ -1,4 +1,12 @@
-import { Component, EventEmitter, Input, Output, OnInit, inject } from '@angular/core';
+import {
+  Component,
+  EventEmitter,
+  Input,
+  Output,
+  OnInit,
+  inject,
+  ChangeDetectorRef,
+} from '@angular/core'; // <-- 1. Importar ChangeDetectorRef
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -12,7 +20,7 @@ import {
 } from '../../../shared/models/community.model';
 import { User } from '../../../shared/models/user.model';
 
-import { ReportModalComponent } from '../report-modal/report-modal.component'; // Importar
+import { ReportModalComponent } from '../report-modal/report-modal.component';
 
 @Component({
   selector: 'app-community-detail-modal',
@@ -28,6 +36,7 @@ export class CommunityDetailModalComponent implements OnInit {
   private communityService = inject(CommunityService);
   private toastService = inject(ToastService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef); // <-- 2. Inyectar ChangeDetectorRef
 
   comments: Comment[] = [];
   newComment = '';
@@ -55,6 +64,8 @@ export class CommunityDetailModalComponent implements OnInit {
       this.isLoadingMoreComments = true;
     }
 
+    this.cdr.detectChanges(); // <-- Mostrar spinners/loaders inmediatamente
+
     this.communityService.getProjectComments(this.project._id, this.commentPage).subscribe({
       next: (res) => {
         if (reset) {
@@ -67,11 +78,14 @@ export class CommunityDetailModalComponent implements OnInit {
         this.hasMoreComments = res.data.hasNextPage;
         this.isLoadingComments = false;
         this.isLoadingMoreComments = false;
+
+        this.cdr.detectChanges(); // <-- 3. Renderizar la lista de comentarios
       },
       error: () => {
         this.isLoadingComments = false;
         this.isLoadingMoreComments = false;
         this.toastService.error('Error al cargar los comentarios');
+        this.cdr.detectChanges(); // <-- Quitar loaders si falla
       },
     });
   }
@@ -87,6 +101,8 @@ export class CommunityDetailModalComponent implements OnInit {
     if (!this.newComment.trim()) return;
 
     this.isSubmittingComment = true;
+    this.cdr.detectChanges(); // <-- Deshabilitar input y botón
+
     this.communityService.addComment(this.project._id, { content: this.newComment }).subscribe({
       next: (res) => {
         // Añadimos el comentario nuevo al principio de la lista
@@ -94,10 +110,13 @@ export class CommunityDetailModalComponent implements OnInit {
         this.newComment = '';
         this.isSubmittingComment = false;
         this.toastService.success('Comentario publicado');
+
+        this.cdr.detectChanges(); // <-- 3. Mostrar el nuevo comentario en la UI al instante
       },
       error: () => {
         this.isSubmittingComment = false;
         this.toastService.error('Error al publicar el comentario');
+        this.cdr.detectChanges(); // <-- Habilitar inputs de nuevo si falla
       },
     });
   }
@@ -106,18 +125,23 @@ export class CommunityDetailModalComponent implements OnInit {
     const wasLiked = this.project.isLikedLocally;
     this.project.isLikedLocally = !wasLiked;
     this.project.likesCount = (this.project.likesCount || 0) + (wasLiked ? -1 : 1);
+
     this.projectUpdated.emit(this.project);
+    this.cdr.detectChanges(); // <-- Actualizar el icono de corazón localmente rápido (Optimistic UI)
 
     this.communityService.likeProject(this.project._id).subscribe({
       next: (res) => {
         this.project.likesCount = res.data.likesCount;
         this.projectUpdated.emit(this.project);
+        this.cdr.detectChanges(); // <-- Por si el servidor devuelve un conteo distinto
       },
       error: () => {
+        // Revertimos en caso de error
         this.project.isLikedLocally = wasLiked;
         this.project.likesCount = (this.project.likesCount || 0) + (wasLiked ? 1 : -1);
         this.projectUpdated.emit(this.project);
         this.toastService.error('Error al procesar el Me gusta');
+        this.cdr.detectChanges(); // <-- Volver a pintar el corazón a su estado original
       },
     });
   }
@@ -128,18 +152,22 @@ export class CommunityDetailModalComponent implements OnInit {
       id: this.project._id,
       title: this.project.title,
     };
+    this.cdr.detectChanges(); // <-- Abrir modal de reporte
   }
 
-  // NUEVO: Método para reportar un comentario individual
   reportComment(comment: Comment) {
     this.reportingData = {
       type: 'Comment',
       id: comment._id,
       title: `Comentario de ${this.getAuthorName(comment.authorId)}`,
     };
+    this.cdr.detectChanges(); // <-- Abrir modal de reporte
   }
+
   startProject() {
     this.isCloning = true;
+    this.cdr.detectChanges(); // <-- Actualizar estado botón
+
     this.toastService.success('Proyecto añadido a tu colección.');
     this.closeModal();
   }
@@ -168,9 +196,11 @@ export class CommunityDetailModalComponent implements OnInit {
       next: () => {
         this.toastService.success('Reporte enviado correctamente.');
         this.reportingData = null; // Cerramos el modal de reporte
+        this.cdr.detectChanges(); // <-- Ocultar el modal de reporte en la UI
       },
       error: () => {
         this.toastService.error('Error al enviar el reporte.');
+        this.cdr.detectChanges();
       },
     });
   }
