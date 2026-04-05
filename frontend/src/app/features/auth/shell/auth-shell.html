@@ -1,16 +1,24 @@
 <main class="min-h-svh w-full flex bg-bg font-sans relative">
   <a
     routerLink="/"
-    class="absolute top-6 left-6 sm:top-8 sm:left-8 z-50 inline-flex items-center gap-2 font-display font-bold text-2xl hover:opacity-80 transition-opacity focus-visible:outline-focus rounded-lg text-text-main lg:text-white"
+    aria-label="Volver a la página de inicio"
+    class="group absolute top-6 left-6 sm:top-8 sm:left-8 z-50 inline-flex items-center gap-2.5 font-display font-bold bg-white text-black px-5 py-2.5 rounded-xl shadow-md hover:bg-gray-50 hover:shadow-lg transition-all duration-300 focus-visible:outline-focus"
   >
-    <div
-      class="w-8 h-8 rounded-lg bg-primary text-white flex items-center justify-center shadow-sm"
+    <svg
+      class="w-5 h-5 transition-transform duration-300 group-hover:-translate-x-1"
+      fill="none"
+      viewBox="0 0 24 24"
+      stroke="currentColor"
+      stroke-width="2.5"
     >
-      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-      </svg>
-    </div>
-    Needly
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"
+      />
+    </svg>
+
+    <span class="text-[17px] md:text-[18px] tracking-tight block"> Volver </span>
   </a>
 
   <div class="hidden lg:block lg:w-1/2 relative overflow-hidden bg-surface">
