@@ -133,7 +133,7 @@ export class Inicio implements OnInit {
 
   handleProjectCreated(project: Project) {
     this.isCreateModalOpen = false;
-    this.router.navigate(['/home/proyectos', project._id]);
+    this.router.navigate(['/home/proyectos', project._id, 'edit']);
   }
 
   handleProjectPublished(project: Project) {

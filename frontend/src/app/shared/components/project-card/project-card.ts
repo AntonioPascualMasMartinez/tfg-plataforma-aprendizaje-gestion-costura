@@ -97,4 +97,11 @@ export class ProjectCardComponent {
   cancelDelete() {
     this.showDeleteModal = false;
   }
+
+  get projectRoute(): string[] {
+    // Si es público, va a la vista de visualización/taller. Si es privado (borrador), va al editor.
+    return this.project.isPublic 
+      ? ['/home/proyectos', this.project._id] 
+      : ['/home/proyectos', this.project._id, 'edit'];
+  }
 }

@@ -2,7 +2,7 @@
   class="group flex flex-col h-full bg-surface rounded-[20px] border border-border-main/15 overflow-hidden transition-all duration-300 ease-out hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_12px_30px_-10px_rgba(255,89,0,0.12)] relative"
 >
   <a
-    [routerLink]="['/home/proyectos', project._id]"
+    [routerLink]="projectRoute"
     class="relative h-48 w-full bg-surface-hover overflow-hidden block shrink-0"
   >
     @if (coverImage) {
@@ -101,7 +101,7 @@
       </div>
     </div>
 
-    <a [routerLink]="['/home/proyectos', project._id]" class="block mb-1.5 group/title w-fit">
+    <a [routerLink]="projectRoute" class="block mb-1.5 group/title w-fit">
       <h3
         class="font-display font-bold text-text-main text-[19px] leading-tight group-hover/title:text-primary transition-colors line-clamp-1"
       >

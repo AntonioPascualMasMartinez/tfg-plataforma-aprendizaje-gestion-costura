@@ -151,7 +151,7 @@ export class Proyectos implements OnInit, OnDestroy {
 
   handleProjectCreated(project: Project) {
     this.isCreateModalOpen = false;
-    this.router.navigate(['/home/proyectos', project._id]);
+    this.router.navigate(['/home/proyectos', project._id, 'edit']);
   }
 
   deleteProject(id: string) {

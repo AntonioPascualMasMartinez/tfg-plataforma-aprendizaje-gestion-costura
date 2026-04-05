@@ -77,6 +77,11 @@ export const routes: Routes = [
       {
         path: 'proyectos/:id',
         loadComponent: () =>
+          import('./features/home/project-workshop/project-workshop').then((m) => m.ProjectWorkshop),
+      },
+      {
+        path: 'proyectos/:id/edit',
+        loadComponent: () =>
           import('./features/home/project-detail/project-detail').then((m) => m.ProjectDetail),
       },
       {
