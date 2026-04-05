@@ -8,7 +8,8 @@
     </div>
 
     <div class="h-fit hidden md:block">
-      <app-quick-actions (createClicked)="openCreateModal()"></app-quick-actions>
+      <app-quick-actions (createClicked)="openCreateModal()" (shareClicked)="openPublishModal()">
+      </app-quick-actions>
     </div>
   </div>
 
@@ -38,4 +39,11 @@
 
 @if (isTutorialModalOpen && selectedTutorial) {
   <app-tutorial-detail-modal [tutorial]="selectedTutorial" (close)="closeTutorialModal()" />
+}
+
+@if (isPublishModalOpen) {
+  <app-publish-project-modal
+    (close)="isPublishModalOpen = false"
+    (projectPublished)="handleProjectPublished($event)"
+  />
 }

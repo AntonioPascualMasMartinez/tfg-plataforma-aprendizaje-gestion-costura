@@ -1,0 +1,228 @@
+<div
+  class="fixed inset-0 z-50 flex items-center justify-center bg-text-main/40 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+>
+  <div
+    class="bg-surface w-full max-w-2xl rounded-[28px] shadow-2xl border border-border-main/10 flex flex-col max-h-[85vh] animate-in slide-in-from-bottom-8 duration-300"
+  >
+    <header class="px-6 md:px-8 py-5 border-b border-border-main/10 shrink-0">
+      <div class="flex items-center justify-between mb-2">
+        <div>
+          <h2 class="text-[24px] font-display font-bold text-text-main leading-none mb-2">
+            Publicar Proyecto
+          </h2>
+          <p class="text-[14px] font-medium text-muted">
+            Selecciona un diseño de tu taller para compartirlo con la comunidad.
+          </p>
+        </div>
+        <button
+          (click)="closeModal()"
+          class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-hover hover:bg-danger/10 text-muted hover:text-danger transition-colors outline-none cursor-pointer"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="p-5 md:p-6 flex-1 bg-surface/30 overflow-y-auto custom-scrollbar">
+      @if (errorMessage) {
+        <div
+          class="mb-4 p-3 rounded-xl bg-danger/10 border border-danger/20 text-danger text-[14px] font-bold flex items-center gap-3"
+        >
+          <svg
+            class="w-5 h-5 shrink-0"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+            />
+          </svg>
+          {{ errorMessage }}
+        </div>
+      }
+
+      @if (isLoading) {
+        <div class="flex flex-col items-center justify-center py-12 text-muted">
+          <svg class="w-8 h-8 animate-spin text-primary mb-3" fill="none" viewBox="0 0 24 24">
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          <p class="text-[14px] font-bold">Buscando tus proyectos privados...</p>
+        </div>
+      } @else if (privateProjects.length === 0) {
+        <div class="flex flex-col items-center justify-center py-12 text-center">
+          <div
+            class="w-16 h-16 bg-surface-hover rounded-full flex items-center justify-center mb-4 text-muted"
+          >
+            <svg
+              class="w-8 h-8"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z"
+              />
+            </svg>
+          </div>
+          <p class="text-[16px] font-bold text-text-main mb-1">No tienes borradores</p>
+          <p class="text-[14px] text-muted max-w-[280px]">
+            Todos tus proyectos ya son públicos o aún no has creado ninguno.
+          </p>
+        </div>
+      } @else {
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          @for (project of privateProjects; track project._id) {
+            <div
+              (click)="selectProject(project._id, isProjectReady(project))"
+              class="relative flex flex-col p-4 rounded-2xl border transition-all duration-200 group outline-none"
+              [ngClass]="{
+                'cursor-pointer hover:border-primary/50 bg-surface': isProjectReady(project),
+                'opacity-60 cursor-not-allowed bg-bg border-border-main/10':
+                  !isProjectReady(project),
+                'border-primary ring-2 ring-primary/20 bg-primary/5':
+                  selectedProjectId === project._id,
+                'border-border-main/20': selectedProjectId !== project._id,
+              }"
+            >
+              <div class="flex items-start gap-3">
+                <div
+                  class="w-12 h-12 rounded-xl overflow-hidden bg-surface-hover shrink-0 border border-border-main/10"
+                >
+                  @if (project.inspirationImageUrl) {
+                    <img
+                      [src]="project.inspirationImageUrl"
+                      class="w-full h-full object-cover"
+                      alt="miniatura"
+                    />
+                  } @else {
+                    <div class="w-full h-full flex items-center justify-center text-muted">
+                      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        />
+                      </svg>
+                    </div>
+                  }
+                </div>
+
+                <div class="flex-1 min-w-0">
+                  <h3 class="text-[14px] font-bold text-text-main truncate">{{ project.title }}</h3>
+                  <p class="text-[12px] font-medium text-muted">{{ project.category }}</p>
+
+                  <div class="mt-2 flex items-center gap-2">
+                    @if (!isProjectReady(project)) {
+                      <span
+                        class="inline-flex items-center text-[10px] font-bold text-warning bg-warning/10 px-2 py-0.5 rounded-md"
+                      >
+                        Incompleto (Faltan fotos o pasos)
+                      </span>
+                    } @else {
+                      <span
+                        class="inline-flex items-center text-[10px] font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded-md"
+                      >
+                        Listo para publicar
+                      </span>
+                    }
+                  </div>
+                </div>
+
+                @if (isProjectReady(project)) {
+                  <div
+                    class="w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors"
+                    [ngClass]="
+                      selectedProjectId === project._id
+                        ? 'border-primary bg-primary'
+                        : 'border-border-main/30 bg-surface group-hover:border-primary/50'
+                    "
+                  >
+                    @if (selectedProjectId === project._id) {
+                      <svg
+                        class="w-3 h-3 text-white"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        stroke-width="3"
+                      >
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    }
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+
+    <footer
+      class="px-6 md:px-8 py-4 border-t border-border-main/10 bg-surface rounded-b-[28px] flex items-center justify-between shrink-0"
+    >
+      <button
+        type="button"
+        (click)="closeModal()"
+        class="cursor-pointer px-6 py-2 rounded-xl text-[14px] font-bold text-muted hover:bg-danger/10 hover:text-danger transition-colors outline-none"
+      >
+        Cancelar
+      </button>
+
+      <button
+        type="button"
+        (click)="publishSelectedProject()"
+        [disabled]="!selectedProjectId || isPublishing"
+        class="cursor-pointer btn btn-primary px-8 py-2.5 text-[14px] font-bold flex items-center justify-center min-w-[160px] shadow-md hover:shadow-primary/25 hover:-translate-y-0.5 transition-all disabled:hover:translate-y-0 disabled:shadow-none disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        @if (isPublishing) {
+          <svg class="w-4 h-4 animate-spin mr-2" fill="none" viewBox="0 0 24 24">
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          Publicando...
+        } @else {
+          Publicar en la comunidad
+        }
+      </button>
+    </footer>
+  </div>
+</div>

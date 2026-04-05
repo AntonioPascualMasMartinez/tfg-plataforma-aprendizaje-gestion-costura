@@ -12,6 +12,7 @@ import { Tutorial } from '../../../shared/models/tutorial.model';
 // Modales
 import { CreateProjectModal } from '../../../shared/modals/create-project/create-project.modal';
 import { TutorialDetailModalComponent } from '../../../shared/modals/tutorial-detail-modal/tutorial-detail-modal.component';
+import { PublishProjectModal } from '../../../shared/modals/publish-project/publish-project.modal';
 
 // Nuevos Subcomponentes (Asumiendo que los crearás)
 import { MobileHeaderComponent } from './components/mobile-header/mobile-header.component';
@@ -26,6 +27,7 @@ import { RecommendedTutorialComponent } from './components/recommended-tutorial/
   imports: [
     CreateProjectModal,
     TutorialDetailModalComponent,
+    PublishProjectModal,
     MobileHeaderComponent,
     RecentProjectComponent,
     QuickActionsComponent,
@@ -56,6 +58,7 @@ export class Inicio implements OnInit {
   // Control de Modales
   isCreateModalOpen = false;
   isTutorialModalOpen = false;
+  isPublishModalOpen = false;
 
   ngOnInit() {
     this.loadUserData();
@@ -133,9 +136,17 @@ export class Inicio implements OnInit {
     this.router.navigate(['/home/proyectos', project._id]);
   }
 
+  handleProjectPublished(project: Project) {
+    this.isPublishModalOpen = false;
+    this.loadMyProjects(); 
+  }
   openTutorialModal(tutorial: Tutorial) {
     this.selectedTutorial = tutorial;
     this.isTutorialModalOpen = true;
+  }
+
+  openPublishModal() {
+    this.isPublishModalOpen = true;
   }
 
   closeTutorialModal() {

@@ -6,10 +6,15 @@ import { Component, EventEmitter, Output } from '@angular/core';
   templateUrl: './quick-actions.component.html',
 })
 export class QuickActionsComponent {
-  // Emite el evento hacia el padre (Inicio)
   @Output() createClicked = new EventEmitter<void>();
+
+  @Output() shareClicked = new EventEmitter<void>();
 
   onCreateClick() {
     this.createClicked.emit();
+  }
+
+  onShareClick() {
+    this.shareClicked.emit();
   }
 }
