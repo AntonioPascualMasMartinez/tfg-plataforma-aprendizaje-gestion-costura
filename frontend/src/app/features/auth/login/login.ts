@@ -26,6 +26,12 @@ export class Login implements OnInit {
     password: ['', [Validators.required, Validators.minLength(6)]],
   });
 
+  showPassword = false;
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+  
   isLoading = false;
   errorMessage = '';
 

@@ -32,6 +32,12 @@ export class Register implements OnInit {
     interests: [[]], // Array opcional
   });
 
+  showPassword = false;
+
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+  
   isLoading = false;
   errorMessage = '';
 
