@@ -1,7 +1,7 @@
 import { User } from './user.model';
 
 export type ProjectStatus = 'Planificado' | 'En curso' | 'Pausado' | 'Finalizado';
-export type ProjectType = 'Nuevo' | 'Comenzado desde Tutorial';
+export type ProjectType = 'Nuevo' | 'Comenzado desde Tutorial' | 'Adaptado de la Comunidad';
 export type ProjectDifficulty = 'Fácil' | 'Intermedio' | 'Avanzado';
 export type StepStatus = 'Pendiente' | 'Completado'; // <-- NUEVO
 
@@ -42,6 +42,8 @@ export interface Project {
   createdAt: string;
   updatedAt: string;
   likes?: string[];
+  originalProjectId?: string | null;
+  clonesCount?: number;             
 }
 
 export interface CreateProjectPayload {
@@ -57,6 +59,7 @@ export interface CreateProjectPayload {
   estimatedTime?: number | null;
   actualTime?: number | null;
   materials?: Omit<ProjectMaterial, '_id' | 'isAcquired'>[];
+  originalProjectId?: string | null;
 }
 
 export type UpdateProjectPayload = Partial<CreateProjectPayload>;

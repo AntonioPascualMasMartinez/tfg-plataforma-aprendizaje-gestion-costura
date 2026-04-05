@@ -22,6 +22,15 @@ class ProjectService {
       ...projectData,
       ownerId: userId,
     });
+    if (projectData.projectType === 'Adaptado de la Comunidad' && projectData.originalProjectId) {
+      try {
+        await Project.findByIdAndUpdate(projectData.originalProjectId, {
+          $inc: { clonesCount: 1 },
+        });
+      } catch (error) {
+        console.error('Error al incrementar clonesCount:', error);
+      }
+    }
     return project;
   }
 

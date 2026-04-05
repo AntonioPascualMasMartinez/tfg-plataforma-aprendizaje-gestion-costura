@@ -39,26 +39,34 @@
         (click)="closeModal()"
         class="absolute top-4 right-4 md:top-6 md:right-6 w-10 h-10 flex items-center justify-center rounded-full bg-surface/50 backdrop-blur-md border border-white/10 text-white hover:bg-danger/80 transition-colors shadow-lg cursor-pointer outline-none"
       >
-        <svg
-          class="w-5 h-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="black"
-          stroke-width="2.5"
-        >
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="black" stroke-width="2.5">
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
 
-      <div
-        class="absolute top-4 left-4 md:top-6 md:left-6 px-3 py-1.5 bg-surface/50 backdrop-blur-md border border-white/10 rounded-xl flex items-center gap-1.5 shadow-lg"
-      >
-        <svg class="w-4 h-4 text-rose-500 fill-rose-500" viewBox="0 0 24 24">
-          <path
-            d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z"
-          />
-        </svg>
-        <span class="text-black font-bold text-[13px]">{{ project.likesCount || 0 }}</span>
+      <div class="absolute top-4 left-4 md:top-6 md:left-6 flex gap-2">
+        <div
+          class="px-3 py-1.5 bg-surface/50 backdrop-blur-md border border-white/10 rounded-xl flex items-center gap-1.5 shadow-lg"
+        >
+          <svg class="w-4 h-4 text-rose-500 fill-rose-500" viewBox="0 0 24 24">
+            <path
+              d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z"
+            />
+          </svg>
+          <span class="text-white font-bold text-[13px]">{{ project.likesCount || 0 }}</span>
+        </div>
+
+        <div
+          class="px-3 py-1.5 bg-surface/50 backdrop-blur-md border border-white/10 rounded-xl flex items-center gap-1.5 shadow-lg"
+          title="Veces guardado en talleres"
+        >
+          <svg class="w-4 h-4 text-primary fill-primary" viewBox="0 0 24 24">
+            <path
+              d="M12 10.5v6m3-3H9m4.06-7.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"
+            />
+          </svg>
+          <span class="text-white font-bold text-[13px]">{{ project.clonesCount || 0 }}</span>
+        </div>
       </div>
     </div>
 

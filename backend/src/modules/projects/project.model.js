@@ -36,7 +36,7 @@ const projectSchema = new mongoose.Schema(
     },
     projectType: {
       type: String,
-      enum: ['Nuevo', 'Comenzado desde Tutorial'],
+      enum: ['Nuevo', 'Comenzado desde Tutorial', 'Adaptado de la Comunidad'],
       required: true,
     },
     category: {
@@ -91,6 +91,15 @@ const projectSchema = new mongoose.Schema(
     actualTime: {
       type: Number, // Minutos reales invertidos
       default: null, // <-- NUEVO (Req. 6)
+    },
+    originalProjectId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Project',
+      default: null,
+    },
+    clonesCount: {
+      type: Number,
+      default: 0,
     },
   },
   {

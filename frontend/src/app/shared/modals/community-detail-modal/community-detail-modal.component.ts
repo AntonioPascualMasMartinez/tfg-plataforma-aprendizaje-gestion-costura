@@ -92,13 +92,14 @@ export class CommunityDetailModalComponent implements OnInit {
     // Preparamos el payload base
     const createPayload: CreateProjectPayload = {
       title: this.project.title,
-      projectType: 'Comenzado desde Tutorial', // Marcamos el origen
+      projectType: 'Adaptado de la Comunidad',
+      originalProjectId: this.project._id,
       category: this.project.category,
       difficulty: this.project.difficulty,
       inspirationImageUrl: this.project.inspirationImageUrl,
       description: this.project.description,
       status: 'Planificado',
-      isPublic: false, // El clon siempre es privado al inicio
+      isPublic: false,
       materials: this.project.materials.map((m) => ({
         name: m.name,
         quantity: m.quantity,

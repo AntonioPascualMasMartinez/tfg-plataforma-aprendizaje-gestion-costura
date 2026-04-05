@@ -3,7 +3,9 @@ const Joi = require('joi');
 const projectValidator = {
   createProject: Joi.object({
     title: Joi.string().max(100).required(),
-    projectType: Joi.string().valid('Nuevo', 'Comenzado desde Tutorial').required(),
+    projectType: Joi.string().valid('Nuevo', 'Comenzado desde Tutorial', 'Adaptado de la Comunidad').required(),
+    originalProjectId: Joi.string().allow('', null).optional(),
+    clonesCount: Joi.number().min(0).optional(),
     category: Joi.string().required(),
     difficulty: Joi.string().valid('Fácil', 'Intermedio', 'Avanzado').required(),
     inspirationImageUrl: Joi.string().uri().allow('', null).optional(),
@@ -28,7 +30,9 @@ const projectValidator = {
 
   updateProject: Joi.object({
     title: Joi.string().max(100).optional(),
-    projectType: Joi.string().valid('Nuevo', 'Comenzado desde Tutorial').optional(),
+    projectType: Joi.string().valid('Nuevo', 'Comenzado desde Tutorial', 'Adaptado de la Comunidad').optional(),
+    originalProjectId: Joi.string().allow('', null).optional(),
+    clonesCount: Joi.number().min(0).optional(),
     category: Joi.string().optional(),
     difficulty: Joi.string().valid('Fácil', 'Intermedio', 'Avanzado').optional(),
     inspirationImageUrl: Joi.string().uri().allow('', null).optional(),
