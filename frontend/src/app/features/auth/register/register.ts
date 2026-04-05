@@ -28,7 +28,7 @@ export class Register implements OnInit {
     displayName: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
-    sewingLevel: [null], // Opcional
+    sewingLevel: ['Principiante'], // Opcional
     interests: [[]], // Array opcional
   });
 
@@ -37,7 +37,7 @@ export class Register implements OnInit {
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
   }
-  
+
   isLoading = false;
   errorMessage = '';
 
