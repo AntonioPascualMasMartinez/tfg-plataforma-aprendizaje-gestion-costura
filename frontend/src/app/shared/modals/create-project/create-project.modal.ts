@@ -44,14 +44,14 @@ export class CreateProjectModal implements OnInit {
 
   projectForm: FormGroup = this.fb.group({
     title: ['', [Validators.required, Validators.maxLength(100)]],
-    projectType: ['Nuevo', [Validators.required]],
+    projectType: ['Nuevo'], // Lo dejamos por defecto, el usuario ya no lo elige
     category: ['', [Validators.required]],
     difficulty: ['', [Validators.required]],
-    estimatedTime: [null, [Validators.min(1)]], // NUEVO: Tiempo estimado en minutos
+    estimatedTime: [null, [Validators.min(1)]],
     inspirationImageUrl: [null],
     description: [''],
     status: ['Planificado'],
-    isPublic: [true],
+    isPublic: [false], // Forzamos a que nazca como borrador (privado)
     materials: this.fb.array([]),
   });
 
@@ -121,16 +121,7 @@ export class CreateProjectModal implements OnInit {
   }
 
   nextStep() {
-    // ACTUALIZADO: Añadimos estimatedTime a las validaciones del paso 1 si fuera estricto, aunque es opcional
-    const step1Controls = [
-      'title',
-      'projectType',
-      'category',
-      'difficulty',
-      'status',
-      'isPublic',
-      'estimatedTime',
-    ];
+    const step1Controls = ['title', 'category', 'difficulty', 'status', 'estimatedTime'];
     let isStep1Valid = true;
 
     step1Controls.forEach((controlName) => {

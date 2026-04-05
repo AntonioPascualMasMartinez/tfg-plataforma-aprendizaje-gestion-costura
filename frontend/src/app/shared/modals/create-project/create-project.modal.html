@@ -98,41 +98,6 @@
                   "
                 />
               </div>
-
-              <div>
-                <label class="block text-[14px] font-bold text-text-main mb-1.5"
-                  >Origen del diseño</label
-                >
-                <div
-                  class="flex p-1 bg-surface-hover rounded-xl border border-border-main/10 relative"
-                >
-                  <button
-                    type="button"
-                    (click)="setControlValue('projectType', 'Nuevo')"
-                    class="flex-1 py-1.5 text-[13px] font-bold rounded-lg transition-all duration-300 z-10 cursor-pointer"
-                    [ngClass]="
-                      projectForm.get('projectType')?.value === 'Nuevo'
-                        ? 'bg-primary text-white shadow-md'
-                        : 'text-muted hover:text-text-main hover:bg-surface/50'
-                    "
-                  >
-                    Diseño Propio
-                  </button>
-                  <button
-                    type="button"
-                    (click)="setControlValue('projectType', 'Comenzado desde Tutorial')"
-                    class="flex-1 py-1.5 text-[13px] font-bold rounded-lg transition-all duration-300 z-10 cursor-pointer"
-                    [ngClass]="
-                      projectForm.get('projectType')?.value === 'Comenzado desde Tutorial'
-                        ? 'bg-primary text-white shadow-md'
-                        : 'text-muted hover:text-text-main hover:bg-surface/50'
-                    "
-                  >
-                    Desde Tutorial
-                  </button>
-                </div>
-              </div>
-
               <div>
                 <label class="block text-[14px] font-bold text-text-main mb-1.5">
                   Categoría <span class="text-danger">*</span>
@@ -340,25 +305,6 @@
                   rows="2"
                   class="w-full p-3 text-[14px] rounded-xl border border-border-main/20 bg-surface text-text-main outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all resize-none placeholder:text-muted/50 font-medium custom-scrollbar"
                 ></textarea>
-              </div>
-
-              <div class="mt-auto pt-3 border-t border-border-main/10">
-                <label
-                  class="flex items-center justify-between p-3 rounded-xl border border-border-main/20 bg-surface cursor-pointer hover:border-primary/40 transition-colors group"
-                >
-                  <div class="flex flex-col">
-                    <span class="text-[13px] text-text-main font-bold">Proyecto Público</span>
-                    <span class="text-[11px] text-muted font-medium"
-                      >Otros usuarios podrán verlo</span
-                    >
-                  </div>
-                  <div class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" formControlName="isPublic" class="sr-only peer" />
-                    <div
-                      class="w-10 h-5 bg-border-main/30 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary shadow-inner"
-                    ></div>
-                  </div>
-                </label>
               </div>
             </div>
           </div>
