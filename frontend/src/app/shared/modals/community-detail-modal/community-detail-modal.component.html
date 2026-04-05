@@ -1,10 +1,10 @@
 <div
-  class="fixed inset-0 z-100 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 animate-in fade-in duration-200"
+  class="fixed inset-0 z-100 flex items-end md:items-center justify-center bg-text-main/60 backdrop-blur-sm md:p-4 animate-in fade-in duration-300"
 >
   <div
-    class="bg-surface w-full max-w-4xl rounded-[28px] shadow-2xl border border-border-main/10 flex flex-col max-h-[90vh] overflow-hidden animate-in slide-in-from-bottom-8 duration-300"
+    class="bg-surface w-full max-w-3xl rounded-t-[32px] md:rounded-[32px] shadow-2xl border border-border-main/10 flex flex-col h-[92vh] md:max-h-[85vh] overflow-hidden animate-in slide-in-from-bottom-full md:slide-in-from-bottom-8 duration-300"
   >
-    <div class="relative h-48 md:h-56 shrink-0 bg-surface-hover w-full">
+    <div class="relative h-56 md:h-72 shrink-0 bg-surface-hover w-full group">
       @if (project.inspirationImageUrl) {
         <img
           [src]="project.inspirationImageUrl"
@@ -12,67 +12,160 @@
           class="w-full h-full object-cover"
         />
         <div
-          class="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent"
+          class="absolute inset-0 bg-linear-to-t from-surface via-surface/40 to-transparent"
         ></div>
       } @else {
         <div
           class="w-full h-full bg-linear-to-br from-surface to-primary/10 flex items-center justify-center"
         >
-          <span class="text-primary/30">Sin imagen de portada</span>
+          <svg
+            class="w-16 h-16 text-primary/20"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="1.5"
+              d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"
+            />
+          </svg>
         </div>
+        <div class="absolute inset-0 bg-linear-to-t from-surface to-transparent"></div>
       }
 
       <button
         (click)="closeModal()"
-        class="absolute top-4 right-4 w-10 h-10 flex items-center justify-center rounded-full bg-black/40 text-white hover:bg-black/60 backdrop-blur-md transition-colors outline-none border border-white/10"
+        class="absolute top-4 right-4 md:top-6 md:right-6 w-10 h-10 flex items-center justify-center rounded-full bg-surface/50 backdrop-blur-md border border-white/10 text-white hover:bg-danger/80 transition-colors shadow-lg cursor-pointer outline-none"
       >
         <svg
           class="w-5 h-5"
           fill="none"
           viewBox="0 0 24 24"
-          stroke="currentColor"
+          stroke="black"
           stroke-width="2.5"
         >
           <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
 
-      <div class="absolute bottom-4 left-6 flex items-center gap-3">
-        <span
-          class="px-3 py-1.5 bg-surface/90 text-text-main text-[11px] font-bold rounded-full shadow-sm uppercase tracking-wider backdrop-blur-md"
-        >
-          {{ project.category || 'Costura' }}
-        </span>
-        <span
-          class="px-3 py-1.5 bg-surface/90 text-text-main text-[11px] font-bold rounded-full shadow-sm uppercase tracking-wider backdrop-blur-md"
-        >
-          {{ project.difficulty || 'No especificada' }}
-        </span>
+      <div
+        class="absolute top-4 left-4 md:top-6 md:left-6 px-3 py-1.5 bg-surface/50 backdrop-blur-md border border-white/10 rounded-xl flex items-center gap-1.5 shadow-lg"
+      >
+        <svg class="w-4 h-4 text-rose-500 fill-rose-500" viewBox="0 0 24 24">
+          <path
+            d="M11.645 20.91l-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.219l-.022.012-.007.004-.003.001a.752.752 0 01-.704 0l-.003-.001z"
+          />
+        </svg>
+        <span class="text-black font-bold text-[13px]">{{ project.likesCount || 0 }}</span>
       </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto custom-scrollbar bg-surface flex flex-col md:flex-row">
-      <div class="p-6 md:p-8 flex-1 border-r border-border-main/10">
-        <div class="flex items-center justify-between mb-4">
-          <div class="flex items-center gap-3">
-            <img
-              [src]="getAuthorAvatar(project.ownerId)"
-              alt="Avatar"
-              class="w-10 h-10 rounded-full object-cover border border-border-main/20 bg-bg"
-            />
-            <div class="flex flex-col">
-              <span class="text-[14px] font-bold text-text-main">{{
-                getAuthorName(project.ownerId)
-              }}</span>
-              <span class="text-[12px] text-muted">Autor del proyecto</span>
-            </div>
-          </div>
+    <div class="flex-1 overflow-y-auto custom-scrollbar relative z-10 -mt-12 md:-mt-16">
+      <div class="px-6 md:px-10 pt-4 pb-6">
+        <h2
+          class="text-[26px] md:text-[32px] font-display font-bold text-text-main leading-tight mb-4 drop-shadow-sm"
+        >
+          {{ project.title }}
+        </h2>
 
-          <button
-            (click)="reportProject()"
-            class="text-muted hover:text-danger p-2 rounded-full hover:bg-danger/10 transition-colors"
-            title="Reportar"
+        <div class="flex items-center gap-3">
+          <img
+            [src]="getAuthorAvatar(project.ownerId)"
+            alt="Autor"
+            class="w-10 h-10 rounded-full border-2 border-surface shadow-sm object-cover"
+          />
+          <div>
+            <p class="text-[12px] font-semibold text-muted uppercase tracking-wider">
+              Patrón original de
+            </p>
+            <p class="text-[15px] font-bold text-text-main">{{ getAuthorName(project.ownerId) }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex flex-wrap gap-2 px-6 md:px-10 pb-6 border-b border-border-main/10">
+        <span
+          class="px-3 py-1.5 bg-bg border border-border-main/15 text-[12px] font-bold rounded-lg text-text-main flex items-center gap-1.5 shadow-sm"
+        >
+          <svg class="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"
+            />
+          </svg>
+          {{ project.category }}
+        </span>
+        <span
+          class="px-3 py-1.5 bg-bg border border-border-main/15 text-[12px] font-bold rounded-lg flex items-center gap-1.5 shadow-sm"
+          [ngClass]="{
+            'text-emerald-600': project.difficulty === 'Fácil',
+            'text-amber-600': project.difficulty === 'Intermedio',
+            'text-rose-600': project.difficulty === 'Avanzado',
+          }"
+        >
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            />
+          </svg>
+          {{ project.difficulty }}
+        </span>
+        @if (project.estimatedTime) {
+          <span
+            class="px-3 py-1.5 bg-bg border border-border-main/15 text-[12px] font-bold rounded-lg text-text-main flex items-center gap-1.5 shadow-sm"
           >
+            <svg class="w-4 h-4 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            ~{{ project.estimatedTime }} min
+          </span>
+        }
+        <span
+          class="px-3 py-1.5 bg-bg border border-border-main/15 text-[12px] font-bold rounded-lg text-text-main flex items-center gap-1.5 shadow-sm ml-auto"
+        >
+          <svg class="w-4 h-4 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
+            />
+          </svg>
+          {{ project.steps?.length || 0 }} Pasos
+        </span>
+      </div>
+
+      <div class="px-6 md:px-10 py-6">
+        <h3 class="text-[18px] font-bold text-text-main mb-3">Sobre este diseño</h3>
+        <p class="text-[15px] text-muted leading-relaxed whitespace-pre-wrap font-medium">
+          {{
+            project.description ||
+              'El autor no ha proporcionado una descripción adicional para este proyecto.'
+          }}
+        </p>
+      </div>
+
+      <div class="px-6 md:px-10 pb-8">
+        <div
+          class="bg-primary/5 rounded-[20px] p-6 border border-primary/15 relative overflow-hidden"
+        >
+          <div
+            class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2 pointer-events-none"
+          ></div>
+
+          <h3 class="text-[16px] font-bold text-primary mb-4 flex items-center gap-2">
             <svg
               class="w-5 h-5"
               fill="none"
@@ -83,169 +176,161 @@
               <path
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                d="M3 3v1.5M3 21v-6m0 0l2.77-.693a9 9 0 016.208.682l.108.054a9 9 0 006.086.71l3.114-.732a48.524 48.524 0 01-.005-10.499l-3.11.732a9 9 0 01-6.085-.711l-.108-.054a9 9 0 00-6.208-.682L3 4.5M3 15V4.5"
+                d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007z"
               />
             </svg>
-          </button>
+            Materiales que necesitarás
+          </h3>
+
+          <ul class="space-y-3 relative z-10">
+            @for (mat of project.materials; track mat._id || mat.name) {
+              <li class="flex items-start gap-3">
+                <div class="w-1.5 h-1.5 rounded-full bg-primary/40 mt-2 shrink-0"></div>
+                <div class="flex-1">
+                  <p class="text-[14px] text-text-main font-semibold">
+                    {{ mat.quantity }} <span class="font-bold">{{ mat.name }}</span>
+                  </p>
+                  @if (mat.notes) {
+                    <p class="text-[12px] text-muted font-medium mt-0.5">{{ mat.notes }}</p>
+                  }
+                </div>
+              </li>
+            }
+            @if (!project.materials?.length) {
+              <li class="text-[14px] text-muted italic">No se han especificado materiales.</li>
+            }
+          </ul>
         </div>
-
-        <h2 class="font-display font-bold text-text-main text-2xl md:text-3xl leading-tight mb-4">
-          {{ project.title }}
-        </h2>
-
-        <p class="text-[15px] text-muted leading-relaxed whitespace-pre-line">
-          {{
-            project.description ||
-              'El autor no ha proporcionado una descripción detallada para este proyecto.'
-          }}
-        </p>
       </div>
 
-      <div
-        class="w-full md:w-80 shrink-0 bg-surface flex flex-col h-full max-h-[400px] md:max-h-full"
-      >
-        <div
-          class="p-4 border-b border-border-main/10 flex items-center justify-between bg-surface-hover/30"
-        >
-          <h3 class="font-bold text-text-main">Comentarios ({{ comments.length }})</h3>
-          <button
-            (click)="toggleLike()"
-            class="flex items-center gap-2 px-3 py-1.5 rounded-xl hover:bg-like/10 transition-colors"
-          >
-            <svg
-              class="w-6 h-6 transition-colors"
-              [class.text-like]="project.isLikedLocally"
-              [class.fill-like]="project.isLikedLocally"
-              [class.text-muted]="!project.isLikedLocally"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
-              />
-            </svg>
-            <span
-              class="font-bold"
-              [class.text-like]="project.isLikedLocally"
-              [class.text-muted]="!project.isLikedLocally"
-            >
-              {{ project.likesCount }}
-            </span>
-          </button>
+      <div class="px-6 md:px-10 pb-10 border-t border-border-main/10 pt-8 bg-bg/50">
+        <div class="flex items-center justify-between mb-6">
+          <h3 class="text-[18px] font-bold text-text-main">Valoraciones ({{ totalComments }})</h3>
         </div>
 
-        <div class="flex-1 overflow-y-auto p-4 space-y-4">
-          @if (isLoadingComments) {
-            <div class="text-center text-muted text-sm py-4">Cargando comentarios...</div>
-          } @else if (comments.length === 0) {
-            <div class="text-center text-muted text-sm py-4">Sé el primero en comentar.</div>
-          } @else {
+        @if (isLoadingComments) {
+          <div class="space-y-4 animate-pulse">
+            <div class="flex gap-3">
+              <div class="w-10 h-10 rounded-full bg-border-main/10 shrink-0"></div>
+              <div class="flex-1 space-y-2">
+                <div class="h-4 bg-border-main/10 w-1/4 rounded"></div>
+                <div class="h-10 bg-border-main/10 w-full rounded"></div>
+              </div>
+            </div>
+          </div>
+        } @else if (comments.length > 0) {
+          <div class="space-y-5">
             @for (comment of comments; track comment._id) {
-              <div class="flex gap-3 group/comment relative">
+              <div class="flex gap-3.5 group">
                 <img
                   [src]="getAuthorAvatar(comment.authorId)"
-                  class="w-8 h-8 rounded-full border border-border-main/20 shrink-0"
+                  alt="Avatar"
+                  class="w-10 h-10 rounded-full bg-surface object-cover shrink-0 border border-border-main/10"
                 />
-                <div class="flex-1">
-                  <div
-                    class="bg-surface-hover p-3 rounded-2xl rounded-tl-none border border-border-main/5 inline-block"
-                  >
-                    <span class="text-[12px] font-bold text-text-main block mb-1">{{
+                <div
+                  class="flex-1 bg-surface border border-border-main/10 p-3.5 rounded-2xl rounded-tl-none shadow-sm relative"
+                >
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="text-[13px] font-bold text-text-main">{{
                       getAuthorName(comment.authorId)
                     }}</span>
-                    <p class="text-[14px] text-muted">{{ comment.content }}</p>
+                    <button
+                      (click)="openReportModal(comment, 'Comment')"
+                      class="text-muted hover:text-danger p-1 rounded-md opacity-0 group-hover:opacity-100 transition-opacity outline-none"
+                      title="Reportar comentario"
+                    >
+                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path
+                          stroke-linecap="round"
+                          stroke-linejoin="round"
+                          stroke-width="2"
+                          d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"
+                        />
+                      </svg>
+                    </button>
                   </div>
-
-                  <button
-                    (click)="reportComment(comment)"
-                    class="ml-2 text-[11px] font-semibold text-muted opacity-0 group-hover/comment:opacity-100 transition-opacity hover:text-danger"
-                    title="Reportar comentario"
-                  >
-                    Reportar
-                  </button>
+                  <p class="text-[14px] text-muted leading-relaxed">{{ comment.content }}</p>
                 </div>
               </div>
             }
-
-            @if (hasMoreComments) {
-              <div class="flex justify-center pt-2">
-                <button
-                  (click)="loadMoreComments()"
-                  [disabled]="isLoadingMoreComments"
-                  class="text-[13px] font-bold text-primary hover:text-primary/80 transition-colors disabled:opacity-50"
-                >
-                  {{ isLoadingMoreComments ? 'Cargando...' : 'Cargar más comentarios' }}
-                </button>
-              </div>
-            }
-          }
-        </div>
-
-        <div class="p-4 border-t border-border-main/10 bg-surface">
-          <div class="flex gap-2">
-            <input
-              type="text"
-              [(ngModel)]="newComment"
-              (keyup.enter)="postComment()"
-              placeholder="Añade un comentario..."
-              class="flex-1 bg-surface-hover border border-border-main/20 rounded-xl px-4 py-2 text-sm focus:outline-none focus:border-primary/50"
-              [disabled]="isSubmittingComment"
-            />
-            <button
-              (click)="postComment()"
-              [disabled]="!newComment.trim() || isSubmittingComment"
-              class="p-2 bg-primary text-white rounded-xl disabled:opacity-50"
-            >
-              <svg
-                class="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
-                />
-              </svg>
-            </button>
           </div>
-        </div>
+        } @else {
+          <div class="text-center py-8 bg-surface rounded-2xl border border-border-main/10">
+            <p class="text-[14px] text-muted">
+              Aún no hay valoraciones. Guarda el patrón, complétalo y sé el primero en comentar.
+            </p>
+          </div>
+        }
       </div>
     </div>
 
     <div
-      class="px-6 py-4 border-t border-border-main/10 bg-bg flex items-center justify-end shrink-0"
+      class="px-6 md:px-8 py-4 border-t border-border-main/10 bg-surface flex items-center justify-between shrink-0 shadow-[0_-10px_20px_rgba(0,0,0,0.02)]"
     >
       <button
-        class="btn btn-primary px-8 py-2.5 text-[15px] font-bold flex items-center gap-2 shadow-lg"
-        (click)="startProject()"
-        [disabled]="isCloning"
+        (click)="openReportModal(project, 'Project')"
+        class="text-muted hover:text-danger hover:bg-danger/10 w-10 h-10 flex items-center justify-center rounded-xl transition-colors outline-none shrink-0"
+        title="Reportar este proyecto"
       >
         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
-            d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9"
+            d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9"
           />
         </svg>
-        Iniciar este proyecto
+      </button>
+
+      <button
+        (click)="startProject()"
+        [disabled]="isCloning"
+        class="btn btn-primary px-8 py-3.5 text-[15px] font-bold flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:hover:translate-y-0 disabled:shadow-none w-full max-w-[280px] ml-3"
+      >
+        @if (isCloning) {
+          <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+            <circle
+              class="opacity-25"
+              cx="12"
+              cy="12"
+              r="10"
+              stroke="currentColor"
+              stroke-width="4"
+            ></circle>
+            <path
+              class="opacity-75"
+              fill="currentColor"
+              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+            ></path>
+          </svg>
+          Preparando tu taller...
+        } @else {
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M12 10.5v6m3-3H9m4.06-7.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z"
+            />
+          </svg>
+          Añadir a mi Taller
+        }
       </button>
     </div>
   </div>
 </div>
 
-@if (reportingData) {
+@if (showReportModal && projectToReport) {
   <app-report-modal
-    [targetType]="reportingData.type"
-    [targetId]="reportingData.id"
-    [targetTitle]="reportingData.title"
-    (close)="reportingData = null"
-    (submitted)="onReportSubmitted($event)"
-  ></app-report-modal>
+    [targetId]="projectToReport.targetId"
+    [targetType]="projectToReport.targetType"
+    [targetTitle]="projectToReport.title"
+    (close)="showReportModal = false"
+    (submitReport)="onReportSubmitted($event)"
+  >
+  </app-report-modal>
 }
