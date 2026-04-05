@@ -104,4 +104,9 @@ export class ProjectCardComponent {
       ? ['/home/proyectos', this.project._id] 
       : ['/home/proyectos', this.project._id, 'edit'];
   }
+
+  get isAdaptedFromCommunity(): boolean {
+    return this.project.projectType === 'Adaptado de la Comunidad';
+  }
+  
 }
