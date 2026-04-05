@@ -8,10 +8,10 @@
       class="absolute inset-0 opacity-20 dark:opacity-10 bg-[linear-gradient(to_right,var(--color-border-main)_1px,transparent_1px),linear-gradient(to_bottom,var(--color-border-main)_1px,transparent_1px)] bg-size-[24px_24px]"
     ></div>
     <div
-      class="absolute top-0 left-0 w-[40vw] h-[40vw] rounded-full bg-rose-200/10 blur-[100px]"
+      class="absolute top-0 left-0 w-[40vw] h-[40vw] rounded-full bg-rose-200/10 blur-[100px] transform-gpu"
     ></div>
     <div
-      class="absolute bottom-0 right-0 w-[30vw] h-[30vw] rounded-full bg-pink-300/5 blur-[100px]"
+      class="absolute bottom-0 right-0 w-[30vw] h-[30vw] rounded-full bg-pink-300/5 blur-[100px] transform-gpu"
     ></div>
   </div>
 
@@ -36,9 +36,10 @@
       @for (feature of features; track feature.title) {
         <article
           [class]="
-            'group rounded-[2.5rem] border border-border-main/10 dark:border-white/5 bg-surface/90 backdrop-blur-md shadow-xl shadow-black/5 transition-all duration-500 overflow-hidden cursor-pointer flex relative ' +
+            'group rounded-[2.5rem] border border-border-main/10 dark:border-white/5 bg-surface/90 backdrop-blur-md shadow-xl shadow-black/5 transition-[box-shadow,transform] duration-500 ease-out overflow-hidden cursor-pointer flex relative ' +
             feature.containerClass
           "
+          style="transform: translateZ(0)"
         >
           <div
             [class]="
@@ -106,7 +107,7 @@
             <img
               [src]="feature.image"
               [alt]="feature.alt"
-              class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+              class="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-110 transform-gpu will-change-transform"
             />
           </div>
         </article>

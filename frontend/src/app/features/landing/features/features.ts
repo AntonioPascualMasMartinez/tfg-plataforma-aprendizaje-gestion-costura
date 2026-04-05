@@ -37,7 +37,7 @@ export class Features {
       alt: 'Máquina de coser sobre una mesa',
       icon: 'planning',
       containerClass:
-        'md:row-span-2 flex-col hover:shadow-[0_32px_64px_-16px_rgba(255,89,0,0.2)] hover:drop-shadow-[0_12px_12px_rgba(255,89,0,0.15)]',
+        'md:row-span-2 flex-col hover:shadow-[0_32px_64px_-16px_rgba(255,89,0,0.3)] hover:-translate-y-1',
       textContainerClass: 'p-8 md:p-10 z-10',
       imageContainerClass:
         'relative flex-1 min-h-80 mx-4 mb-4 rounded-4xl overflow-hidden border border-border-main/10 shadow-[0_0_20px_rgba(0,0,0,0.05)_inset]',
