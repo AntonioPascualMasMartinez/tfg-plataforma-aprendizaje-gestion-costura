@@ -12,7 +12,15 @@ import { ConfirmModalComponent } from '../../modals/confirm-modal/confirm-modal.
 })
 export class ProjectCardComponent {
   @Input({ required: true }) project!: Project;
+  
+  // NUEVOS INPUTS para controlar la vista y la validación
+  @Input() activeView: 'taller' | 'portafolio' = 'taller';
+  @Input() isComplete: boolean = false;
+  
   @Output() delete = new EventEmitter<string>();
+  
+  // NUEVO OUTPUT para la acción de publicar/ocultar
+  @Output() toggleVisibility = new EventEmitter<void>();
 
   showDeleteModal = false;
 
@@ -41,17 +49,15 @@ export class ProjectCardComponent {
     return this.project.materials.filter((mat) => mat.isAcquired).length;
   }
 
-  // RENAMED GETTER Y CLASES ACTUALIZADAS
-  // Ahora solo definimos colores de texto y borde. El fondo lo definimos estático en el HTML.
   get difficultyTextColorClass(): string {
     switch (this.project.difficulty) {
-      case 'Fácil': // Verde
+      case 'Fácil':
         return 'text-emerald-700 border-emerald-200 dark:text-emerald-400 dark:border-emerald-800/50';
-      case 'Intermedio': // Amarillo
+      case 'Intermedio':
         return 'text-amber-800 border-amber-200 dark:text-amber-400 dark:border-amber-800/50';
-      case 'Avanzado': // Rosa/Rojo
+      case 'Avanzado':
         return 'text-rose-700 border-rose-200 dark:text-rose-400 dark:border-rose-800/50';
-      default: // Gris por defecto
+      default:
         return 'text-gray-700 border-gray-200 dark:text-gray-300 dark:border-gray-700';
     }
   }
@@ -70,8 +76,15 @@ export class ProjectCardComponent {
     }
   }
 
+  // NUEVO MÉTODO para manejar el clic en publicar/ocultar
+  onToggleVisibility(event: Event) {
+    event.preventDefault(); // Previene la navegación al proyecto
+    event.stopPropagation();
+    this.toggleVisibility.emit();
+  }
+
   onDeleteRequest(event: Event) {
-    event.preventDefault();
+    event.preventDefault(); // Previene la navegación al proyecto
     event.stopPropagation();
     this.showDeleteModal = true;
   }

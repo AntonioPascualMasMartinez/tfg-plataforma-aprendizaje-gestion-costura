@@ -78,6 +78,7 @@ export class ProjectService {
     sortBy: string = 'nuevo',
     search: string = '',
     projectType?: string,
+    isPublic?: boolean,
   ): Observable<ApiResponse<PaginatedResult<Project>>> {
     let params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
 
@@ -85,7 +86,7 @@ export class ProjectService {
     if (sortBy) params = params.set('sortBy', sortBy);
     if (search) params = params.set('search', search);
     if (projectType) params = params.set('projectType', projectType);
-
+    if (isPublic !== undefined) params = params.set('isPublic', isPublic.toString());
     return this.http.get<ApiResponse<PaginatedResult<Project>>>(`${this.apiUrl}/me`, { params });
   }
 }

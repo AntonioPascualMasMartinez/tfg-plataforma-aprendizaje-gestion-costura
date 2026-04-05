@@ -26,7 +26,7 @@
         </h1>
       </div>
       <p class="text-muted text-[15px] md:text-[16px] pl-14 opacity-90">
-        Gestiona, filtra y organiza tu taller de costura.
+        Gestiona tu taller de borradores y tu portafolio público.
       </p>
     </div>
 
@@ -46,6 +46,45 @@
       <span class="font-bold text-[14px] md:text-[15px]">Crear Proyecto</span>
     </button>
   </header>
+
+  <div class="flex items-center gap-2 border-b border-border-main/10 px-1">
+    <button
+      (click)="switchView('taller')"
+      class="relative px-5 py-3 text-[15px] font-bold transition-colors outline-none flex items-center gap-2"
+      [ngClass]="activeView === 'taller' ? 'text-primary' : 'text-muted hover:text-text-main'"
+    >
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.824M11.42 15.17l-3.96 3.96a2.653 2.653 0 01-3.75-3.75l3.96-3.96m8.167-3.96l-3.96-3.96a2.653 2.653 0 00-3.75 3.75l3.96 3.96m8.167-3.96l-8.167 8.167"
+        />
+      </svg>
+      Mi Taller (Borradores)
+      @if (activeView === 'taller') {
+        <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full"></div>
+      }
+    </button>
+
+    <button
+      (click)="switchView('portafolio')"
+      class="relative px-5 py-3 text-[15px] font-bold transition-colors outline-none flex items-center gap-2"
+      [ngClass]="activeView === 'portafolio' ? 'text-primary' : 'text-muted hover:text-text-main'"
+    >
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+        />
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+      Mi Portafolio (Públicos)
+      @if (activeView === 'portafolio') {
+        <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full"></div>
+      }
+    </button>
+  </div>
 
   <div
     class="flex flex-col xl:flex-row justify-between items-start xl:items-center gap-4 bg-surface p-4 md:p-5 rounded-4xl border border-border-main/10 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.03)] transition-all duration-500 hover:shadow-[0_20px_50px_-12px_rgba(0,0,0,0.05)]"
@@ -71,7 +110,9 @@
       <input
         [formControl]="searchTerm"
         type="text"
-        placeholder="Buscar en mis creaciones..."
+        [placeholder]="
+          activeView === 'taller' ? 'Buscar en mis borradores...' : 'Buscar en mi portafolio...'
+        "
         class="w-full pl-11 pr-10 py-3 bg-bg border border-border-main/15 shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)] rounded-[1.25rem] focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all duration-300 text-[14px] font-semibold text-text-main placeholder:text-muted/60 placeholder:font-medium"
       />
       @if (searchTerm.value) {
@@ -262,7 +303,13 @@
     } @else if (projects.length > 0) {
       <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
         @for (project of projects; track project._id) {
-          <app-project-card [project]="project" (delete)="deleteProject($event)">
+          <app-project-card
+            [project]="project"
+            [activeView]="activeView"
+            [isComplete]="isProjectComplete(project)"
+            (delete)="deleteProject($event)"
+            (toggleVisibility)="toggleProjectVisibility(project)"
+          >
           </app-project-card>
         }
       </div>
@@ -289,12 +336,12 @@
             </button>
 
             <div class="px-5 py-2 flex flex-col items-center justify-center min-w-30">
-              <span class="text-[14px] font-bold text-text-main tracking-wide">
-                Página {{ currentPage }}
-              </span>
-              <span class="text-[11px] font-semibold text-muted tracking-wider uppercase">
-                de {{ totalPages }}
-              </span>
+              <span class="text-[14px] font-bold text-text-main tracking-wide"
+                >Página {{ currentPage }}</span
+              >
+              <span class="text-[11px] font-semibold text-muted tracking-wider uppercase"
+                >de {{ totalPages }}</span
+              >
             </div>
 
             <button
@@ -329,27 +376,32 @@
             class="relative w-full h-full object-contain opacity-80 drop-shadow-[0_4px_10px_rgba(0,0,0,0.1)] transition-transform duration-700 hover:scale-110"
           />
         </div>
-        <h2
-          class="text-[22px] md:text-[26px] font-display font-bold text-text-main mb-3 tracking-tight"
-        >
-          {{ searchTerm.value ? 'Sin resultados de búsqueda' : 'Tu colección está en blanco' }}
-        </h2>
-        <p class="text-[15px] md:text-[16px] text-muted max-w-[320px] mb-8 leading-relaxed px-4">
-          {{
-            searchTerm.value
-              ? 'Prueba con otras palabras, cambia los filtros o limpia la búsqueda actual.'
-              : 'Parece que aún no has documentado ninguna creación. ¿Qué te parece si empezamos ahora?'
-          }}
-        </p>
 
         @if (searchTerm.value) {
+          <h2
+            class="text-[22px] md:text-[26px] font-display font-bold text-text-main mb-3 tracking-tight"
+          >
+            Sin resultados de búsqueda
+          </h2>
+          <p class="text-[15px] md:text-[16px] text-muted max-w-[320px] mb-8 leading-relaxed px-4">
+            Prueba con otras palabras, cambia los filtros o limpia la búsqueda actual.
+          </p>
           <button
             (click)="searchTerm.setValue('')"
             class="btn bg-bg text-text-main border border-border-main/15 shadow-sm hover:shadow-md hover:border-border-main/30 px-6 py-3 rounded-xl transition-all cursor-pointer font-bold outline-none focus:ring-2 focus:ring-primary/20"
           >
             Limpiar filtros
           </button>
-        } @else {
+        } @else if (activeView === 'taller') {
+          <h2
+            class="text-[22px] md:text-[26px] font-display font-bold text-text-main mb-3 tracking-tight"
+          >
+            Tu taller está vacío
+          </h2>
+          <p class="text-[15px] md:text-[16px] text-muted max-w-[320px] mb-8 leading-relaxed px-4">
+            No tienes borradores pendientes. ¡Es un buen momento para empezar un nuevo diseño de
+            costura!
+          </p>
           <button
             (click)="openCreateModal()"
             class="group flex items-center justify-center gap-2.5 bg-primary text-white px-7 py-3.5 rounded-2xl shadow-[0_8px_20px_-6px_rgba(255,89,0,0.4)] hover:shadow-[0_12px_25px_-8px_rgba(255,89,0,0.5)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 active:scale-95 cursor-pointer outline-none"
@@ -364,6 +416,22 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
             <span class="font-bold text-[15px]">Crear mi primer patrón</span>
+          </button>
+        } @else {
+          <h2
+            class="text-[22px] md:text-[26px] font-display font-bold text-text-main mb-3 tracking-tight"
+          >
+            Aún no hay publicaciones
+          </h2>
+          <p class="text-[15px] md:text-[16px] text-muted max-w-[320px] mb-8 leading-relaxed px-4">
+            Tu portafolio público está vacío. Termina un proyecto en tu taller y publícalo para
+            inspirar a la comunidad.
+          </p>
+          <button
+            (click)="switchView('taller')"
+            class="btn bg-bg text-text-main border border-border-main/15 shadow-sm hover:shadow-md hover:border-border-main/30 px-6 py-3 rounded-xl transition-all cursor-pointer font-bold outline-none focus:ring-2 focus:ring-primary/20"
+          >
+            Ir a mi Taller
           </button>
         }
       </div>
