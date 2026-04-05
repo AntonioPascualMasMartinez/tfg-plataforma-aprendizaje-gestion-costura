@@ -36,6 +36,17 @@ export class ResetPassword implements OnInit {
     { validators: this.passwordMatchValidator },
   );
 
+  showNewPassword = false;
+  showConfirmPassword = false;
+
+  toggleNewPasswordVisibility() {
+    this.showNewPassword = !this.showNewPassword;
+  }
+
+  toggleConfirmPasswordVisibility() {
+    this.showConfirmPassword = !this.showConfirmPassword;
+  }
+  
   ngOnInit() {
     // Capturamos el token de la URL (ej: ?token=...)
     this.token = this.route.snapshot.queryParamMap.get('token');
