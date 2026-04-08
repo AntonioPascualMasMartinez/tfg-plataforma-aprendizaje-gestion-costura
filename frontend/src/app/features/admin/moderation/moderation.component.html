@@ -1,35 +1,92 @@
-<div class="max-w-6xl mx-auto relative">
-  <div class="flex justify-between items-center mb-8">
-    <h1 class="text-3xl font-display font-bold text-text-main">Cola de Moderación</h1>
+<div class="max-w-7xl mx-auto relative pb-10">
+  <div class="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-8">
+    <h1 class="text-3xl font-display font-bold text-text-main">Centro de Resoluciones</h1>
     <button
-      (click)="loadReports(1)"
-      class="p-2 text-muted hover:text-primary transition-colors cursor-pointer"
+      (click)="loadReports()"
+      class="bg-surface border border-border-main/20 text-muted hover:text-primary px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-colors focus:outline-none focus:ring-2 focus:ring-primary/50 cursor-pointer shadow-sm"
       title="Refrescar lista"
     >
-      <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
           d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
         />
       </svg>
+      Refrescar
     </button>
   </div>
 
+  <div class="flex gap-6 mb-6 border-b border-border-main/10">
+    <label
+      class="cursor-pointer pb-3 border-b-2 transition-all font-semibold select-none text-sm"
+      [class.border-primary]="statusTab.value === 'Pending'"
+      [class.text-primary]="statusTab.value === 'Pending'"
+      [class.border-transparent]="statusTab.value !== 'Pending'"
+      [class.text-muted]="statusTab.value !== 'Pending'"
+      [class.hover:text-text-main]="statusTab.value !== 'Pending'"
+    >
+      <input type="radio" [formControl]="statusTab" value="Pending" class="hidden" />
+      Pendientes
+    </label>
+    <label
+      class="cursor-pointer pb-3 border-b-2 transition-all font-semibold select-none text-sm"
+      [class.border-primary]="statusTab.value === 'Reviewed'"
+      [class.text-primary]="statusTab.value === 'Reviewed'"
+      [class.border-transparent]="statusTab.value !== 'Reviewed'"
+      [class.text-muted]="statusTab.value !== 'Reviewed'"
+      [class.hover:text-text-main]="statusTab.value !== 'Reviewed'"
+    >
+      <input type="radio" [formControl]="statusTab" value="Reviewed" class="hidden" />
+      Revisados
+    </label>
+    <label
+      class="cursor-pointer pb-3 border-b-2 transition-all font-semibold select-none text-sm"
+      [class.border-primary]="statusTab.value === 'Dismissed'"
+      [class.text-primary]="statusTab.value === 'Dismissed'"
+      [class.border-transparent]="statusTab.value !== 'Dismissed'"
+      [class.text-muted]="statusTab.value !== 'Dismissed'"
+      [class.hover:text-text-main]="statusTab.value !== 'Dismissed'"
+    >
+      <input type="radio" [formControl]="statusTab" value="Dismissed" class="hidden" />
+      Desestimados
+    </label>
+  </div>
+
   @if (errorMessage) {
-    <div class="mb-4 p-4 text-sm text-danger bg-danger/10 rounded-xl border border-danger/20">
+    <div
+      class="mb-6 p-4 text-sm text-danger bg-danger/10 rounded-xl border border-danger/20 flex items-center gap-2"
+    >
+      <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
       {{ errorMessage }}
     </div>
   }
 
   @if (successMessage) {
-    <div class="mb-4 p-4 text-sm text-success bg-success/10 rounded-xl border border-success/20">
+    <div
+      class="mb-6 p-4 text-sm text-success bg-success/10 rounded-xl border border-success/20 flex items-center gap-2"
+    >
+      <svg class="w-5 h-5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
+      </svg>
       {{ successMessage }}
     </div>
   }
 
   <div
-    class="bg-surface rounded-2xl border border-border-main/15 shadow-sm overflow-hidden relative"
+    class="bg-surface rounded-2xl border border-border-main/15 shadow-sm overflow-hidden relative flex flex-col min-h-[400px]"
   >
     @if (isLoading) {
       <div
@@ -58,125 +115,197 @@
       </div>
     }
 
-    <table class="w-full text-left border-collapse">
-      <thead>
-        <tr class="bg-surface-hover/50 text-muted text-sm border-b border-border-main/10">
-          <th class="py-4 px-6 font-semibold">Fecha</th>
-          <th class="py-4 px-6 font-semibold">Tipo</th>
-          <th class="py-4 px-6 font-semibold">Razón del Reporte</th>
-          <th class="py-4 px-6 font-semibold">Estado</th>
-          <th class="py-4 px-6 font-semibold text-right">Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (report of reports; track report._id) {
-          <tr
-            class="border-b border-border-main/5 hover:bg-surface-hover/30 transition-colors"
-            [class.opacity-60]="report.status !== 'Pending'"
-          >
-            <td class="py-4 px-6 text-sm text-muted">
-              {{ report.createdAt | date: 'shortDate' }}
-            </td>
+    <div class="overflow-x-auto flex-1">
+      <table class="w-full text-left border-collapse min-w-[900px]">
+        <thead>
+          <tr class="bg-surface-hover/50 text-muted text-sm border-b border-border-main/10">
+            <th class="py-4 px-6 font-semibold w-32">Fecha</th>
+            <th class="py-4 px-6 font-semibold">Reportado por</th>
+            <th class="py-4 px-6 font-semibold w-1/3">Contenido Infractor</th>
+            <th class="py-4 px-6 font-semibold">Motivo</th>
+            <th class="py-4 px-6 font-semibold text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (report of reports; track report._id) {
+            <tr
+              class="border-b border-border-main/5 hover:bg-surface-hover/30 transition-colors items-start"
+            >
+              <td class="py-4 px-6 text-sm text-muted align-top pt-5">
+                {{ report.createdAt | date: 'mediumDate' }}
+              </td>
 
-            <td class="py-4 px-6">
-              <span
-                class="px-2.5 py-1 text-xs font-bold rounded-lg border"
-                [class]="
-                  report.targetType === 'Comment'
-                    ? 'bg-primary/5 text-primary border-primary/20'
-                    : 'bg-success/5 text-success border-success/20'
-                "
-              >
-                {{ report.targetType === 'Comment' ? 'Comentario' : 'Proyecto' }}
-              </span>
-            </td>
+              <td class="py-4 px-6 align-top pt-5">
+                <div class="font-semibold text-text-main text-sm">
+                  {{ $any(report.reporterId)?.displayName || 'Usuario Desconocido' }}
+                </div>
+                <div class="text-xs text-muted">
+                  {{ $any(report.reporterId)?.email || 'Sin correo' }}
+                </div>
+              </td>
 
-            <td class="py-4 px-6 text-sm text-text-main max-w-xs truncate" [title]="report.reason">
-              {{ report.reason }}
-            </td>
-
-            <td class="py-4 px-6">
-              @if (report.status === 'Pending') {
-                <span class="flex items-center gap-1.5 text-xs font-bold text-[#E65000]">
-                  <div class="w-2 h-2 rounded-full bg-[#E65000]"></div>
-                  Pendiente
-                </span>
-              } @else if (report.status === 'Reviewed') {
-                <span class="flex items-center gap-1.5 text-xs font-bold text-success">
-                  <div class="w-2 h-2 rounded-full bg-success"></div>
-                  Revisado
-                </span>
-              } @else {
-                <span class="flex items-center gap-1.5 text-xs font-bold text-muted">
-                  <div class="w-2 h-2 rounded-full bg-muted"></div>
-                  Desestimado
-                </span>
-              }
-            </td>
-
-            <td class="py-4 px-6 text-right">
-              @if (report.status === 'Pending') {
-                <div class="flex justify-end gap-3">
-                  <button
-                    (click)="requestDismiss(report)"
-                    class="text-xs font-semibold text-muted hover:text-text-main transition-colors cursor-pointer"
+              <td class="py-4 px-6 align-top">
+                <div class="flex items-center gap-2 mb-1.5">
+                  <span
+                    class="px-2 py-0.5 text-[10px] uppercase tracking-wider font-bold rounded-md border"
+                    [class]="
+                      report.targetType === 'Comment'
+                        ? 'bg-primary/5 text-primary border-primary/20'
+                        : 'bg-success/5 text-success border-success/20'
+                    "
                   >
-                    Desestimar
-                  </button>
+                    {{ report.targetType === 'Comment' ? 'Comentario' : 'Proyecto' }}
+                  </span>
+                </div>
+                <div
+                  class="p-3 bg-surface-hover/50 rounded-lg border border-border-main/10 text-sm text-text-main line-clamp-3"
+                >
+                  {{ report.targetContent || 'Contenido no disponible (Quizás fue eliminado)' }}
+                </div>
+              </td>
 
-                  @if (report.targetType === 'Comment') {
+              <td class="py-4 px-6 align-top pt-5">
+                <span
+                  class="inline-block px-3 py-1.5 bg-danger/5 text-danger font-semibold text-xs rounded-lg border border-danger/10"
+                >
+                  {{ report.reason }}
+                </span>
+              </td>
+
+              <td class="py-4 px-6 text-right align-top pt-5">
+                <div class="flex flex-col items-end gap-2">
+                  @if (report.status === 'Pending') {
                     <button
-                      (click)="requestDeleteComment(report)"
-                      class="text-xs font-semibold text-danger hover:underline transition-all cursor-pointer"
+                      (click)="requestReview(report)"
+                      class="text-xs font-semibold text-primary hover:text-primary/80 transition-colors focus:outline-none focus:underline"
                     >
-                      Borrar Comentario
+                      Marcar como Resuelto
+                    </button>
+
+                    @if (
+                      report.targetType === 'Comment' &&
+                      report.targetContent !== '[Contenido eliminado previamente]'
+                    ) {
+                      <button
+                        (click)="requestDeleteComment(report)"
+                        class="text-xs font-semibold text-danger hover:text-danger/80 transition-colors focus:outline-none focus:underline"
+                      >
+                        Borrar Comentario
+                      </button>
+                    }
+
+                    <button
+                      (click)="requestBanUser(report)"
+                      class="text-xs font-semibold text-danger hover:text-danger/80 transition-colors focus:outline-none focus:underline"
+                    >
+                      Banear Autor
+                    </button>
+
+                    <button
+                      (click)="requestDismiss(report)"
+                      class="text-xs font-semibold text-muted hover:text-text-main transition-colors focus:outline-none focus:underline mt-2"
+                    >
+                      Desestimar (Falsa alarma)
                     </button>
                   } @else {
                     <button
-                      (click)="requestReview(report)"
-                      class="text-xs font-semibold text-primary hover:underline transition-all cursor-pointer"
+                      (click)="requestReopen(report)"
+                      class="text-xs font-semibold px-3 py-1.5 rounded-lg border border-border-main/20 text-muted hover:text-primary hover:bg-primary/5 hover:border-primary/30 transition-all focus:outline-none focus:ring-2 focus:ring-primary/50"
                     >
-                      Resolver
+                      Reabrir Reporte
                     </button>
                   }
                 </div>
-              } @else {
-                <span class="text-xs text-muted italic">Acción tomada</span>
-              }
-            </td>
-          </tr>
-        } @empty {
-          <tr>
-            <td colspan="5" class="py-12 text-center text-muted text-sm">
-              <svg
-                class="w-12 h-12 mx-auto mb-3 text-border-main"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="1.5"
-                  d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                />
-              </svg>
-              No hay reportes en la cola. ¡Buen trabajo!
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="py-16 text-center text-muted text-sm">
+                <div class="flex flex-col items-center justify-center opacity-60">
+                  <svg
+                    class="w-16 h-16 mb-4 text-muted"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                  @if (statusTab.value === 'Pending') {
+                    ¡Excelente trabajo! No hay reportes pendientes de revisión.
+                  } @else {
+                    No hay reportes en la categoría "{{
+                      statusTab.value === 'Reviewed' ? 'Revisados' : 'Desestimados'
+                    }}".
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div
+      class="border-t border-border-main/10 px-6 py-4 flex items-center justify-between bg-surface-hover/20"
+    >
+      <span class="text-sm text-muted">
+        Mostrando <span class="font-semibold text-text-main">{{ reports.length }}</span> de
+        <span class="font-semibold text-text-main">{{ totalDocs }}</span> reportes
+      </span>
+
+      <div class="flex items-center gap-3">
+        <button
+          (click)="prevPage()"
+          [disabled]="currentPage === 1"
+          class="flex items-center justify-center w-8 h-8 rounded-lg border border-border-main/20 text-muted hover:text-text-main hover:bg-surface-hover hover:border-border-main/40 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+        </button>
+
+        <span class="text-sm text-text-main font-medium">
+          Página {{ currentPage }} de {{ totalPages || 1 }}
+        </span>
+
+        <button
+          (click)="nextPage()"
+          [disabled]="currentPage >= totalPages || totalPages === 0"
+          class="flex items-center justify-center w-8 h-8 rounded-lg border border-border-main/20 text-muted hover:text-text-main hover:bg-surface-hover hover:border-border-main/40 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+        >
+          <svg
+            class="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
+      </div>
+    </div>
   </div>
 </div>
 
 <app-confirm-modal
-  [isOpen]="isModalOpen"
-  [title]="modalTitle"
-  [message]="modalMessage"
-  [confirmText]="modalConfirmText"
-  [isDestructive]="isModalDestructive"
-  [isLoading]="isModalLoading"
+  [isOpen]="modalState.isOpen"
+  [title]="modalState.title"
+  [message]="modalState.message"
+  [confirmText]="modalState.confirmText"
+  [isDestructive]="modalState.isDestructive"
+  [isLoading]="modalState.isLoading"
   (confirm)="executeAction()"
   (cancel)="closeModal()"
 >

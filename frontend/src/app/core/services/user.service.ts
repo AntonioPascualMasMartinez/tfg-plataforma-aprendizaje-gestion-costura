@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environments/environment.development';
 import { ApiResponse } from '../../shared/models/api-response.model';
-import { User, UpdateProfilePayload, Role } from '../../shared/models/user.model';
+import { User, UpdateProfilePayload, Role, DashboardStats } from '../../shared/models/user.model';
 import { PaginatedResult } from '../../shared/models/pagination.model';
 
 @Injectable({
@@ -62,5 +62,12 @@ export class UserService {
     return this.http.put<ApiResponse<User>>(`${this.apiUrl}/admin/${userId}/status`, {
       isActive,
     });
+  }
+
+  /**
+   * Obtiene todas las métricas unificadas para el Dashboard (Admin)
+   */
+  getDashboardStats(): Observable<ApiResponse<DashboardStats>> {
+    return this.http.get<ApiResponse<DashboardStats>>(`${this.apiUrl}/admin/dashboard-stats`);
   }
 }

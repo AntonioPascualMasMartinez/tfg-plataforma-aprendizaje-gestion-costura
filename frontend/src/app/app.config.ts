@@ -5,6 +5,7 @@ import { provideHttpClient, withInterceptors, withFetch } from '@angular/common/
 import { authInterceptor } from './core/interceptors/auth.interceptor';
 import { errorInterceptor } from './core/interceptors/error.interceptor';
 import { provideClientHydration, withEventReplay } from '@angular/platform-browser';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 import {
   SocialAuthServiceConfig,
@@ -19,7 +20,7 @@ export const appConfig: ApplicationConfig = {
     provideHttpClient(withInterceptors([authInterceptor, errorInterceptor]), withFetch()),
 
     importProvidersFrom(SocialLoginModule),
-
+    provideCharts(withDefaultRegisterables()),
     {
       provide: 'SocialAuthServiceConfig', // ¡En la v2.4.0 esto funciona perfecto!
       useValue: {
