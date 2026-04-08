@@ -338,7 +338,7 @@
     [targetType]="projectToReport.targetType"
     [targetTitle]="projectToReport.title"
     (close)="showReportModal = false"
-    (submitReport)="onReportSubmitted($event)"
+    (submitted)="onReportSubmitted($event)"
   >
   </app-report-modal>
 }

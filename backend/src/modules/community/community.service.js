@@ -85,13 +85,47 @@ class CommunityService {
   }
 
   /**
-   * (Admin) Obtiene la cola de moderación.
+   * (Admin) Obtiene la cola de moderación filtrada por estado.
    */
-  static async getModerationQueue(page = 1, limit = 20) {
-    return await Report.paginate(
-      { status: 'Pending' },
-      { page, limit, sort: { createdAt: 1 }, populate: 'reporterId targetId' },
+  static async getModerationQueue(page = 1, limit = 20, status = 'Pending') {
+    // 1. Buscamos y paginamos. Hacemos populate dinámico de targetId
+    const result = await Report.paginate(
+      { status },
+      {
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10),
+        sort: { createdAt: -1 }, // Ordenamos por más recientes primero
+        populate: [
+          { path: 'reporterId', select: 'displayName avatar email' },
+          { path: 'targetId' }, // Como configuraste refPath en el modelo, Mongoose sabe si traer un Project o Comment
+        ],
+      },
     );
+
+    // 2. Mapeamos los resultados para inyectar los datos unificados que necesita el frontend
+    const docs = result.docs.map((report) => {
+      const doc = report.toObject();
+
+      // Si el objetivo ya fue borrado de la base de datos, lo manejamos de forma segura
+      if (!doc.targetId) {
+        doc.targetContent = '[Contenido eliminado previamente]';
+        doc.reportedUserId = null;
+        return doc;
+      }
+
+      // Extraemos el contenido y el autor dependiendo de si es Comentario o Proyecto
+      if (doc.targetType === 'Comment') {
+        doc.reportedUserId = doc.targetId.authorId;
+        doc.targetContent = doc.targetId.content;
+      } else if (doc.targetType === 'Project') {
+        doc.reportedUserId = doc.targetId.ownerId;
+        doc.targetContent = `[Proyecto] ${doc.targetId.title} - ${doc.targetId.description || ''}`;
+      }
+
+      return doc;
+    });
+
+    return { ...result, docs };
   }
 
   /**
@@ -99,11 +133,7 @@ class CommunityService {
    */
   static async resolveReport(reportId, action) {
     // action puede ser 'Dismissed' (ignorar) o 'Reviewed' (penalizar)
-    const report = await Report.findByIdAndUpdate(
-      reportId,
-      { status: action },
-      { new: true }
-    );
+    const report = await Report.findByIdAndUpdate(reportId, { status: action }, { new: true });
     if (!report) throw new ApiError(404, 'Reporte no encontrado');
     return report;
   }
@@ -116,8 +146,6 @@ class CommunityService {
     if (!deleted) throw new ApiError(404, 'Comentario no encontrado');
     return true;
   }
-  
-
 }
 
 module.exports = CommunityService;

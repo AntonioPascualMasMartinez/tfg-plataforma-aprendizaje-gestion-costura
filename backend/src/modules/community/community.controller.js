@@ -68,8 +68,8 @@ class CommunityController {
 
   static async getModerationQueue(req, res, next) {
     try {
-      const { page, limit } = req.query;
-      const queue = await CommunityService.getModerationQueue(page, limit);
+      const { page, limit, status } = req.query; // <-- Capturamos 'status'
+      const queue = await CommunityService.getModerationQueue(page, limit, status); // <-- Lo pasamos al servicio
       return ResponseFormatter.success(res, 200, 'Cola de moderación', queue);
     } catch (error) {
       next(error);

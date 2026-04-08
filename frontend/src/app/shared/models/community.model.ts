@@ -1,7 +1,7 @@
 import { User } from './user.model';
 
 export type ReportTargetType = 'Project' | 'Comment';
-export type ReportStatus = 'Pending' | 'Reviewed' | 'Dismissed';
+export type ReportStatus = 'Reviewed' | 'Dismissed' | 'Pending';
 
 export interface Comment {
   _id: string;
@@ -18,11 +18,13 @@ export interface Report {
   _id: string;
   reporterId: string | Partial<User>;
   targetType: ReportTargetType;
-  targetId: string | any; // Dependiendo del populate, puede ser un ID o un objeto Comment/Project
+  targetId: string | any;
   reason: string;
   status: ReportStatus;
   createdAt: string;
   updatedAt: string;
+  reportedUserId?: string; 
+  targetContent?: string; 
 }
 
 // Payload para crear un comentario

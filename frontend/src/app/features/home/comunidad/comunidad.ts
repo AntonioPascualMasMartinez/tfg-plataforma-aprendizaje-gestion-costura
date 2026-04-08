@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { ReactiveFormsModule, FormControl } from '@angular/forms';
 import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
-import { Subscription } from 'rxjs';
+import { merge, Subscription } from 'rxjs';
 
 import { ProjectService } from '../../../core/services/project.service';
 import { CommunityService } from '../../../core/services/community.service';
@@ -17,6 +17,7 @@ import { CommunityDetailModalComponent } from '../../../shared/modals/community-
 import { CreateReportPayload } from '../../../shared/models/community.model';
 import { ReportModalComponent } from '../../../shared/modals/report-modal/report-modal.component';
 import { ToastService } from '../../../core/services/toast.service';
+
 @Component({
   selector: 'app-comunidad',
   standalone: true,
@@ -38,109 +39,142 @@ export class Comunidad implements OnInit, OnDestroy {
   private cdr = inject(ChangeDetectorRef);
   private toastService = inject(ToastService);
 
-  projects: CommunityProject[] = [];
+  // --- ESTADOS DE DATOS ---
+  featuredProject: CommunityProject | null = null;
+  gridProjects: CommunityProject[] = [];
   projectToReport: CommunityProject | null = null;
-  currentPage = 1;
-  limit = 12;
-
-  isLoading = true;
-  isLoadingMore = false;
-  hasMore = true;
-
-  searchTerm = new FormControl('');
-  private searchSub?: Subscription;
-
   selectedProject: CommunityProject | null = null;
 
-  // NUEVO: Variable para guardar el ID del usuario actual
+  // --- PAGINACIÓN ---
+  currentPage = 1;
+  totalPages = 1;
+  limit = 13; // 1 Destacado + 12 para el Grid (en la página 1)
+
+  isLoading = true;
   currentUserId: string | null = null;
 
+  // --- FILTROS INTERACTIVOS ---
+  searchTerm = new FormControl('');
+  categoryFilter = new FormControl('Todas');
+  difficultyFilter = new FormControl('Todas');
+  sortByFilter = new FormControl('populares');
+
+  readonly categories = ['Todas', 'Bolsos', 'Monederos', 'Ropa', 'Hogar', 'Accesorios'];
+  readonly difficulties = ['Todas', 'Fácil', 'Intermedio', 'Avanzado'];
+
+  private filterSub?: Subscription;
+
   ngOnInit() {
-    // 1. Primero obtenemos el usuario actual
     this.userService.getMe().subscribe({
       next: (res) => {
-        this.currentUserId = res.data._id; // Guardamos el ID
-        this.initFeed(); // Iniciamos la carga
+        this.currentUserId = res.data._id;
+        this.initFeed();
       },
       error: () => {
-        // Si hay error (ej. token expirado), cargamos el feed igual pero como invitado
-        this.initFeed();
+        this.initFeed(); // Cargar como invitado si falla
       },
     });
   }
 
-  // Método auxiliar para iniciar la búsqueda y el feed una vez tenemos el usuario
-  private initFeed() {
-    this.setupSearch();
-    this.loadFeed(true);
-  }
-
   ngOnDestroy() {
-    if (this.searchSub) {
-      this.searchSub.unsubscribe();
+    if (this.filterSub) {
+      this.filterSub.unsubscribe();
     }
   }
 
-  private setupSearch() {
-    this.searchSub = this.searchTerm.valueChanges
-      .pipe(debounceTime(400), distinctUntilChanged())
-      .subscribe(() => {
-        this.loadFeed(true);
-      });
+  private initFeed() {
+    this.setupFilters();
+    this.loadFeed();
   }
 
-  loadFeed(reset = false) {
-    if (reset) {
+  private setupFilters() {
+    const search$ = this.searchTerm.valueChanges.pipe(debounceTime(400), distinctUntilChanged());
+    const cat$ = this.categoryFilter.valueChanges;
+    const diff$ = this.difficultyFilter.valueChanges;
+    const sort$ = this.sortByFilter.valueChanges;
+
+    // Escuchamos cualquier cambio en cualquier filtro para resetear la página a 1 y recargar
+    this.filterSub = merge(search$, cat$, diff$, sort$).subscribe(() => {
       this.currentPage = 1;
-      this.isLoading = true;
-      this.projects = [];
-      this.cdr.detectChanges();
-    } else {
-      this.isLoadingMore = true;
-    }
+      this.loadFeed();
+    });
+  }
+
+  loadFeed() {
+    this.isLoading = true;
+    this.cdr.detectChanges();
 
     const search = this.searchTerm.value || '';
 
+    // Llamada al backend (Asumiendo la firma actual de tu Angular Service)
     this.projectService.getPublicFeed(this.currentPage, this.limit, search).subscribe({
       next: (response) => {
-        const newProjects = response.data.docs as CommunityProject[];
+        let fetchedDocs = response.data.docs as CommunityProject[];
 
-        newProjects.forEach((p) => {
-          // 1. Calculamos el total de likes basado en el tamaño del array
+        // 1. Cálculos de Likes (necesario antes de ordenar)
+        fetchedDocs.forEach((p) => {
           p.likesCount = p.likes ? p.likes.length : 0;
-
-          // 2. Comprobamos si el ID del usuario actual existe dentro del array de likes
           p.isLikedLocally =
             this.currentUserId && p.likes ? p.likes.includes(this.currentUserId) : false;
         });
 
-        if (reset) {
-          this.projects = newProjects;
-        } else {
-          this.projects = [...this.projects, ...newProjects];
+        // 2. Filtros Locales Temporales
+        // *Nota: Idealmente esto debería pasarse como parámetro en getPublicFeed hacia el backend*
+        const cat = this.categoryFilter.value;
+        if (cat !== 'Todas') {
+          fetchedDocs = fetchedDocs.filter((p) => p.category === cat);
         }
 
-        this.hasMore = response.data.hasNextPage ?? newProjects.length === this.limit;
+        const diff = this.difficultyFilter.value;
+        if (diff !== 'Todas') {
+          fetchedDocs = fetchedDocs.filter((p) => p.difficulty === diff);
+        }
+
+        // 3. Ordenamiento
+        const sortBy = this.sortByFilter.value;
+        if (sortBy === 'populares') {
+          fetchedDocs.sort((a, b) => (b.likesCount || 0) - (a.likesCount || 0));
+        } else {
+          fetchedDocs.sort(
+            (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+          );
+        }
+
+        this.totalPages = response.data.totalPages || 1;
+        this.currentPage = response.data.page || 1;
+
+        // 4. Lógica del Destacado Inteligente
+        const isFiltering = search !== '' || cat !== 'Todas' || diff !== 'Todas';
+
+        if (this.currentPage === 1 && !isFiltering && fetchedDocs.length > 0) {
+          this.featuredProject = fetchedDocs[0];
+          this.gridProjects = fetchedDocs.slice(1);
+        } else {
+          this.featuredProject = null;
+          this.gridProjects = fetchedDocs;
+        }
+
         this.isLoading = false;
-        this.isLoadingMore = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
         console.error('Error cargando el feed', err);
         this.isLoading = false;
-        this.isLoadingMore = false;
         this.cdr.detectChanges();
       },
     });
   }
 
-  loadMore() {
-    if (this.hasMore && !this.isLoadingMore) {
-      this.currentPage++;
+  // --- PAGINACIÓN ---
+  changePage(newPage: number) {
+    if (newPage >= 1 && newPage <= this.totalPages) {
+      this.currentPage = newPage;
       this.loadFeed();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
 
+  // --- INTERACCIONES ---
   handleLike(payload: { project: CommunityProject; event: Event }) {
     const { project, event } = payload;
     event.stopPropagation();
@@ -153,11 +187,11 @@ export class Comunidad implements OnInit, OnDestroy {
     this.communityService.likeProject(project._id).subscribe({
       next: (response) => {
         project.likesCount = response.data.likesCount;
-        // Sincronizamos localmente para evitar desfases
         project.isLikedLocally = response.data.isLikedByMe;
         this.cdr.detectChanges();
       },
       error: () => {
+        // Reversión optimista en caso de error
         project.isLikedLocally = wasLiked;
         project.likesCount = (project.likesCount || 0) + (wasLiked ? 1 : -1);
         this.cdr.detectChanges();
@@ -168,16 +202,21 @@ export class Comunidad implements OnInit, OnDestroy {
   handleReport(payload: { project: CommunityProject; event: Event }) {
     payload.event.stopPropagation();
     payload.event.preventDefault();
-    // Guardamos el proyecto que queremos reportar para pasárselo al modal
     this.projectToReport = payload.project;
   }
 
   handleProjectUpdated(updatedProject: CommunityProject) {
-    const index = this.projects.findIndex((p) => p._id === updatedProject._id);
-    if (index !== -1) {
-      this.projects[index] = updatedProject;
-      this.cdr.detectChanges();
+    // Buscar si el proyecto actualizado es el destacado
+    if (this.featuredProject && this.featuredProject._id === updatedProject._id) {
+      this.featuredProject = updatedProject;
+    } else {
+      // Si no, buscar en el grid
+      const index = this.gridProjects.findIndex((p) => p._id === updatedProject._id);
+      if (index !== -1) {
+        this.gridProjects[index] = updatedProject;
+      }
     }
+    this.cdr.detectChanges();
   }
 
   openModal(project: CommunityProject) {
@@ -187,17 +226,16 @@ export class Comunidad implements OnInit, OnDestroy {
   closeModal() {
     this.selectedProject = null;
   }
+
   onReportSubmitted(payload: CreateReportPayload) {
     this.communityService.createReport(payload).subscribe({
       next: () => {
         this.toastService.success('Proyecto reportado correctamente. Gracias por ayudarnos.');
-        this.projectToReport = null; // Cerramos el modal
+        this.projectToReport = null;
       },
       error: (err) => {
         console.error('Error al reportar', err);
         this.toastService.error('Hubo un error al enviar el reporte.');
-        // Opcional: Podrías resetear el estado isSubmitting del modal hijo usando un ViewChild
-        // pero por simplicidad, si falla, el usuario puede reintentar en el modal abierto.
       },
     });
   }

@@ -81,14 +81,18 @@ export class CommunityService {
   // ==========================================
 
   /**
-   * Obtiene la cola de moderación (reportes pendientes)
-   * GET /api/v1/community/admin/moderation
+   * Obtiene la cola de moderación (reportes filtrados por estado)
+   * GET /api/v1/community/admin/moderation?status=Pending
    */
   getModerationQueue(
     page: number = 1,
     limit: number = 20,
+    status: string = 'Pending', // <-- NUEVO PARÁMETRO
   ): Observable<ApiResponse<PaginatedResult<Report>>> {
-    const params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('limit', limit.toString())
+      .set('status', status); // <-- AÑADIR A LA PETICIÓN
 
     return this.http.get<ApiResponse<PaginatedResult<Report>>>(`${this.apiUrl}/admin/moderation`, {
       params,
@@ -101,7 +105,7 @@ export class CommunityService {
    */
   resolveReport(
     reportId: string,
-    action: 'Reviewed' | 'Dismissed',
+    action: 'Reviewed' | 'Dismissed' | 'Pending',
   ): Observable<ApiResponse<Report>> {
     return this.http.put<ApiResponse<Report>>(`${this.apiUrl}/admin/moderation/${reportId}`, {
       action,

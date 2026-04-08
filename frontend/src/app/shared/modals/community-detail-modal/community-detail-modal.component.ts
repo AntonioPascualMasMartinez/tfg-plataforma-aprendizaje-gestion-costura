@@ -183,15 +183,13 @@ export class CommunityDetailModalComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  onReportSubmitted(eventData: any) {
-    // Si tu modal emite directamente el string con el motivo (lo más habitual)
-    const reasonText = typeof eventData === 'string' ? eventData : eventData.reason;
-
-    // Construimos el payload completo aquí en el padre
+  onReportSubmitted(eventData: CreateReportPayload) {
+    // <-- Mejoramos el tipado
+    // El modal hijo ya nos envía el payload completo, pero usamos el reason por seguridad
     const payload: CreateReportPayload = {
       targetId: this.projectToReport.targetId,
       targetType: this.projectToReport.targetType,
-      reason: reasonText,
+      reason: eventData.reason,
     };
 
     this.communityService.createReport(payload).subscribe({
@@ -201,7 +199,13 @@ export class CommunityDetailModalComponent implements OnInit {
         this.projectToReport = null;
         this.cdr.detectChanges();
       },
-      error: () => this.toastService.error('Error al enviar el reporte.'),
+      error: () => {
+        this.toastService.error('Error al enviar el reporte. Inténtalo de nuevo.');
+        // NUEVO: Cerramos el modal también en caso de error para no dejar el spinner bloqueado
+        this.showReportModal = false;
+        this.projectToReport = null;
+        this.cdr.detectChanges();
+      },
     });
   }
 }
