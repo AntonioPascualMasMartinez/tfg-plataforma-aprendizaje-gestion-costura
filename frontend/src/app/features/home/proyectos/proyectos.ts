@@ -11,7 +11,7 @@ import { ProjectCardComponent } from '../../../shared/components/project-card/pr
 import { CreateProjectModal } from '../../../shared/modals/create-project/create-project.modal';
 import { ToastService } from '../../../core/services/toast.service';
 
-type ViewMode = 'taller' | 'portafolio';
+type ViewMode = 'taller' | 'portafolio' | 'tutoriales' | 'comunidad';
 
 @Component({
   selector: 'app-proyectos',
@@ -34,12 +34,12 @@ export class Proyectos implements OnInit, OnDestroy {
   // Estado principal
   projects: Project[] = [];
   isLoading = true;
-  activeView: ViewMode = 'taller'; // Por defecto mostramos los borradores
+  activeView: ViewMode = 'taller'; // Por defecto mostramos los borradores propios
 
   // Controles de filtrado
   searchTerm = new FormControl('');
   statusFilter = new FormControl('Todos');
-  difficultyFilter = new FormControl('Todas');
+  difficultyFilter = new FormControl('Todas'); // Nota: el backend actual no filtra por dificultad directamente, habría que añadirlo al service si se quiere filtrado real
   sortByFilter = new FormControl('nuevo');
 
   // Paginación
@@ -107,22 +107,46 @@ export class Proyectos implements OnInit, OnDestroy {
     const search = this.searchTerm.value || '';
     const status = this.statusFilter.value || 'Todos';
     const sortBy = this.sortByFilter.value || 'nuevo';
-    const difficulty = this.difficultyFilter.value || 'Todas';
 
-    // Determinamos el estado de privacidad según la pestaña activa
-    const isPublic = this.activeView === 'portafolio';
+    // Determinamos qué pedirle al backend basándonos en la pestaña activa
+    let projectType: string | undefined = undefined;
+    let isPublic: boolean | undefined = undefined;
 
+    switch (this.activeView) {
+      case 'taller':
+        // Mis borradores: Proyectos creados por mí que NO son públicos
+        projectType = 'Nuevo';
+        isPublic = false;
+        break;
+      case 'portafolio':
+        // Mis publicaciones: Proyectos creados por mí que SÍ son públicos
+        projectType = 'Nuevo';
+        isPublic = true;
+        break;
+      case 'tutoriales':
+        // Clonados de tutoriales
+        projectType = 'Comenzado desde Tutorial';
+        isPublic = false; // Los clones siempre son privados
+        break;
+      case 'comunidad':
+        // Clonados de la comunidad
+        projectType = 'Adaptado de la Comunidad';
+        isPublic = false; // Los clones siempre son privados
+        break;
+    }
+
+    // Petición al backend con todos los filtros correctos aplicados
     this.projectService
-      .getMyProjects(this.currentPage, 9, status, sortBy, search, undefined, isPublic)
+      .getMyProjects(this.currentPage, 9, status, sortBy, search, projectType, isPublic)
       .subscribe({
         next: (response) => {
           if (response.data) {
             let fetchedDocs = response.data.docs;
 
-            fetchedDocs = fetchedDocs.filter((p) => p.isPublic === isPublic);
-
+            // Filtro local de dificultad (Idealmente esto debería hacerlo el backend)
+            const difficulty = this.difficultyFilter.value || 'Todas';
             if (difficulty !== 'Todas') {
-              fetchedDocs = fetchedDocs.filter((p) => p.difficulty === difficulty);
+              fetchedDocs = fetchedDocs.filter((p: Project) => p.difficulty === difficulty);
             }
 
             this.projects = fetchedDocs;
@@ -130,6 +154,8 @@ export class Proyectos implements OnInit, OnDestroy {
             this.totalResults = response.data.totalDocs;
           } else {
             this.projects = [];
+            this.totalPages = 1;
+            this.totalResults = 0;
           }
 
           this.isLoading = false;
@@ -143,6 +169,7 @@ export class Proyectos implements OnInit, OnDestroy {
         },
       });
   }
+
   // --- ACCIONES DE PROYECTO ---
 
   openCreateModal() {
@@ -200,9 +227,6 @@ export class Proyectos implements OnInit, OnDestroy {
           : '¡Proyecto publicado! Ya es visible para la comunidad.';
 
         this.toastService.success(message);
-
-        // Recargamos la lista para que el proyecto desaparezca de la vista actual
-        // y aparezca en la pestaña correspondiente.
         this.loadProjects();
       },
       error: (err) => {

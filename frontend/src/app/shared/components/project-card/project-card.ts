@@ -12,13 +12,13 @@ import { ConfirmModalComponent } from '../../modals/confirm-modal/confirm-modal.
 })
 export class ProjectCardComponent {
   @Input({ required: true }) project!: Project;
-  
+
   // NUEVOS INPUTS para controlar la vista y la validación
   @Input() activeView: 'taller' | 'portafolio' = 'taller';
   @Input() isComplete: boolean = false;
-  
+
   @Output() delete = new EventEmitter<string>();
-  
+
   // NUEVO OUTPUT para la acción de publicar/ocultar
   @Output() toggleVisibility = new EventEmitter<void>();
 
@@ -99,14 +99,19 @@ export class ProjectCardComponent {
   }
 
   get projectRoute(): string[] {
-    // Si es público, va a la vista de visualización/taller. Si es privado (borrador), va al editor.
-    return this.project.isPublic 
-      ? ['/home/proyectos', this.project._id] 
+    if (this.isFromTutorial || this.isAdaptedFromCommunity) {
+      return ['/home/proyectos', this.project._id];
+    }
+    return this.project.isPublic
+      ? ['/home/proyectos', this.project._id]
       : ['/home/proyectos', this.project._id, 'edit'];
   }
 
   get isAdaptedFromCommunity(): boolean {
     return this.project.projectType === 'Adaptado de la Comunidad';
   }
-  
+
+  get isOriginal(): boolean {
+    return this.project.projectType === 'Nuevo';
+  }
 }

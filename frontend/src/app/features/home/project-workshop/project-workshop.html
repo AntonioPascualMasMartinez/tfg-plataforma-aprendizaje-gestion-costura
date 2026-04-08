@@ -11,7 +11,7 @@
     <header
       class="shrink-0 px-4 py-4 md:py-6 bg-surface md:bg-transparent border-b md:border-none border-border-main/10 flex items-center justify-between z-40"
     >
-      <div class="flex items-center gap-3">
+      <div class="flex items-center gap-3 min-w-0">
         <a
           routerLink="/home/proyectos"
           class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-hover border border-border-main/10 text-text-main hover:bg-border-main/10 transition-colors shadow-sm outline-none cursor-pointer shrink-0"
@@ -37,13 +37,35 @@
           <h1 class="text-[16px] md:text-[20px] font-display font-bold text-text-main truncate">
             {{ project.title }}
           </h1>
+
+          @if (project.projectType === 'Adaptado de la Comunidad' && originalProject) {
+            <p class="text-[12px] text-muted flex items-center gap-1 mt-0.5 truncate">
+              <svg
+                class="w-3.5 h-3.5 text-indigo-500 shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
+                />
+              </svg>
+              Inspirado en el patrón de
+              <span class="font-bold text-text-main ml-0.5">{{
+                getAuthorName(originalProject.ownerId)
+              }}</span>
+            </p>
+          }
         </div>
       </div>
 
-      @if (isOwner) {
+      @if (isOwner && project.projectType !== 'Adaptado de la Comunidad') {
         <a
           [routerLink]="['/home/proyectos', project._id, 'edit']"
-          class="ml-auto mr-4 px-4 py-2 bg-primary/10 text-primary hover:bg-primary/20 text-[13px] font-bold rounded-xl transition-colors flex items-center gap-2 outline-none"
+          class="ml-auto mr-4 px-4 py-2 bg-primary/10 text-primary hover:bg-primary/20 text-[13px] font-bold rounded-xl transition-colors flex items-center gap-2 outline-none shrink-0"
         >
           <svg
             class="w-4.5 h-4.5 hidden md:block"
@@ -103,13 +125,11 @@
                 >Paso {{ activeStepIndex + 1 }}
                 <span class="text-muted font-medium">de {{ project.steps.length }}</span></span
               >
-              <span class="text-primary"
-                >{{ completedStepsCount }} / {{ project.steps.length }} listos</span
-              >
+              <span class="text-primary">{{ progressPercentage | number: '1.0-0' }}% listos</span>
             </div>
             <div class="w-full h-2.5 bg-border-main/10 rounded-full overflow-hidden shadow-inner">
               <div
-                class="h-full bg-linear-to-r from-primary/80 to-primary rounded-full transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] relative"
+                class="h-full bg-linear-to-r from-primary/80 to-primary rounded-full transition-all duration-700 relative"
                 [style.width.%]="progressPercentage"
               >
                 <div class="absolute inset-0 bg-white/20 w-full animate-pulse"></div>
@@ -120,7 +140,7 @@
           <div
             class="bg-surface rounded-[2rem] border border-border-main/10 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col min-h-[50vh] md:min-h-0 md:flex-1 relative"
           >
-            @if (project.steps[activeStepIndex].mediaUrl) {
+            @if (project.steps[activeStepIndex]?.mediaUrl) {
               <div
                 class="w-full aspect-video md:aspect-[21/9] bg-surface-hover relative group shrink-0"
               >
@@ -161,14 +181,13 @@
                 <h2
                   class="text-[20px] md:text-[24px] font-display font-bold text-text-main leading-tight mt-1"
                 >
-                  {{ project.steps[activeStepIndex].title }}
+                  {{ project.steps[activeStepIndex]?.title || 'Sin título' }}
                 </h2>
               </div>
-
               <p
                 class="text-[15px] md:text-[16px] text-muted leading-relaxed whitespace-pre-wrap font-medium flex-1"
               >
-                {{ project.steps[activeStepIndex].description }}
+                {{ project.steps[activeStepIndex]?.description || 'Sin descripción' }}
               </p>
             </div>
 
@@ -179,12 +198,12 @@
                 (click)="toggleStepStatus(activeStepIndex)"
                 class="w-full sm:flex-1 py-3.5 rounded-2xl text-[15px] font-bold flex items-center justify-center gap-2.5 transition-all duration-300 shadow-sm active:scale-[0.98] outline-none cursor-pointer"
                 [ngClass]="
-                  project.steps[activeStepIndex].status === 'Completado'
+                  project.steps[activeStepIndex]?.status === 'Completado'
                     ? 'bg-success text-white border border-success/50 hover:bg-success/90'
                     : 'bg-primary text-white border border-primary/50 hover:bg-primary/90 hover:shadow-primary/30 shadow-md'
                 "
               >
-                @if (project.steps[activeStepIndex].status === 'Completado') {
+                @if (project.steps[activeStepIndex]?.status === 'Completado') {
                   <svg
                     class="w-5 h-5"
                     fill="none"
@@ -243,20 +262,7 @@
       @if (activeTab === 'materiales') {
         <div class="animate-in fade-in slide-in-from-right-4 duration-300 md:mt-4">
           <div class="bg-surface rounded-3xl border border-border-main/10 shadow-sm p-5 md:p-8">
-            <div class="flex items-center justify-between mb-6">
-              <div>
-                <h2 class="text-[20px] font-display font-bold text-text-main">Materiales</h2>
-                <p class="text-[13px] text-muted font-medium mt-0.5">
-                  Reúne todo antes de empezar a coser.
-                </p>
-              </div>
-              <div
-                class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-[14px] shrink-0 border border-primary/20"
-              >
-                {{ acquiredMaterialsCount }}/{{ project.materials.length }}
-              </div>
-            </div>
-
+            <h2 class="text-[20px] font-display font-bold text-text-main mb-6">Materiales</h2>
             <div class="space-y-3">
               @for (mat of project.materials; track mat._id || mat.name; let i = $index) {
                 <div
@@ -265,18 +271,18 @@
                   [ngClass]="
                     mat.isAcquired
                       ? 'bg-bg border-transparent opacity-60'
-                      : 'bg-surface border-border-main/10 hover:border-primary/40 shadow-sm hover:shadow-md'
+                      : 'bg-surface border-border-main/10 hover:border-primary/40 shadow-sm'
                   "
                 >
                   <div class="mr-4 shrink-0 relative flex items-center justify-center w-6 h-6">
                     <input
                       type="checkbox"
                       [checked]="mat.isAcquired"
-                      class="peer appearance-none w-6 h-6 border-2 border-border-main/30 rounded-md checked:bg-primary checked:border-primary transition-all cursor-pointer outline-none"
+                      class="peer appearance-none w-6 h-6 border-2 border-border-main/30 rounded-md checked:bg-primary transition-all cursor-pointer"
                       (click)="$event.stopPropagation(); toggleMaterial(i)"
                     />
                     <svg
-                      class="absolute w-4 h-4 text-white opacity-0 peer-checked:opacity-100 pointer-events-none transition-opacity duration-200"
+                      class="absolute w-4 h-4 text-white opacity-0 peer-checked:opacity-100 pointer-events-none"
                       fill="none"
                       viewBox="0 0 24 24"
                       stroke="currentColor"
@@ -300,7 +306,7 @@
                       <span class="text-[13px] font-semibold text-muted">{{ mat.quantity }}</span>
                       @if (mat.notes) {
                         <span
-                          class="text-[11px] bg-border-main/10 text-muted px-2 py-0.5 rounded uppercase tracking-wider font-bold truncate max-w-[120px] md:max-w-none"
+                          class="text-[11px] bg-border-main/10 text-muted px-2 py-0.5 rounded uppercase tracking-wider font-bold truncate"
                           >{{ mat.notes }}</span
                         >
                       }
@@ -308,17 +314,16 @@
                   </div>
                 </div>
               }
+              @if (project.materials.length === 0) {
+                <div
+                  class="text-center py-10 border-2 border-dashed border-border-main/20 rounded-2xl"
+                >
+                  <p class="text-[14px] text-muted font-medium">
+                    Este proyecto no especifica materiales.
+                  </p>
+                </div>
+              }
             </div>
-
-            @if (project.materials.length === 0) {
-              <div
-                class="text-center py-10 border-2 border-dashed border-border-main/20 rounded-2xl"
-              >
-                <p class="text-[14px] text-muted font-medium">
-                  Este proyecto no especifica materiales.
-                </p>
-              </div>
-            }
           </div>
         </div>
       }
@@ -357,10 +362,10 @@
                     <path
                       stroke-linecap="round"
                       stroke-linejoin="round"
-                      d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+                      d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
                     />
                   </svg>
-                  Tus Notas
+                  Bitácora Privada
                 </h2>
 
                 <div
@@ -407,10 +412,147 @@
 
               <textarea
                 [formControl]="notesControl"
-                placeholder="Apunta aquí tus ajustes, qué aguja usaste, si modificaste alguna medida..."
+                placeholder="Tus notas son privadas. Apunta aquí qué aguja usaste, si modificaste alguna medida..."
                 class="w-full flex-1 resize-none bg-transparent outline-none text-[16px] text-amber-950 dark:text-amber-50 font-medium leading-[2rem] placeholder:text-amber-900/40 dark:placeholder:text-amber-100/30 custom-scrollbar"
                 spellcheck="false"
               ></textarea>
+            </div>
+          </div>
+        </div>
+      }
+
+      @if (activeTab === 'comunidad') {
+        <div
+          class="animate-in fade-in slide-in-from-right-4 duration-300 md:mt-4 h-full md:h-[600px] flex flex-col"
+        >
+          <div
+            class="bg-surface rounded-[2rem] border border-border-main/10 shadow-md flex flex-col h-full overflow-hidden"
+          >
+            <div
+              class="p-4 bg-indigo-50 dark:bg-indigo-900/20 border-b border-indigo-100 dark:border-indigo-800/30 flex items-center gap-3 shrink-0"
+            >
+              <svg
+                class="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+                />
+              </svg>
+              <p class="text-[13px] text-indigo-900 dark:text-indigo-200 font-medium leading-snug">
+                Foro público del proyecto original. Aquí puedes consultar dudas al creador o a la
+                comunidad.
+              </p>
+            </div>
+
+            <div class="flex-1 overflow-y-auto custom-scrollbar p-5 md:p-6 space-y-5 bg-bg/30">
+              @if (isLoadingComments) {
+                <div class="space-y-4 animate-pulse">
+                  <div class="flex gap-3">
+                    <div class="w-8 h-8 rounded-full bg-border-main/10 shrink-0"></div>
+                    <div class="h-16 bg-border-main/10 w-3/4 rounded-2xl"></div>
+                  </div>
+                </div>
+              } @else if (comments.length === 0) {
+                <div class="h-full flex flex-col items-center justify-center text-center px-4">
+                  <div
+                    class="w-12 h-12 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-500 flex items-center justify-center mb-3"
+                  >
+                    <svg
+                      class="w-6 h-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                      />
+                    </svg>
+                  </div>
+                  <h4 class="text-[16px] font-bold text-text-main mb-1">Sin comentarios aún</h4>
+                  <p class="text-[14px] text-muted max-w-[250px]">
+                    Sé el primero en aportar un consejo o hacer una pregunta.
+                  </p>
+                </div>
+              } @else {
+                @for (comment of comments; track comment._id) {
+                  <div class="flex gap-3 items-end group">
+                    <div
+                      class="w-8 h-8 rounded-full bg-surface border border-border-main/20 flex items-center justify-center text-[12px] font-bold text-primary shrink-0"
+                    >
+                      {{ getAuthorName(comment.authorId).charAt(0) }}
+                    </div>
+                    <div
+                      class="bg-surface border border-border-main/10 rounded-2xl rounded-bl-none p-3 shadow-sm max-w-[85%] relative"
+                    >
+                      <span class="text-[11px] font-bold text-muted block mb-0.5">{{
+                        getAuthorName(comment.authorId)
+                      }}</span>
+                      <p class="text-[14px] text-text-main leading-relaxed">
+                        {{ comment.content }}
+                      </p>
+                    </div>
+                  </div>
+                }
+              }
+            </div>
+
+            <div class="p-4 bg-surface border-t border-border-main/10 shrink-0">
+              <div
+                class="flex items-end gap-3 bg-bg rounded-2xl border border-border-main/20 p-2 focus-within:border-indigo-400 focus-within:ring-2 focus-within:ring-indigo-100 transition-all"
+              >
+                <textarea
+                  [formControl]="newCommentControl"
+                  rows="1"
+                  placeholder="Añade un comentario..."
+                  class="flex-1 bg-transparent border-none outline-none text-[14px] text-text-main resize-none p-2 custom-scrollbar min-h-[40px] max-h-[120px]"
+                ></textarea>
+                <button
+                  (click)="postComment()"
+                  [disabled]="newCommentControl.invalid || isSubmittingComment"
+                  class="w-10 h-10 rounded-xl bg-indigo-600 text-white flex items-center justify-center shrink-0 shadow-sm disabled:opacity-50 disabled:bg-border-main/20 disabled:text-muted transition-colors cursor-pointer outline-none"
+                >
+                  @if (isSubmittingComment) {
+                    <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle
+                        class="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        stroke-width="4"
+                      ></circle>
+                      <path
+                        class="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>
+                    </svg>
+                  } @else {
+                    <svg
+                      class="w-5 h-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                    >
+                      <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
+                      />
+                    </svg>
+                  }
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -423,10 +565,10 @@
       <div class="flex items-center justify-around p-2 md:p-1.5 gap-1">
         <button
           (click)="switchTab('pasos')"
-          class="flex-1 flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2.5 py-2.5 md:py-3 md:px-5 rounded-2xl transition-all duration-300 outline-none cursor-pointer"
+          class="flex-1 flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2.5 py-2 md:py-3 md:px-4 rounded-2xl transition-all duration-300 outline-none cursor-pointer"
           [ngClass]="
             activeTab === 'pasos'
-              ? 'text-primary md:bg-primary/10 shadow-[0_4px_12px_rgba(255,89,0,0.15)]'
+              ? 'text-primary md:bg-primary/10'
               : 'text-muted hover:text-text-main hover:bg-bg'
           "
         >
@@ -447,12 +589,12 @@
             </svg>
             @if (activeTab === 'pasos') {
               <div
-                class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-primary md:hidden"
+                class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary md:hidden"
               ></div>
             }
           </div>
           <span
-            class="text-[11px] md:text-[14px] font-bold"
+            class="text-[10px] md:text-[13px] font-bold"
             [class.opacity-100]="activeTab === 'pasos'"
             [class.opacity-80]="activeTab !== 'pasos'"
             >Instrucciones</span
@@ -461,10 +603,10 @@
 
         <button
           (click)="switchTab('materiales')"
-          class="flex-1 flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2.5 py-2.5 md:py-3 md:px-5 rounded-2xl transition-all duration-300 outline-none cursor-pointer"
+          class="flex-1 flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2.5 py-2 md:py-3 md:px-4 rounded-2xl transition-all duration-300 outline-none cursor-pointer"
           [ngClass]="
             activeTab === 'materiales'
-              ? 'text-primary md:bg-primary/10 shadow-[0_4px_12px_rgba(255,89,0,0.15)]'
+              ? 'text-primary md:bg-primary/10'
               : 'text-muted hover:text-text-main hover:bg-bg'
           "
         >
@@ -485,12 +627,12 @@
             </svg>
             @if (activeTab === 'materiales') {
               <div
-                class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-primary md:hidden"
+                class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary md:hidden"
               ></div>
             }
           </div>
           <span
-            class="text-[11px] md:text-[14px] font-bold"
+            class="text-[10px] md:text-[13px] font-bold"
             [class.opacity-100]="activeTab === 'materiales'"
             [class.opacity-80]="activeTab !== 'materiales'"
             >Materiales</span
@@ -499,10 +641,10 @@
 
         <button
           (click)="switchTab('bitacora')"
-          class="flex-1 flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2.5 py-2.5 md:py-3 md:px-5 rounded-2xl transition-all duration-300 outline-none cursor-pointer"
+          class="flex-1 flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2.5 py-2 md:py-3 md:px-4 rounded-2xl transition-all duration-300 outline-none cursor-pointer"
           [ngClass]="
             activeTab === 'bitacora'
-              ? 'text-primary md:bg-primary/10 shadow-[0_4px_12px_rgba(255,89,0,0.15)]'
+              ? 'text-primary md:bg-primary/10'
               : 'text-muted hover:text-text-main hover:bg-bg'
           "
         >
@@ -523,17 +665,57 @@
             </svg>
             @if (activeTab === 'bitacora') {
               <div
-                class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-primary md:hidden"
+                class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary md:hidden"
               ></div>
             }
           </div>
           <span
-            class="text-[11px] md:text-[14px] font-bold"
+            class="text-[10px] md:text-[13px] font-bold"
             [class.opacity-100]="activeTab === 'bitacora'"
             [class.opacity-80]="activeTab !== 'bitacora'"
             >Bitácora</span
           >
         </button>
+
+        @if (project.projectType === 'Adaptado de la Comunidad') {
+          <button
+            (click)="switchTab('comunidad')"
+            class="flex-1 flex flex-col md:flex-row items-center justify-center gap-1 md:gap-2.5 py-2 md:py-3 md:px-4 rounded-2xl transition-all duration-300 outline-none cursor-pointer"
+            [ngClass]="
+              activeTab === 'comunidad'
+                ? 'text-indigo-600 md:bg-indigo-50 dark:md:bg-indigo-900/30'
+                : 'text-muted hover:text-text-main hover:bg-bg'
+            "
+          >
+            <div class="relative">
+              <svg
+                class="w-6 h-6 md:w-5 md:h-5 transition-transform duration-300"
+                [class.-translate-y-1]="activeTab === 'comunidad'"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2.2"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"
+                />
+              </svg>
+              @if (activeTab === 'comunidad') {
+                <div
+                  class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-indigo-600 md:hidden"
+                ></div>
+              }
+            </div>
+            <span
+              class="text-[10px] md:text-[13px] font-bold"
+              [class.opacity-100]="activeTab === 'comunidad'"
+              [class.opacity-80]="activeTab !== 'comunidad'"
+              >Foro</span
+            >
+          </button>
+        }
       </div>
     </nav>
   }

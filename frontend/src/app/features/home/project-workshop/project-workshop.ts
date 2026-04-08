@@ -8,17 +8,19 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { Subject } from 'rxjs';
-import { debounceTime, takeUntil, distinctUntilChanged } from 'rxjs/operators';
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Subject, forkJoin, of } from 'rxjs';
+import { debounceTime, takeUntil, distinctUntilChanged, switchMap } from 'rxjs/operators';
 
 import { ProjectService } from '../../../core/services/project.service';
+import { CommunityService } from '../../../core/services/community.service';
+import { UserService } from '../../../core/services/user.service';
 import { ToastService } from '../../../core/services/toast.service';
 import { Project } from '../../../shared/models/project.model';
+import { Comment } from '../../../shared/models/community.model';
 
-import { UserService } from '../../../core/services/user.service';
-
-type WorkshopTab = 'pasos' | 'materiales' | 'bitacora';
+// Definición de las pestañas del taller, incluyendo la pestaña dinámica de comunidad
+type WorkshopTab = 'pasos' | 'materiales' | 'bitacora' | 'comunidad';
 
 @Component({
   selector: 'app-project-workshop',
@@ -30,47 +32,45 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private projectService = inject(ProjectService);
+  private communityService = inject(CommunityService);
+  private userService = inject(UserService);
   private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
-  private userService = inject(UserService);
-  currentUserId: string | null = null;
 
-  // Estado del proyecto
+  // --- ESTADO DEL PROYECTO ACTUAL ---
   project: Project | null = null;
   isLoading = true;
-  errorMessage = '';
+  currentUserId: string | null = null;
+  isOwner = false;
 
-  // Control de interfaz (Mobile First)
+  // --- ESTADO DEL PROYECTO ORIGINAL (Para Créditos y Comunidad) ---
+  originalProject: Project | null = null;
+  comments: Comment[] = [];
+  isLoadingComments = false;
+
+  // --- CONTROL DE INTERFAZ ---
   activeTab: WorkshopTab = 'pasos';
   activeStepIndex = 0;
 
-  // Sistema de Bitácora (Autoguardado)
+  // --- SISTEMA DE BITÁCORA (Privada) ---
   notesControl = new FormControl('');
   isSavingNotes = false;
   lastSavedTime: Date | null = null;
+
+  // --- SISTEMA DE COMENTARIOS (Públicos) ---
+  newCommentControl = new FormControl('', [Validators.required]);
+  isSubmittingComment = false;
+
   private destroy$ = new Subject<void>();
 
   ngOnInit() {
     const projectId = this.route.snapshot.paramMap.get('id');
-    if (projectId) {
-      this.loadProject(projectId);
-      this.setupAutoSave();
-
-      // Obtenemos el usuario actual para la validación de propiedad
-      this.userService.getMe().subscribe({
-        next: (res) => (this.currentUserId = res.data._id),
-      });
-    } else {
+    if (!projectId) {
       this.router.navigate(['/home/proyectos']);
+      return;
     }
-  }
 
-  get isOwner(): boolean {
-    if (!this.project || !this.currentUserId) return false;
-    // Manejamos si el ownerId está populado (objeto) o es solo el string
-    const ownerId =
-      typeof this.project.ownerId === 'string' ? this.project.ownerId : this.project.ownerId._id;
-    return this.currentUserId === ownerId;
+    this.initWorkshop(projectId);
   }
 
   ngOnDestroy() {
@@ -78,115 +78,81 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  // Permite navegación por teclado (útil si se usa en tablet/PC)
-  @HostListener('window:keydown', ['$event'])
-  handleKeyDown(event: KeyboardEvent) {
-    if (this.activeTab === 'pasos') {
-      if (event.key === 'ArrowRight') this.nextStep();
-      if (event.key === 'ArrowLeft') this.prevStep();
-    }
-  }
-
-  // --- CARGA Y CONFIGURACIÓN ---
-
-  loadProject(id: string) {
+  /**
+   * Orquestación inicial: Carga el proyecto, el usuario actual y,
+   * si es una adaptación, los datos del autor original.
+   */
+  private initWorkshop(id: string) {
     this.isLoading = true;
-    this.projectService.getProjectById(id).subscribe({
-      next: (res) => {
-        this.project = res.data;
+
+    forkJoin({
+      projectRes: this.projectService.getProjectById(id),
+      userRes: this.userService.getMe(),
+    }).subscribe({
+      next: ({ projectRes, userRes }) => {
+        this.project = projectRes.data;
+        this.currentUserId = userRes.data._id;
+
+        // Verificamos si el usuario actual es el dueño del clon
+        const ownerId =
+          typeof this.project.ownerId === 'string'
+            ? this.project.ownerId
+            : this.project.ownerId?._id;
+        this.isOwner = this.currentUserId === ownerId;
+
+        // Inicializar bitácora
+        this.notesControl.setValue(this.project.learningNotes || '', { emitEvent: false });
+        this.setupAutoSave();
+
+        // Si es adaptado, cargamos los créditos y comentarios del original
+        if (
+          this.project.projectType === 'Adaptado de la Comunidad' &&
+          this.project.originalProjectId
+        ) {
+          this.loadOriginalData(this.project.originalProjectId);
+        }
+
         this.isLoading = false;
-
-        // Inicializar la bitácora con las notas existentes
-        if (this.project.learningNotes) {
-          this.notesControl.setValue(this.project.learningNotes, { emitEvent: false });
-        }
-
-        // Inteligencia de UX: Si no tiene pasos, llevarlo a materiales
-        if (this.project.steps.length === 0) {
-          this.activeTab = 'materiales';
-        }
-
         this.cdr.detectChanges();
       },
       error: () => {
-        this.errorMessage = 'No se pudo cargar el taller del proyecto.';
-        this.isLoading = false;
+        this.toastService.error('Error al cargar el taller.');
+        this.router.navigate(['/home/proyectos']);
+      },
+    });
+  }
+
+  /**
+   * Carga los datos del proyecto original para mostrar la atribución y los comentarios.
+   */
+  private loadOriginalData(originalId: string) {
+    this.projectService.getProjectById(originalId).subscribe({
+      next: (res) => {
+        this.originalProject = res.data;
+        this.loadComments();
         this.cdr.detectChanges();
       },
     });
   }
 
-  private setupAutoSave() {
-    // Escucha cambios en el textarea y guarda automáticamente tras 1 segundo sin escribir
-    this.notesControl.valueChanges
-      .pipe(debounceTime(1000), distinctUntilChanged(), takeUntil(this.destroy$))
-      .subscribe((notes) => {
-        if (this.project) {
-          this.saveNotes(notes || '');
-        }
-      });
-  }
-
-  // --- NAVEGACIÓN MOBILE ---
-
-  switchTab(tab: WorkshopTab) {
-    this.activeTab = tab;
-  }
+  // --- GESTIÓN DE PASOS Y PROGRESO ---
 
   nextStep() {
     if (this.project && this.activeStepIndex < this.project.steps.length - 1) {
       this.activeStepIndex++;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      this.scrollToTop();
     }
   }
 
   prevStep() {
     if (this.activeStepIndex > 0) {
       this.activeStepIndex--;
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      this.scrollToTop();
     }
   }
 
-  // --- LÓGICA DE PROGRESO Y SEGUIMIENTO ---
-
-  get completedStepsCount(): number {
-    if (!this.project || !this.project.steps) return 0;
-    return this.project.steps.filter((step) => step.status === 'Completado').length;
-  }
-
-  get progressPercentage(): number {
-    if (!this.project || !this.project.steps || this.project.steps.length === 0) return 0;
-    return (this.completedStepsCount / this.project.steps.length) * 100;
-  }
-
-  get acquiredMaterialsCount(): number {
-    if (!this.project || !this.project.materials) return 0;
-    return this.project.materials.filter((mat) => mat.isAcquired).length;
-  }
-
-  // Marcar material como comprado/obtenido
-  toggleMaterial(index: number) {
-    if (!this.project) return;
-
-    const material = this.project.materials[index];
-    material.isAcquired = !material.isAcquired;
-
-    this.projectService
-      .updateProject(this.project._id, { materials: this.project.materials } as any)
-      .subscribe({
-        error: () => {
-          // Revertir en caso de error
-          material.isAcquired = !material.isAcquired;
-          this.toastService.error('Error al sincronizar el material.');
-          this.cdr.detectChanges();
-        },
-      });
-  }
-
-  // Marcar paso como completado/pendiente
   toggleStepStatus(index: number) {
     if (!this.project) return;
-
     const step = this.project.steps[index];
     step.status = step.status === 'Completado' ? 'Pendiente' : 'Completado';
 
@@ -194,27 +160,45 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
       .updateProject(this.project._id, { steps: this.project.steps } as any)
       .subscribe({
         next: () => {
-          // Avanzar automáticamente al siguiente paso si se marca como completado
           if (
             step.status === 'Completado' &&
             this.activeStepIndex < this.project!.steps.length - 1
           ) {
-            // Un pequeño retraso para que el usuario vea la animación de completado
             setTimeout(() => this.nextStep(), 600);
           }
         },
         error: () => {
           step.status = step.status === 'Completado' ? 'Pendiente' : 'Completado';
-          this.toastService.error('Error al sincronizar el paso.');
-          this.cdr.detectChanges();
+          this.toastService.error('Error al actualizar el paso.');
         },
       });
   }
 
-  // Autoguardado de notas (Bitácora)
-  private saveNotes(notes: string) {
+  toggleMaterial(index: number) {
     if (!this.project) return;
+    const mat = this.project.materials[index];
+    mat.isAcquired = !mat.isAcquired;
 
+    this.projectService
+      .updateProject(this.project._id, { materials: this.project.materials } as any)
+      .subscribe({
+        error: () => {
+          mat.isAcquired = !mat.isAcquired;
+          this.toastService.error('Error al actualizar material.');
+        },
+      });
+  }
+
+  // --- SISTEMA DE BITÁCORA (AUTOGUARDADO) ---
+
+  private setupAutoSave() {
+    this.notesControl.valueChanges
+      .pipe(debounceTime(1000), distinctUntilChanged(), takeUntil(this.destroy$))
+      .subscribe((notes) => this.saveLearningNotes(notes || ''));
+  }
+
+  private saveLearningNotes(notes: string) {
+    if (!this.project) return;
     this.isSavingNotes = true;
     this.cdr.detectChanges();
 
@@ -226,9 +210,81 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
       },
       error: () => {
         this.isSavingNotes = false;
-        this.toastService.error('Error al guardar tus notas en la bitácora.');
         this.cdr.detectChanges();
       },
     });
+  }
+
+  // --- SISTEMA DE COMUNIDAD (COMENTARIOS PÚBLICOS) ---
+
+  loadComments() {
+    const targetId = this.project?.originalProjectId || this.project?._id;
+    if (!targetId) return;
+
+    this.isLoadingComments = true;
+    this.communityService.getProjectComments(targetId, 1, 50).subscribe({
+      next: (res) => {
+        this.comments = res.data.docs;
+        this.isLoadingComments = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.isLoadingComments = false;
+        this.cdr.detectChanges();
+      },
+    });
+  }
+
+  postComment() {
+    const targetId = this.project?.originalProjectId || this.project?._id;
+    if (!targetId || this.newCommentControl.invalid) return;
+
+    this.isSubmittingComment = true;
+    const content = this.newCommentControl.value!;
+
+    this.communityService.addComment(targetId, { content }).subscribe({
+      next: () => {
+        this.newCommentControl.reset();
+        this.isSubmittingComment = false;
+        this.loadComments(); // Recargamos para ver el nuevo comentario
+        this.toastService.success('Comentario publicado en la comunidad.');
+      },
+      error: () => {
+        this.isSubmittingComment = false;
+        this.toastService.error('No se pudo publicar el comentario.');
+      },
+    });
+  }
+
+  // --- HELPERS ---
+
+  switchTab(tab: WorkshopTab) {
+    this.activeTab = tab;
+    if (tab === 'comunidad') {
+      this.loadComments();
+    }
+  }
+
+  private scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  get progressPercentage(): number {
+    if (!this.project?.steps.length) return 0;
+    const completed = this.project.steps.filter((s) => s.status === 'Completado').length;
+    return (completed / this.project.steps.length) * 100;
+  }
+
+  getAuthorName(ownerId: any): string {
+    if (ownerId && typeof ownerId === 'object') return ownerId.displayName || 'Anónimo';
+    return 'Anónimo';
+  }
+
+  @HostListener('window:keydown', ['$event'])
+  handleKeyDown(event: KeyboardEvent) {
+    if (this.activeTab === 'pasos') {
+      if (event.key === 'ArrowRight') this.nextStep();
+      if (event.key === 'ArrowLeft') this.prevStep();
+    }
   }
 }
