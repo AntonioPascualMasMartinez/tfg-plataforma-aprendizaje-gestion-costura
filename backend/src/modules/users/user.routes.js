@@ -28,6 +28,9 @@ router.get(
 // ==========================================
 // Rutas Administrativas (Requieren Rol 'Admin')
 // ==========================================
+
+router.get('/admin/dashboard-stats', authorizeRoles('Admin'), UserController.getDashboardStats);
+
 router.get('/admin', authorizeRoles('Admin'), UserController.getAllUsers);
 
 // Nueva ruta para RF7

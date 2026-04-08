@@ -147,6 +147,19 @@ class UserController {
       next(error);
     }
   }
+
+  /**
+   * GET /api/v1/users/admin/dashboard-stats
+   * Obtiene todas las métricas para el panel principal.
+   */
+  static async getDashboardStats(req, res, next) {
+    try {
+      const stats = await UserService.getDashboardStats();
+      return ResponseFormatter.success(res, 200, 'Estadísticas del dashboard', stats);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = UserController;

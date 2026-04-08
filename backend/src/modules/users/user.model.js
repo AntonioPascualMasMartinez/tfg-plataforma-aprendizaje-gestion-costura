@@ -43,7 +43,6 @@ const userSchema = new mongoose.Schema(
     ],
     googleId: {
       type: String,
-      default: null, // Si es nulo, significa que se registró con email/password
       unique: true,
       sparse: true, // Permite múltiples valores null sin violar la restricción unique
     },

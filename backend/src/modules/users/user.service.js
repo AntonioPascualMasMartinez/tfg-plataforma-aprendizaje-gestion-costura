@@ -2,6 +2,10 @@ const User = require('./user.model');
 const ApiError = require('../../utils/apiError');
 const bcrypt = require('bcrypt');
 
+const Tutorial = require('../tutorials/tutorial.model');
+const Report = require('../community/report.model');
+const Progress = require('../tutorials/progress.model');
+
 class UserService {
   /**
    * Obtiene un usuario por su ID.
@@ -131,6 +135,59 @@ class UserService {
     }
 
     return updatedUser;
+  }
+
+  /**
+   * Obtiene todas las estadísticas unificadas para el Dashboard del Admin.
+   */
+  static async getDashboardStats() {
+    // 1. Conteos básicos en paralelo para máxima velocidad
+    const [totalUsers, totalTutorials, pendingReports] = await Promise.all([
+      User.countDocuments(),
+      Tutorial.countDocuments(),
+      Report.countDocuments({ status: 'Pending' })
+    ]);
+
+    // 2. Gráfica de Crecimiento (Últimos 6 meses)
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    
+    const userGrowth = await User.aggregate([
+      { $match: { createdAt: { $gte: sixMonthsAgo } } },
+      {
+        $group: {
+          _id: { month: { $month: '$createdAt' }, year: { $year: '$createdAt' } },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { '_id.year': 1, '_id.month': 1 } }
+    ]);
+
+    // 3. Gráfica de Demografía (Nivel de Costura)
+    const demographics = await User.aggregate([
+      {
+        $group: {
+          // Si el campo es null o no existe, lo agrupamos como 'No especificado'
+          _id: { $ifNull: ['$sewingLevel', 'No especificado'] },
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    // 4. Gráfica de Engagement (Éxito en tutoriales)
+    const engagement = await Progress.aggregate([
+      {
+        $group: {
+          _id: '$status', // Agrupa por 'En curso' o 'Completado'
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+
+    return {
+      counts: { totalUsers, totalTutorials, pendingReports },
+      charts: { userGrowth, demographics, engagement }
+    };
   }
 }
 
