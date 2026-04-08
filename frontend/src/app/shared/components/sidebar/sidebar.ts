@@ -1,8 +1,9 @@
 import { Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { NgClass, isPlatformBrowser } from '@angular/common'; // <-- Importar NgClass e isPlatformBrowser
+import { NgClass, isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
+import { UserService } from '../../../core/services/user.service'; // <-- 1. Importar UserService
 import { ConfirmModalComponent } from '../../modals/confirm-modal/confirm-modal.component';
 
 interface NavItem {
@@ -15,7 +16,7 @@ interface NavItem {
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, ConfirmModalComponent, NgClass], // <-- Añadir NgClass
+  imports: [RouterLink, RouterLinkActive, ConfirmModalComponent, NgClass],
   templateUrl: './sidebar.html',
   styles: [
     `
@@ -37,13 +38,15 @@ interface NavItem {
 })
 export class Sidebar implements OnInit {
   private authService = inject(AuthService);
+  private userService = inject(UserService); // <-- 2. Inyectar el servicio
   private router = inject(Router);
   private sanitizer = inject(DomSanitizer);
-  private platformId = inject(PLATFORM_ID); // <-- Inyectar PLATFORM_ID
+  private platformId = inject(PLATFORM_ID);
 
   isLoadingLogout = false;
   showLogoutModal = false;
-  isDarkMode = false; // <-- Estado del tema
+  isDarkMode = false;
+  isAdmin = false; // <-- 3. Bandera de estado para el rol
 
   navItems: NavItem[] = [
     {
@@ -79,7 +82,6 @@ export class Sidebar implements OnInit {
       safeIcon: this.sanitizer.bypassSecurityTrustHtml(item.icon),
     }));
 
-    // <-- Lógica de inicialización del tema
     if (isPlatformBrowser(this.platformId)) {
       const savedTheme = localStorage.getItem('theme');
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -89,9 +91,26 @@ export class Sidebar implements OnInit {
         document.documentElement.classList.add('dark');
       }
     }
+
+    // 4. Llamar a la validación del rol al iniciar el componente
+    this.checkUserRole();
   }
 
-  // <-- Nuevo método para alternar el tema
+  // --- NUEVO MÉTODO PARA VALIDAR EL ROL ---
+  private checkUserRole() {
+    this.userService.getMe().subscribe({
+      next: (res) => {
+        if (res.data && res.data.role === 'Admin') {
+          this.isAdmin = true;
+        }
+      },
+      error: (err) => {
+        console.error('Error al verificar el rol de usuario:', err);
+      },
+    });
+  }
+  // ----------------------------------------
+
   toggleTheme() {
     if (isPlatformBrowser(this.platformId)) {
       this.isDarkMode = !this.isDarkMode;
