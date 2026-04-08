@@ -25,3 +25,16 @@ export interface UpdateProfilePayload {
   sewingLevel?: SewingLevel | null;
   interests?: string[];
 }
+
+export interface DashboardStats {
+  counts: {
+    totalUsers: number;
+    totalTutorials: number;
+    pendingReports: number;
+  };
+  charts: {
+    userGrowth: { _id: { month: number; year: number }; count: number }[];
+    demographics: { _id: string; count: number }[];
+    engagement: { _id: string; count: number }[];
+  };
+}

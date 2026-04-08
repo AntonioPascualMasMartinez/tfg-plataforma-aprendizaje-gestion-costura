@@ -17,6 +17,8 @@ router.use(authenticate);
 
 // Creación de contenido (SOLO ADMINS)
 router.post('/', authorizeRoles('Admin'), TutorialController.create); // <-- NUEVA RUTA PROTEGIDA
+router.put('/:id', authorizeRoles('Admin'), TutorialController.update);
+router.delete('/:id', authorizeRoles('Admin'), TutorialController.delete);
 
 // Interacción de los usuarios con el tutorial
 router.post('/:id/start', TutorialController.start);

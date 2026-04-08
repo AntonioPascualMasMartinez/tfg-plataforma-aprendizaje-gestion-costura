@@ -34,7 +34,7 @@ app.use(express.json()); // Parseo de JSON payloads
 app.use(express.urlencoded({ extended: true })); // Parseo de datos x-www-form-urlencoded
 app.use(cookieParser()); // Parseo de Cookies para extraer el Refresh Token
 
-// 4. Montaje de Rutas Maestras (Vertical Slices)
+// 4. Montaje de Rutas  (Vertical Slices)
 
 const authRoutes = require('./modules/auth/auth.routes');
 const userRoutes = require('./modules/users/user.routes');
@@ -50,7 +50,7 @@ app.use('/api/v1/projects', projectRoutes);
 app.use('/api/v1/tutorials', tutorialRoutes);
 app.use('/api/v1/community', communityRoutes);
 
-// Endpoint de verificación rápida (Healthcheck)
+// Endpoint de verificación rápida
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'OK', message: 'Servidor operativo y escuchando.' });
 });
@@ -59,13 +59,12 @@ app.use(
   '/api-docs',
   swaggerUi.serve,
   swaggerUi.setup(swaggerSpec, {
-    customSiteTitle: 'Documentación API - Costura',
+    customSiteTitle: 'Documentación API',
   }),
 );
 
-// 5. Middleware Global de Manejo de Errores (Siempre debe ir al final)
+// 5. Middleware Global de Manejo de Errores
 const errorHandler = require('./middlewares/error.middleware');
 app.use(errorHandler);
 
-// Exportamos la instancia pura, facilitando las pruebas de integración con Supertest
 module.exports = app;

@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angula
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { merge, Subscription } from 'rxjs';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 import { TutorialCardComponent } from '../../../shared/components/tutorial-card/tutorial-card';
 import { TutorialService } from '../../../core/services/tutorial.service';
@@ -18,7 +19,7 @@ export class Tutoriales implements OnInit, OnDestroy {
   private tutorialService = inject(TutorialService);
   private cdr = inject(ChangeDetectorRef);
 
-  // Estados
+  // --- ESTADOS ---
   featuredTutorial: Tutorial | null = null;
   gridTutorials: Tutorial[] = [];
 
@@ -27,18 +28,19 @@ export class Tutoriales implements OnInit, OnDestroy {
 
   currentPage = 1;
   totalPages = 1;
-  limit = 10; // 1 Destacado + 9 Grid
+  limit = 10; // Si hay destacado, 1 para él y 9 para el grid. Si hay filtros, los 10 van al grid.
 
   selectedTutorial: Tutorial | null = null;
   showDetailModal = false;
 
-  // Filtros interactivos
+  // --- FILTROS INTERACTIVOS ---
+  searchTerm = new FormControl(''); // <-- NUEVO: Buscador de texto
   categoryFilter = new FormControl('Todos');
   difficultyFilter = new FormControl('Todos');
   timeFilter = new FormControl('Todos');
 
-  // Arrays de opciones basados estrictamente en tutorial.model.ts
-  readonly categories = ['Todos', 'Bolsos', 'Monederos', 'Ropa', 'Hogar', 'Accesorios'];
+  // Opciones de filtros
+  readonly categories = ['Todos', 'Bolsos', 'Monederos', 'Carteras'];
   readonly difficulties: ('Todos' | DifficultyLevel)[] = [
     'Todos',
     'Principiante',
@@ -61,12 +63,14 @@ export class Tutoriales implements OnInit, OnDestroy {
   }
 
   private setupFilters() {
+    // Configuramos RxJS para que reaccione a cualquier cambio en los filtros
+    const search$ = this.searchTerm.valueChanges.pipe(debounceTime(400), distinctUntilChanged());
     const cat$ = this.categoryFilter.valueChanges;
     const diff$ = this.difficultyFilter.valueChanges;
     const time$ = this.timeFilter.valueChanges;
 
-    this.filterSubscription = merge(cat$, diff$, time$).subscribe(() => {
-      this.currentPage = 1;
+    this.filterSubscription = merge(search$, cat$, diff$, time$).subscribe(() => {
+      this.currentPage = 1; // Al filtrar, siempre volvemos a la página 1
       this.loadTutorials();
     });
   }
@@ -76,57 +80,79 @@ export class Tutoriales implements OnInit, OnDestroy {
     this.errorMessage = '';
     this.cdr.markForCheck();
 
+    // 1. Preparamos los parámetros exactos para el Backend
+    const search = this.searchTerm.value || '';
     const category = this.categoryFilter.value === 'Todos' ? undefined : this.categoryFilter.value!;
+    const difficulty =
+      this.difficultyFilter.value === 'Todos' ? undefined : this.difficultyFilter.value!;
 
-    this.tutorialService.getCatalog(this.currentPage, this.limit, category).subscribe({
-      next: (response) => {
-        if (response.data) {
-          let fetchedDocs = response.data.docs;
+    // Mapeo del filtro de texto a minutos reales
+    let maxTime: number | undefined = undefined;
+    let minTime: number | undefined = undefined;
 
-          // Filtrado Local: Por difficultyLevel (según modelo)
-          const diff = this.difficultyFilter.value;
-          if (diff !== 'Todos') {
-            fetchedDocs = fetchedDocs.filter((t: Tutorial) => t.difficultyLevel === diff);
-          }
+    if (this.timeFilter.value === 'Menos de 30 min') maxTime = 30;
+    if (this.timeFilter.value === '30 a 60 min') {
+      maxTime = 60;
+      minTime = 30;
+    }
+    if (this.timeFilter.value === 'Más de 1 hora') minTime = 60;
 
-          // Filtrado Local: Por estimatedTime (según modelo)
-          const time = this.timeFilter.value;
-          if (time !== 'Todos') {
-            fetchedDocs = fetchedDocs.filter((t: Tutorial) => {
-              const dur = t.estimatedTime || 0;
-              if (time === 'Menos de 30 min') return dur < 30;
-              if (time === '30 a 60 min') return dur >= 30 && dur <= 60;
-              if (time === 'Más de 1 hora') return dur > 60;
-              return true;
-            });
-          }
+    // Llamada al servicio pasando la carga al backend
+    this.tutorialService
+      .getCatalog(this.currentPage, this.limit, category, difficulty, maxTime)
+      .subscribe({
+        next: (response) => {
+          if (response.data) {
+            let fetchedDocs = response.data.docs;
 
-          this.totalPages = response.data.totalPages;
-          this.currentPage = response.data.page;
+            // *Nota: Fallback local temporal para `search` y `minTime` hasta que actualicemos tu Backend
+            if (search) {
+              const query = search.toLowerCase();
+              fetchedDocs = fetchedDocs.filter(
+                (t: Tutorial) =>
+                  t.title.toLowerCase().includes(query) ||
+                  t.description.toLowerCase().includes(query),
+              );
+            }
+            if (minTime) {
+              fetchedDocs = fetchedDocs.filter((t: Tutorial) => (t.estimatedTime || 0) >= minTime!);
+            }
 
-          // Separar Destacado vs Grid
-          if (this.currentPage === 1 && fetchedDocs.length > 0) {
-            this.featuredTutorial = fetchedDocs[0];
-            this.gridTutorials = fetchedDocs.slice(1);
+            this.totalPages = response.data.totalPages;
+            this.currentPage = response.data.page;
+
+            // 2. Lógica del "Destacado Inteligente"
+            const isFiltering =
+              search !== '' ||
+              category !== undefined ||
+              difficulty !== undefined ||
+              maxTime !== undefined ||
+              minTime !== undefined;
+
+            // Solo mostramos el destacado si estamos en la página 1 y NO hay ningún filtro activo
+            if (this.currentPage === 1 && !isFiltering && fetchedDocs.length > 0) {
+              this.featuredTutorial = fetchedDocs[0];
+              this.gridTutorials = fetchedDocs.slice(1);
+            } else {
+              // Si el usuario está buscando algo, ocultamos el gigante y mostramos todo en el grid
+              this.featuredTutorial = null;
+              this.gridTutorials = fetchedDocs;
+            }
           } else {
             this.featuredTutorial = null;
-            this.gridTutorials = fetchedDocs;
+            this.gridTutorials = [];
           }
-        } else {
-          this.featuredTutorial = null;
-          this.gridTutorials = [];
-        }
 
-        this.isLoading = false;
-        this.cdr.markForCheck();
-      },
-      error: (err) => {
-        console.error('Error cargando el catálogo:', err);
-        this.errorMessage = 'No se pudieron cargar los tutoriales. Por favor, intenta de nuevo.';
-        this.isLoading = false;
-        this.cdr.markForCheck();
-      },
-    });
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        },
+        error: (err) => {
+          console.error('Error cargando el catálogo:', err);
+          this.errorMessage = 'No se pudieron cargar los tutoriales. Por favor, intenta de nuevo.';
+          this.isLoading = false;
+          this.cdr.markForCheck();
+        },
+      });
   }
 
   setCategory(cat: string) {
@@ -153,14 +179,9 @@ export class Tutoriales implements OnInit, OnDestroy {
     }, 300);
   }
 
-  /**
-   * Obtiene dinámicamente la imagen de portada basada en el último paso del tutorial
-   */
   getTutorialCover(tutorial: Tutorial): string | null {
     if (!tutorial.steps || tutorial.steps.length === 0) return null;
-    
-    // Invertimos el array para encontrar el último mediaUrl disponible
-    const lastStepWithMedia = [...tutorial.steps].reverse().find(s => s.mediaUrl);
+    const lastStepWithMedia = [...tutorial.steps].reverse().find((s) => s.mediaUrl);
     return lastStepWithMedia ? lastStepWithMedia.mediaUrl : null;
   }
 }

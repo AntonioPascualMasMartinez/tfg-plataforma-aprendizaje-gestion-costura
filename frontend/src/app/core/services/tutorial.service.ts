@@ -16,23 +16,15 @@ import {
 })
 export class TutorialService {
   private http = inject(HttpClient);
-  // Asumiendo que tu ruta base en Express es /api/v1/tutorials
   private readonly apiUrl = `${environment.apiUrl}/tutorials`;
 
-  // ==========================================
-  // Rutas Públicas
-  // ==========================================
-
-  /**
-   * Obtiene el catálogo paginado de tutoriales disponibles
-   * GET /api/v1/tutorials
-   */
+  // --- RUTAS PÚBLICAS ---
   getCatalog(
     page: number = 1,
     limit: number = 10,
     category?: string,
-    difficultyLevel?: string, // <-- NUEVO FILTRO
-    maxTime?: number, // <-- NUEVO FILTRO
+    difficultyLevel?: string,
+    maxTime?: number,
   ): Observable<ApiResponse<PaginatedResult<Tutorial>>> {
     let params = new HttpParams().set('page', page.toString()).set('limit', limit.toString());
 
@@ -43,47 +35,36 @@ export class TutorialService {
     return this.http.get<ApiResponse<PaginatedResult<Tutorial>>>(this.apiUrl, { params });
   }
 
-  /**
-   * Obtiene los detalles de un tutorial específico (Modo Lectura)
-   * GET /api/v1/tutorials/:id
-   */
   getTutorialById(tutorialId: string): Observable<ApiResponse<Tutorial>> {
     return this.http.get<ApiResponse<Tutorial>>(`${this.apiUrl}/${tutorialId}`);
   }
 
-  // ==========================================
-  // Rutas de Administración (Requieren Rol 'Admin')
-  // ==========================================
-
-  /**
-   * Crea un nuevo tutorial (Solo Admin)
-   * POST /api/v1/tutorials
-   */
+  // --- RUTAS DE ADMINISTRACIÓN (Rol Admin) ---
   createTutorial(payload: CreateTutorialPayload): Observable<ApiResponse<Tutorial>> {
-    // Usamos 'any' por ahora, lo tiparemos luego con CreateTutorialPayload
     return this.http.post<ApiResponse<Tutorial>>(this.apiUrl, payload);
   }
 
-  // ==========================================
-  // Rutas Privadas (Requieren Autenticación vía Interceptor)
-  // ==========================================
+  // NUEVO: Método para actualizar tutorial
+  updateTutorial(
+    tutorialId: string,
+    payload: Partial<CreateTutorialPayload>,
+  ): Observable<ApiResponse<Tutorial>> {
+    return this.http.put<ApiResponse<Tutorial>>(`${this.apiUrl}/${tutorialId}`, payload);
+  }
 
-  /**
-   * Inicia un tutorial guiado (Clona el proyecto en el espacio del usuario)
-   * POST /api/v1/tutorials/:id/start
-   */
+  // NUEVO: Método para eliminar tutorial
+  deleteTutorial(tutorialId: string): Observable<ApiResponse<null>> {
+    return this.http.delete<ApiResponse<null>>(`${this.apiUrl}/${tutorialId}`);
+  }
+
+  // --- RUTAS PRIVADAS (Interacción) ---
   startTutorial(tutorialId: string): Observable<ApiResponse<StartTutorialResponse>> {
-    // El cuerpo va vacío {} ya que el ID va en la URL y el usuario en el token
     return this.http.post<ApiResponse<StartTutorialResponse>>(
       `${this.apiUrl}/${tutorialId}/start`,
       {},
     );
   }
 
-  /**
-   * Actualiza el paso actual del tutorial para calcular el porcentaje de progreso
-   * PUT /api/v1/tutorials/:id/progress
-   */
   updateProgress(
     tutorialId: string,
     currentStep: number,

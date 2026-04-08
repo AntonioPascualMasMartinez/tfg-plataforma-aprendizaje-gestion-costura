@@ -24,10 +24,14 @@ export class TutorialDetailModalComponent {
 
   isLoading = false;
 
-  // Lógica para extraer la imagen de portada
+  /**
+   * Obtiene la imagen de portada.
+   * Busca en orden inverso (desde el último paso hacia el primero)
+   * para mostrar el resultado final del tutorial.
+   */
   get coverImage(): string | null {
     if (this.tutorial.steps && this.tutorial.steps.length > 0) {
-      const stepWithImage = this.tutorial.steps.find((step) => step.mediaUrl);
+      const stepWithImage = [...this.tutorial.steps].reverse().find((step) => step.mediaUrl);
       return stepWithImage ? stepWithImage.mediaUrl : null;
     }
     return null;
@@ -60,27 +64,42 @@ export class TutorialDetailModalComponent {
     }
   }
 
-  // Llamada al backend para clonar e iniciar el tutorial
+  /**
+   * Llamada al backend para clonar e iniciar el tutorial
+   */
   startTutorial() {
     this.isLoading = true;
     this.tutorialService.startTutorial(this.tutorial._id).subscribe({
       next: (response) => {
         this.isLoading = false;
-        this.toastService.success('¡Tutorial iniciado! Proyecto añadido a tu colección.');
+        this.toastService.success('¡Tutorial iniciado! Preparando tu mesa de trabajo...');
 
         // El backend devuelve el proyecto clonado, tomamos su ID para redirigir
         const newProjectId = response.data.clonedProject._id;
 
-        // Cerramos el modal y navegamos a la vista de ese nuevo proyecto
+        // Cerramos el modal y navegamos a la vista inmersiva del Workshop
         this.closeModal();
         this.router.navigate(['/home/proyectos', newProjectId]);
       },
       error: (err) => {
         console.error('Error al iniciar el tutorial:', err);
         this.isLoading = false;
-        this.toastService.error(
-          err.error?.message || 'Error al iniciar el tutorial. ¿Quizás ya lo habías iniciado?',
-        );
+
+        // Manejo inteligente de error: Si ya lo había iniciado, lo llevamos a su Taller
+        const errorMessage = err.error?.message?.toLowerCase() || '';
+
+        if (
+          errorMessage.includes('iniciado') ||
+          errorMessage.includes('ya existe') ||
+          err.status === 400
+        ) {
+          this.toastService.info('Ya estabas realizando este tutorial. Abriendo tu taller...');
+          this.closeModal();
+          // Como no tenemos el ID del clon exacto en el error, lo llevamos a la pestaña de sus tutoriales
+          this.router.navigate(['/home/proyectos']);
+        } else {
+          this.toastService.error('Error al preparar el tutorial. Por favor, intenta de nuevo.');
+        }
       },
     });
   }

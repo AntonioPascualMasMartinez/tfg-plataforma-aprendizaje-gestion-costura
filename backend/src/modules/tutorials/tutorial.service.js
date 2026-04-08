@@ -127,6 +127,21 @@ class TutorialService {
     const newTutorial = await Tutorial.create(tutorialData);
     return newTutorial;
   }
+
+  static async updateTutorial(tutorialId, updateData) {
+    const tutorial = await Tutorial.findByIdAndUpdate(tutorialId, updateData, {
+      new: true,
+      runValidators: true,
+    });
+    if (!tutorial) throw new ApiError(404, 'Tutorial no encontrado.');
+    return tutorial;
+  }
+
+  static async deleteTutorial(tutorialId) {
+    const tutorial = await Tutorial.findByIdAndDelete(tutorialId);
+    if (!tutorial) throw new ApiError(404, 'Tutorial no encontrado.');
+    return tutorial;
+  }
 }
 
 module.exports = TutorialService;
