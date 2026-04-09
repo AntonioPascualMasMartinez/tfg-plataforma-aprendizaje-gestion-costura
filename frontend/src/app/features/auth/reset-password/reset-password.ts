@@ -1,3 +1,9 @@
+/**
+ * @file reset-password.ts
+ * @description Componente encargado de la fase final de restitución de credenciales.
+ * Intercepta el token criptográfico emitido por URL y aplica validadores personalizados
+ * (Validación cruzada) para garantizar la consistencia entre la nueva contraseña y su confirmación.
+ */
 import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import {
@@ -28,6 +34,7 @@ export class ResetPassword implements OnInit {
   successMessage = '';
   errorMessage = '';
 
+  /** Formulario reactivo instrumentado con el validador cruzado a nivel de grupo. */
   resetForm: FormGroup = this.fb.group(
     {
       newPassword: ['', [Validators.required, Validators.minLength(8)]],
@@ -39,16 +46,19 @@ export class ResetPassword implements OnInit {
   showNewPassword = false;
   showConfirmPassword = false;
 
-  toggleNewPasswordVisibility() {
+  toggleNewPasswordVisibility(): void {
     this.showNewPassword = !this.showNewPassword;
   }
 
-  toggleConfirmPasswordVisibility() {
+  toggleConfirmPasswordVisibility(): void {
     this.showConfirmPassword = !this.showConfirmPassword;
   }
-  
-  ngOnInit() {
-    // Capturamos el token de la URL (ej: ?token=...)
+
+  /**
+   * Ciclo de vida: Inicialización.
+   * Extrae el parámetro de consulta (QueryParam) de la ruta activa para capturar el token de sesión temporal.
+   */
+  ngOnInit(): void {
     this.token = this.route.snapshot.queryParamMap.get('token');
 
     if (!this.token) {
@@ -57,14 +67,22 @@ export class ResetPassword implements OnInit {
     }
   }
 
-  // Validador personalizado para confirmar que las contraseñas coinciden
+  /**
+   * Validador cruzado personalizado. Evalúa la equivalencia estricta entre dos controles
+   * independientes del mismo grupo reactivo.
+   * @param {AbstractControl} control - Instancia del grupo de formulario.
+   * @returns {ValidationErrors | null} Objeto de error si la validación falla, o nulo en caso de éxito.
+   */
   private passwordMatchValidator(control: AbstractControl): ValidationErrors | null {
     const password = control.get('newPassword')?.value;
     const confirmPassword = control.get('confirmPassword')?.value;
     return password === confirmPassword ? null : { passwordMismatch: true };
   }
 
-  onSubmit() {
+  /**
+   * Compone el Payload (Token + Nueva Credencial) y solicita la actualización al backend.
+   */
+  onSubmit(): void {
     if (this.resetForm.invalid || !this.token) return;
 
     this.isLoading = true;

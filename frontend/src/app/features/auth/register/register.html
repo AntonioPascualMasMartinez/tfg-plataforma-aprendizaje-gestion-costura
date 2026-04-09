@@ -38,9 +38,9 @@
         </div>
 
         <div class="relative flex items-center mb-2">
-          <div class="flex-grow border-t border-border-main/20"></div>
-          <span class="flex-shrink-0 mx-4 text-muted text-[14px] font-medium">O con tu correo</span>
-          <div class="flex-grow border-t border-border-main/20"></div>
+          <div class="grow border-t border-border-main/20"></div>
+          <span class="shrink-0 mx-4 text-muted text-[14px] font-medium">O con tu correo</span>
+          <div class="grow border-t border-border-main/20"></div>
         </div>
 
         <div class="flex flex-col gap-2">
@@ -50,7 +50,7 @@
             id="displayName"
             formControlName="displayName"
             placeholder="Ana Costurera"
-            class="h-[48px] px-4 rounded-xl border border-border-main/20 bg-surface text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+            class="h-12 px-4 rounded-xl border border-border-main/20 bg-surface text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
             [class.border-danger]="
               registerForm.get('displayName')?.invalid && registerForm.get('displayName')?.touched
             "
@@ -64,7 +64,7 @@
             id="email"
             formControlName="email"
             placeholder="tu@email.com"
-            class="h-[48px] px-4 rounded-xl border border-border-main/20 bg-surface text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+            class="h-12 px-4 rounded-xl border border-border-main/20 bg-surface text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
             [class.border-danger]="
               registerForm.get('email')?.invalid && registerForm.get('email')?.touched
             "
@@ -79,7 +79,7 @@
               id="password"
               formControlName="password"
               placeholder="Mínimo 8 caracteres"
-              class="w-full h-[48px] pl-4 pr-11 rounded-xl border border-border-main/20 bg-surface text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
+              class="w-full h-12 pl-4 pr-11 rounded-xl border border-border-main/20 bg-surface text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
               [class.border-danger]="
                 registerForm.get('password')?.invalid && registerForm.get('password')?.touched
               "
@@ -148,7 +148,7 @@
           <select
             id="sewingLevel"
             formControlName="sewingLevel"
-            class="h-[48px] px-4 rounded-xl border border-border-main/20 bg-surface text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
+            class="h-12 px-4 rounded-xl border border-border-main/20 bg-surface text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer"
           >
             <option value="Principiante">Principiante</option>
             <option value="Intermedio">Intermedio</option>
@@ -163,7 +163,7 @@
           <div class="flex flex-wrap gap-2 mt-1">
             @for (interest of interestsList; track interest) {
               <label
-                class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-border-main/20 bg-surface cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/10"
+                class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-border-main/20 bg-surface cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-colors has-checked:border-primary has-checked:bg-primary/10"
               >
                 <input
                   type="checkbox"
@@ -240,7 +240,7 @@
         ¡Cuenta creada!
       </h1>
 
-      <p class="text-[16px] text-muted mb-8 max-w-[300px]">
+      <p class="text-[16px] text-muted mb-8 max-w-75">
         Bienvenido a la comunidad. Tu registro se ha completado con éxito, ya puedes empezar a
         explorar.
       </p>

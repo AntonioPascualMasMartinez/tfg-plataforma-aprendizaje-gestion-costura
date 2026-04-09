@@ -1,3 +1,10 @@
+/**
+ * @file register.ts
+ * @description Componente responsable del flujo de creación de nuevas cuentas de usuario.
+ * Implementa un patrón de diseño tipo asistente (Wizard) de múltiples fases, empleando
+ * formularios reactivos (ReactiveForms) para la validación progresiva de datos. Soporta
+ * tanto el registro tradicional por credenciales como la delegación de identidad vía OAuth 2.0 (Google).
+ */
 import { ChangeDetectorRef, Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -19,29 +26,39 @@ export class Register implements OnInit {
   private socialAuthService = inject(SocialAuthService);
   private platformId = inject(PLATFORM_ID);
   private cdr = inject(ChangeDetectorRef);
-  // Control de las fases del registro (1: Básico, 2: Intereses, 3: Confirmación)
+
+  /** * Máquina de estados que controla el flujo de la interfaz del asistente.
+   * Fases: 1 (Credenciales base), 2 (Perfilado de intereses), 3 (Confirmación de éxito).
+   */
   currentStep = 1;
 
+  /** Diccionario estático de categorías para la personalización del perfil de usuario. */
   interestsList = ['Accesorios', 'Bordado', 'Ropa a medida', 'Sastrería', 'Upcycling'];
 
+  /**
+   * Estructura reactiva del formulario. Agrupa tanto atributos obligatorios
+   * de seguridad como metadatos opcionales para la segmentación del usuario.
+   */
   registerForm: FormGroup = this.fb.group({
     displayName: ['', [Validators.required, Validators.minLength(3)]],
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required, Validators.minLength(8)]],
-    sewingLevel: ['Principiante'], // Opcional
-    interests: [[]], // Array opcional
+    sewingLevel: ['Principiante'],
+    interests: [[]],
   });
 
   showPassword = false;
-
-  togglePasswordVisibility() {
-    this.showPassword = !this.showPassword;
-  }
-
   isLoading = false;
   errorMessage = '';
 
-  // Getter para saber si podemos avanzar al paso 2
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  /**
+   * Propiedad computada que evalúa la completitud estructural de la primera fase del registro.
+   * @returns {boolean} Confirmación de validez de los controles críticos.
+   */
   get isStep1Valid(): boolean {
     const nameValid = this.registerForm.get('displayName')?.valid ?? false;
     const emailValid = this.registerForm.get('email')?.valid ?? false;
@@ -49,7 +66,12 @@ export class Register implements OnInit {
     return nameValid && emailValid && passwordValid;
   }
 
-  ngOnInit() {
+  /**
+   * Ciclo de vida: Inicialización.
+   * Establece la suscripción asíncrona al proveedor de identidad de Google.
+   * Se aísla la ejecución condicionalmente al entorno del cliente para evitar fallos de hidratación en SSR.
+   */
+  ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.socialAuthService.authState.subscribe((user) => {
         if (user && user.idToken) {
@@ -63,8 +85,9 @@ export class Register implements OnInit {
             },
             error: (err) => {
               this.isLoading = false;
-              this.errorMessage = err.error?.message || 'Error al iniciar sesión con Google.';
-              this.cdr.detectChanges(); // 3. Forzar actualización
+              this.errorMessage =
+                err.error?.message || 'Error al procesar la autenticación con Google.';
+              this.cdr.detectChanges();
             },
           });
         }
@@ -72,7 +95,12 @@ export class Register implements OnInit {
     }
   }
 
-  onInterestChange(event: Event) {
+  /**
+   * Captura la interacción sobre el conjunto de casillas de verificación (Checkboxes)
+   * y muta el arreglo interno del control reactivo preservando la inmutabilidad de los datos.
+   * @param {Event} event - Evento nativo del DOM disparado por la entrada del usuario.
+   */
+  onInterestChange(event: Event): void {
     const checkbox = event.target as HTMLInputElement;
     const value = checkbox.value;
     const interestsControl = this.registerForm.get('interests');
@@ -87,35 +115,43 @@ export class Register implements OnInit {
     interestsControl?.setValue(currentInterests);
   }
 
-  // Métodos de navegación entre fases
-  nextStep() {
+  /* ==========================================================================
+     TRANSICIONES DEL ASISTENTE DE REGISTRO
+     ========================================================================== */
+
+  nextStep(): void {
     if (this.isStep1Valid) {
       this.currentStep = 2;
     }
   }
 
-  prevStep() {
+  prevStep(): void {
     this.currentStep = 1;
   }
 
-  onSubmit() {
+  /**
+   * Culmina el flujo recolectando la carga útil del formulario reactivo y
+   * transmitiendo los datos al servicio de identidad para su persistencia en base de datos.
+   */
+  onSubmit(): void {
     if (this.registerForm.invalid) return;
     this.isLoading = true;
     this.errorMessage = '';
 
     this.authService.register(this.registerForm.value).subscribe({
       next: () => {
-        this.currentStep = 3; // Mover a pantalla de éxito
-        this.cdr.detectChanges(); // 4. Forzar cambio de paso en el HTML
+        /* Transición a la vista de confirmación (Paso 3) tras una resolución exitosa */
+        this.currentStep = 3;
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = err.error?.message || 'Error al crear la cuenta.';
-        this.cdr.detectChanges(); // 5. Mostrar error
+        this.errorMessage = err.error?.message || 'Error durante la provisión de la cuenta.';
+        this.cdr.detectChanges();
       },
       complete: () => {
         this.isLoading = false;
-        this.cdr.detectChanges(); // 6. Limpiar estado de carga
+        this.cdr.detectChanges();
       },
     });
   }

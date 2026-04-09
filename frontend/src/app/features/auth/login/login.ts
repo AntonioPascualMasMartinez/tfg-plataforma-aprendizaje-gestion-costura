@@ -1,3 +1,10 @@
+/**
+ * @file login.ts
+ * @description Componente principal de acceso al sistema (Pasarela de Autenticación).
+ * Soporta autenticación mediante credenciales tradicionales (JWT local) y autenticación
+ * delegada OAuth 2.0 (Google). Gestiona el enrutamiento condicional post-login en base
+ * a la jerarquía de roles (RBAC) del usuario autenticado, asegurando compatibilidad con SSR.
+ */
 import { ChangeDetectorRef, Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -9,7 +16,6 @@ import { SocialAuthService, GoogleSigninButtonModule } from '@abacritt/angularx-
 @Component({
   selector: 'app-login',
   standalone: true,
-  // Añadimos GoogleSigninButtonModule a los imports
   imports: [RouterLink, AuthShell, ReactiveFormsModule, GoogleSigninButtonModule],
   templateUrl: './login.html',
 })
@@ -27,26 +33,31 @@ export class Login implements OnInit {
   });
 
   showPassword = false;
-
-  togglePasswordVisibility() {
-    this.showPassword = !this.showPassword;
-  }
-  
   isLoading = false;
   errorMessage = '';
 
-  ngOnInit() {
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  /**
+   * Ciclo de vida: Inicialización.
+   * Suscribe el componente a los cambios de estado del proveedor OAuth externo.
+   * La instanciación se restringe explícitamente al entorno del navegador (isPlatformBrowser)
+   * para evitar excepciones de acceso al objeto 'window' durante el Server-Side Rendering (SSR).
+   */
+  ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.socialAuthService.authState.subscribe((user) => {
         if (user && user.idToken) {
           this.isLoading = true;
-          this.cdr.detectChanges(); // Forzar estado "Verificando..."
+          this.cdr.detectChanges();
 
           this.authService.googleAuth({ idToken: user.idToken }).subscribe({
             next: (response) => {
               localStorage.setItem('accessToken', response.data.accessToken);
 
-              // Verificamos el rol del usuario
+              /* Control de Flujo de Navegación Basado en Roles (RBAC) */
               if (response.data.user.role === 'Admin') {
                 this.router.navigate(['/admin']);
               } else {
@@ -56,7 +67,7 @@ export class Login implements OnInit {
             error: (err) => {
               this.isLoading = false;
               this.errorMessage = err.error?.message || 'Error al iniciar sesión con Google.';
-              this.cdr.detectChanges(); // 3. Forzar actualización
+              this.cdr.detectChanges();
             },
           });
         }
@@ -64,18 +75,21 @@ export class Login implements OnInit {
     }
   }
 
-  onSubmit() {
+  /**
+   * Orquesta el proceso de autenticación por formulario tradicional.
+   */
+  onSubmit(): void {
     if (this.loginForm.invalid) return;
     this.isLoading = true;
     this.errorMessage = '';
 
     this.authService.login(this.loginForm.value).subscribe({
       next: (response) => {
+        /* Persistencia temporal del token JWT para consumo en interceptores HTTP */
         localStorage.setItem('accessToken', response.data.accessToken);
 
-        // Verificamos el rol del usuario
         if (response.data.user.role === 'Admin') {
-          this.router.navigate(['/admin/dashboard']); // O la ruta raíz que decidas para admin
+          this.router.navigate(['/admin/dashboard']);
         } else {
           this.router.navigate(['/home']);
         }
@@ -83,11 +97,11 @@ export class Login implements OnInit {
       error: (err) => {
         this.isLoading = false;
         this.errorMessage = err.error?.message || 'Correo o contraseña incorrectos.';
-        this.cdr.detectChanges(); // 4. Forzar actualización
+        this.cdr.detectChanges();
       },
       complete: () => {
         this.isLoading = false;
-        this.cdr.detectChanges(); // 5. Asegurar que el botón vuelva a su estado original
+        this.cdr.detectChanges();
       },
     });
   }

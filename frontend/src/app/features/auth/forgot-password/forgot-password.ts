@@ -1,3 +1,9 @@
+/**
+ * @file forgot-password.ts
+ * @description Componente gestor del inicio del flujo de recuperación de credenciales.
+ * Utiliza formularios reactivos para validar sintácticamente la entrada del usuario antes
+ * de solicitar al backend la emisión de un token criptográfico a través de correo electrónico.
+ */
 import { Component, inject, ChangeDetectorRef } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -15,6 +21,7 @@ export class ForgotPassword {
   private authService = inject(AuthService);
   private cdr = inject(ChangeDetectorRef);
 
+  /** Estructura reactiva con validación estricta de formato de correo electrónico. */
   recoverForm: FormGroup = this.fb.group({
     email: ['', [Validators.required, Validators.email]],
   });
@@ -23,7 +30,10 @@ export class ForgotPassword {
   successMessage = '';
   errorMessage = '';
 
-  onSubmit() {
+  /**
+   * Ejecuta la solicitud de recuperación tras validar la integridad del formulario local.
+   */
+  onSubmit(): void {
     if (this.recoverForm.invalid) return;
 
     this.isLoading = true;
@@ -42,9 +52,13 @@ export class ForgotPassword {
       },
       error: (err) => {
         this.isLoading = false;
-        //Hacemos la lectura del error más robusta por si el interceptor devuelve un string o altera el objeto
-        this.errorMessage = typeof err === 'string' ? err : (err.error?.message || err.message || 'Hubo un error al procesar tu solicitud.');
-        this.cdr.detectChanges(); 
+        /* Resolución dinámica del objeto de error para prevenir fallos de lectura en 
+           excepciones interceptadas o errores nativos de red. */
+        this.errorMessage =
+          typeof err === 'string'
+            ? err
+            : err.error?.message || err.message || 'Hubo un error al procesar tu solicitud.';
+        this.cdr.detectChanges();
       },
     });
   }
