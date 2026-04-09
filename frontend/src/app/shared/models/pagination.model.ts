@@ -1,3 +1,10 @@
+/**
+ * @file pagination.model.ts
+ * @description Envoltorio genérico para estructuras de datos paginadas.
+ * Facilita la construcción de interfaces de navegación (paginadores, scroll infinito)
+ * exponiendo los metadatos de los cursores de la base de datos.
+ */
+
 export interface PaginatedResult<T> {
   docs: T[];
   totalDocs: number;
