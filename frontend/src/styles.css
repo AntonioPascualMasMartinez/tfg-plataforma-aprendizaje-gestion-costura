@@ -1,12 +1,18 @@
+/**
+ * @file styles.css
+ * @description Hoja de estilos global del proyecto. Define los tokens de diseño,
+ * tipografías, componentes atómicos y variables de tema (claro/oscuro) integrados con Tailwind CSS v4.
+ */
+
 /* 1. Directivas principales de Tailwind v4 */
 @import "tailwindcss";
 
-/* 2. Carga de tus tipografías personalizadas */
+/* 2. Carga de tipografías personalizadas */
 @font-face {
   font-family: 'Agrandir';
   src: url('/fonts/agrandir-regular.otf') format('opentype');
   font-weight: 400;
-  /* Coincide con el peso del Body en tu Tabla 43 */
+  /* Correspondiente al peso tipográfico del Body (Ref: Tabla 43) */
   font-style: normal;
   font-display: swap;
 }
@@ -15,22 +21,21 @@
   font-family: 'Loubag';
   src: url('/fonts/loubag-semi-bold.ttf') format('truetype');
   font-weight: 600;
-  /* Coincide con H3 y base de títulos */
+  /* Correspondiente al peso tipográfico H3 y títulos (Ref: Tabla 43) */
   font-style: normal;
   font-display: swap;
 }
 
-/* 3. CONFIGURACIÓN DEL TEMA (Tokens de Diseño - Tabla 42) */
+/* 3. Configuración del Tema y Tokens de Diseño (Ref: Tabla 42) */
 @theme {
   /* Tipografía */
   --font-sans: 'Agrandir', sans-serif;
   --font-display: 'Loubag', sans-serif;
 
-  /* Paleta de Colores Semánticos (Roles) */
+  /* Paleta de Colores Semánticos y Roles */
   --color-bg: #FFFFFF;
   --color-surface: #FFFFFF;
   --color-text-main: #000000;
-  /* Evitamos colisión con la clase text de Tailwind */
   --color-muted: #818181;
   --color-border-main: #818181;
 
@@ -46,15 +51,14 @@
   --color-focus: #0EA5E9;
 }
 
-/* 4. Estilos base y Tipografía (Tabla 43 y Accesibilidad 1.1.4) */
+/* 4. Estilos Base y Accesibilidad */
 @layer base {
   body {
-    /* Fondo principal y texto base a 16px con interlineado cómodo */
     @apply font-sans antialiased bg-bg text-text-main text-[16px] leading-relaxed;
     @apply transition-colors duration-300;
   }
 
-  /* Escala Tipográfica (Tabla 43) */
+  /* Escala Tipográfica (Ref: Tabla 43) */
   h1 {
     @apply font-display text-[32px] md:text-[36px] font-bold text-text-main;
   }
@@ -75,40 +79,32 @@
     @apply text-[14px] md:text-[16px] font-medium text-text-main;
   }
 
-  /* Accesibilidad por defecto (1.1.4): Foco visible global */
+  /* Criterio de Accesibilidad 1.1.4: Foco visible global */
   *:focus-visible {
     @apply outline-2 outline-offset-2 outline-focus;
   }
 
+  /* Variables para el esquema de color oscuro */
   .dark {
     --color-bg: #121212;
-    /* Fondo principal oscuro */
     --color-surface: #1E1E1E;
-    /* Fondo de navbar/tarjetas ligeramente más claro */
     --color-text-main: #F5F5F5;
-    /* Texto claro (no blanco puro para no deslumbrar) */
     --color-muted: #A3A3A3;
     --color-border-main: #3F3F3F;
-
-    /* Si lo deseas, puedes aclarar sutilmente tu color primario aquí 
-       para que tenga mejor contraste sobre fondos oscuros:
-       --color-primary: #FF7026; 
-    */
   }
 }
 
-/* 5. Componentes Atómicos (Tabla 45) */
+/* 5. Componentes Atómicos (Ref: Tabla 45) */
 @layer components {
 
-  /* Botón Base (Altura mínima 44px interactiva) */
+  /* Botón Base */
   .btn {
-    @apply inline-flex items-center justify-center min-h-[44px] px-5 py-2 text-[14px] md:text-[16px] font-semibold rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center min-h-11 px-5 py-2 text-[14px] md:text-[16px] font-semibold rounded-lg transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  /* Variantes de botones */
+  /* Variantes semánticas de botones */
   .btn-primary {
     @apply bg-primary text-white hover:bg-[#E65000];
-    /* Un tono ligeramente más oscuro para hover */
   }
 
   .btn-secondary {
@@ -121,17 +117,12 @@
 }
 
 /* =========================================
-     CUSTOM SCROLLBAR (Identidad Needly)
-     ========================================= */
+   Personalización de la Barra de Desplazamiento
+   ========================================= */
 
 html {
   scrollbar-width: thin;
   scrollbar-color: var(--color-border-main) transparent;
-}
-
-.btn {
-  @apply cursor-pointer transition-all duration-300;
-  /* O simplemente 'cursor: pointer;' si no usas directivas @apply */
 }
 
 ::-webkit-scrollbar {
@@ -143,7 +134,6 @@ html {
   background: transparent;
 }
 
-/* La barra en sí (Thumb) */
 ::-webkit-scrollbar-thumb {
   background-color: var(--color-border-main);
   border-radius: 9999px;

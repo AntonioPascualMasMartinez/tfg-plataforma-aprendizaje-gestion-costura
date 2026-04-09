@@ -1,3 +1,9 @@
+/**
+ * @file server.ts
+ * @description Servidor web basado en Express configurado para gestionar el 
+ * Server-Side Rendering (SSR) de la aplicación Angular.
+ */
+
 import {
   AngularNodeAppEngine,
   createNodeRequestHandler,
@@ -13,19 +19,8 @@ const app = express();
 const angularApp = new AngularNodeAppEngine();
 
 /**
- * Example Express Rest API endpoints can be defined here.
- * Uncomment and define endpoints as necessary.
- *
- * Example:
- * ```ts
- * app.get('/api/{*splat}', (req, res) => {
- *   // Handle API request
- * });
- * ```
- */
-
-/**
- * Serve static files from /browser
+ * Middleware para la entrega de archivos estáticos.
+ * Se sirven los recursos compilados de la carpeta /browser.
  */
 app.use(
   express.static(browserDistFolder, {
@@ -36,7 +31,9 @@ app.use(
 );
 
 /**
- * Handle all other requests by rendering the Angular application.
+ * Interceptor principal de peticiones.
+ * Todas las rutas no gestionadas por los recursos estáticos son delegadas 
+ * al motor de Angular para su renderizado en el servidor.
  */
 app.use((req, res, next) => {
   angularApp
@@ -48,8 +45,9 @@ app.use((req, res, next) => {
 });
 
 /**
- * Start the server if this module is the main entry point, or it is ran via PM2.
- * The server listens on the port defined by the `PORT` environment variable, or defaults to 4000.
+ * Inicialización del servidor.
+ * Verifica si el módulo se ejecuta como proceso principal o a través de un gestor (ej. PM2).
+ * El puerto por defecto es el 4000, sobreescribible mediante variables de entorno.
  */
 if (isMainModule(import.meta.url) || process.env['pm_id']) {
   const port = process.env['PORT'] || 4000;
@@ -57,12 +55,12 @@ if (isMainModule(import.meta.url) || process.env['pm_id']) {
     if (error) {
       throw error;
     }
-
-    console.log(`Node Express server listening on http://localhost:${port}`);
+    console.log(`Servidor Node Express en ejecución: http://localhost:${port}`);
   });
 }
 
 /**
- * Request handler used by the Angular CLI (for dev-server and during build) or Firebase Cloud Functions.
+ * Exportación del manejador de peticiones para su uso interno por Angular CLI 
+ * durante el desarrollo o compilación, así como en despliegues serverless.
  */
 export const reqHandler = createNodeRequestHandler(app);
