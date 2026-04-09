@@ -1,3 +1,9 @@
+/**
+ * @file tutorials.component.ts
+ * @description Módulo administrativo integral para la gestión (CRUD) del catálogo formativo.
+ * Orquesta la presentación tabular de las unidades didácticas y centraliza el manejo de modales
+ * para la autoría, modificación y purgado de los recursos pedagógicos.
+ */
 import {
   Component,
   inject,
@@ -15,7 +21,9 @@ import { Tutorial, CreateTutorialPayload } from '../../../shared/models/tutorial
 import { CreateTutorialModalComponent } from '../../../shared/modals/create-tutorial-modal/create-tutorial-modal.component';
 import { ConfirmModalComponent } from '../../../shared/modals/confirm-modal/confirm-modal.component';
 
-// Interfaz para el modal de confirmación (Borrado)
+/**
+ * DTO interno para el seguimiento del estado asíncrono del flujo de borrado.
+ */
 interface DeleteModalState {
   isOpen: boolean;
   isLoading: boolean;
@@ -28,7 +36,7 @@ interface DeleteModalState {
   standalone: true,
   imports: [DatePipe, CreateTutorialModalComponent, ConfirmModalComponent, ReactiveFormsModule],
   templateUrl: './tutorials.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush, // Optimización de rendimiento
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TutorialsComponent implements OnInit, OnDestroy {
   private tutorialService = inject(TutorialService);
@@ -40,27 +48,27 @@ export class TutorialsComponent implements OnInit, OnDestroy {
   errorMessage = '';
   successMessage = '';
 
-  // --- Filtros Reactivos ---
-  searchControl = new FormControl(''); // Servirá para Título o Categoría (búsqueda local por ahora)
-  difficultyControl = new FormControl(''); // Filtro enviado al backend
+  /* Controles reactivos de filtrado bidimensional (Texto libre y Selectores categóricos) */
+  searchControl = new FormControl('');
+  difficultyControl = new FormControl('');
   searchTerm = '';
 
-  // --- Paginación ---
+  /* Variables de control de Paginación */
   currentPage = 1;
   limit = 10;
   totalPages = 1;
   totalDocs = 0;
 
-  // --- Ordenación ---
+  /* Criterios de ordenación matricial */
   sortColumn: keyof Tutorial | '' = '';
   sortDirection: 'asc' | 'desc' = 'asc';
 
-  // --- Estado Modal Creación/Edición ---
+  /* Interfaz transaccional: Creación y Edición */
   isCreateModalOpen = false;
   isSavingTutorial = false;
-  selectedTutorialForEdit: Tutorial | null = null; // Si es null, es Creación; si tiene valor, es Edición
+  selectedTutorialForEdit: Tutorial | null = null;
 
-  // --- Estado Modal Confirmación de Borrado ---
+  /* Interfaz transaccional: Supresión de registros */
   deleteModal: DeleteModalState = {
     isOpen: false,
     isLoading: false,
@@ -68,28 +76,35 @@ export class TutorialsComponent implements OnInit, OnDestroy {
     tutorialTitle: '',
   };
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.setupFilters();
     this.loadTutorials();
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  private setupFilters() {
-    // Escuchar cambios tanto en la barra de búsqueda como en el selector de dificultad
+  /**
+   * Unifica los flujos de eventos procedentes de múltiples inputs reactivos.
+   * Dispara una re-carga del catálogo tras estabilizarse la entrada del usuario.
+   */
+  private setupFilters(): void {
     merge(this.searchControl.valueChanges, this.difficultyControl.valueChanges)
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe(() => {
         this.searchTerm = this.searchControl.value?.toLowerCase() || '';
-        this.currentPage = 1; // Volver a página 1 al filtrar
+        this.currentPage = 1;
         this.loadTutorials();
       });
   }
 
-  loadTutorials() {
+  /**
+   * Extrae la colección formativa de la base de datos inyectando los parámetros
+   * de redimensionamiento (paginación) y categorización (dificultad).
+   */
+  loadTutorials(): void {
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
@@ -104,7 +119,6 @@ export class TutorialsComponent implements OnInit, OnDestroy {
         this.totalPages = response.data.totalPages || 1;
         this.totalDocs = response.data.totalDocs || this.tutorials.length;
 
-        // Búsqueda local combinada (Título y Categoría) - Útil si el backend aún no busca por texto libre
         if (this.searchTerm) {
           this.tutorials = this.tutorials.filter(
             (t) =>
@@ -113,12 +127,12 @@ export class TutorialsComponent implements OnInit, OnDestroy {
           );
         }
 
-        this.applySort(); // Mantiene la tabla ordenada tras recargar
+        this.applySort();
         this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error al cargar tutoriales:', err);
+        console.error('Excepción crítica durante la indexación de tutoriales:', err);
         this.errorMessage = 'No se pudo cargar el catálogo de tutoriales.';
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -126,8 +140,7 @@ export class TutorialsComponent implements OnInit, OnDestroy {
     });
   }
 
-  // --- Métodos de Ordenación ---
-  toggleSort(column: keyof Tutorial) {
+  toggleSort(column: keyof Tutorial): void {
     if (this.sortColumn === column) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
@@ -138,7 +151,10 @@ export class TutorialsComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  private applySort() {
+  /**
+   * Ejecuta la reordenación vectorial respetando la estrategia OnPush.
+   */
+  private applySort(): void {
     if (!this.sortColumn) return;
 
     this.tutorials = [...this.tutorials].sort((a, b) => {
@@ -159,45 +175,54 @@ export class TutorialsComponent implements OnInit, OnDestroy {
     });
   }
 
-  // --- Métodos de Paginación ---
-  goToPage(page: number) {
+  goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
       this.loadTutorials();
     }
   }
 
-  nextPage() {
+  nextPage(): void {
     this.goToPage(this.currentPage + 1);
   }
-  prevPage() {
+
+  prevPage(): void {
     this.goToPage(this.currentPage - 1);
   }
 
-  // --- Gestión de Creación y Edición ---
-  openCreateModal() {
-    this.selectedTutorialForEdit = null; // Asegura que esté en modo creación
+  /**
+   * Despliega la interfaz modal configurando su contexto como "Creación de Nuevo Recurso".
+   */
+  openCreateModal(): void {
+    this.selectedTutorialForEdit = null;
     this.isCreateModalOpen = true;
   }
 
-  editTutorial(tutorial: Tutorial) {
-    this.selectedTutorialForEdit = tutorial; // Pasa los datos al modo edición
+  /**
+   * Despliega la interfaz modal inyectando la entidad base y configurando el contexto en "Modo Edición".
+   * @param {Tutorial} tutorial - Estructura de datos origen a editar.
+   */
+  editTutorial(tutorial: Tutorial): void {
+    this.selectedTutorialForEdit = tutorial;
     this.isCreateModalOpen = true;
   }
 
-  handleSaveTutorial(payload: CreateTutorialPayload) {
+  /**
+   * Resolutor centralizado del componente modal.
+   * Determina la acción HTTP en función del estado de contexto (PATCH vs POST).
+   * @param {CreateTutorialPayload} payload - Modelo de datos validado y estructurado.
+   */
+  handleSaveTutorial(payload: CreateTutorialPayload): void {
     this.isSavingTutorial = true;
     this.errorMessage = '';
     this.cdr.detectChanges();
 
     if (this.selectedTutorialForEdit) {
-      // Flujo de Edición
       this.tutorialService.updateTutorial(this.selectedTutorialForEdit._id, payload).subscribe({
         next: () => this.finalizeSave('¡Tutorial actualizado con éxito!'),
         error: (err) => this.handleSaveError(err),
       });
     } else {
-      // Flujo de Creación
       this.tutorialService.createTutorial(payload).subscribe({
         next: () => this.finalizeSave('¡Tutorial creado con éxito!'),
         error: (err) => this.handleSaveError(err),
@@ -205,22 +230,25 @@ export class TutorialsComponent implements OnInit, OnDestroy {
     }
   }
 
-  private finalizeSave(message: string) {
+  /**
+   * Cierre exitoso del flujo de guardado, demolición de la ventana y sincronización tabular.
+   */
+  private finalizeSave(message: string): void {
     this.isSavingTutorial = false;
     this.isCreateModalOpen = false;
     this.successMessage = message;
     this.loadTutorials();
   }
 
-  private handleSaveError(err: any) {
-    console.error('Error al guardar el tutorial:', err);
+  private handleSaveError(err: any): void {
+    console.error('Rechazo del backend durante la persistencia del tutorial:', err);
     this.isSavingTutorial = false;
-    this.errorMessage = err.error?.message || 'Ocurrió un error al guardar el tutorial.';
+    this.errorMessage =
+      err.error?.message || 'Ocurrió un error de validación u originado en el servidor.';
     this.cdr.detectChanges();
   }
 
-  // --- Gestión de Borrado ---
-  requestDelete(tutorial: Tutorial) {
+  requestDelete(tutorial: Tutorial): void {
     this.deleteModal = {
       isOpen: true,
       isLoading: false,
@@ -229,13 +257,13 @@ export class TutorialsComponent implements OnInit, OnDestroy {
     };
   }
 
-  closeDeleteModal() {
+  closeDeleteModal(): void {
     this.deleteModal.isOpen = false;
     this.deleteModal.isLoading = false;
     this.deleteModal.tutorialId = null;
   }
 
-  executeDelete() {
+  executeDelete(): void {
     if (!this.deleteModal.tutorialId) return;
 
     this.deleteModal.isLoading = true;
@@ -243,12 +271,13 @@ export class TutorialsComponent implements OnInit, OnDestroy {
 
     this.tutorialService.deleteTutorial(this.deleteModal.tutorialId).subscribe({
       next: () => {
-        this.successMessage = 'Tutorial eliminado correctamente.';
+        this.successMessage = 'Tutorial eliminado correctamente de la plataforma.';
         this.closeDeleteModal();
         this.loadTutorials();
       },
       error: (err) => {
-        this.errorMessage = err.error?.message || 'Hubo un error al eliminar el tutorial.';
+        this.errorMessage =
+          err.error?.message || 'Hubo un error de integridad al eliminar el tutorial.';
         this.closeDeleteModal();
         this.cdr.detectChanges();
       },

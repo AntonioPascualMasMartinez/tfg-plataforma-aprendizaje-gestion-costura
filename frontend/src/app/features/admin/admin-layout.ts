@@ -1,4 +1,11 @@
-import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core'; // <-- 1. Importar ChangeDetectorRef
+/**
+ * @file admin-layout.ts
+ * @description Componente estructural (Layout) para el módulo de administración.
+ * Actúa como contenedor principal (Wrapper) para las vistas protegidas por el `adminGuard`.
+ * Gestiona la barra de navegación lateral exclusiva para administradores y el estado global
+ * de la sesión en el contexto del panel de control.
+ */
+import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
@@ -13,11 +20,18 @@ export class AdminLayout implements OnInit {
   private authService = inject(AuthService);
   private userService = inject(UserService);
   private router = inject(Router);
-  private cdr = inject(ChangeDetectorRef); // <-- 2. Inyectar el detector
+
+  /** * Referencia al detector de cambios de Angular.
+   * Utilizado para forzar ciclos de renderizado tras la resolución de operaciones asíncronas.
+   */
+  private cdr = inject(ChangeDetectorRef);
 
   adminName = 'Cargando...';
   adminInitial = '';
 
+  /** * Configuración estática del árbol de navegación administrativo.
+   * Emplea iconos vectoriales (SVG) integrados para optimizar las peticiones de red.
+   */
   navItems = [
     {
       label: 'Dashboard',
@@ -41,21 +55,31 @@ export class AdminLayout implements OnInit {
     },
   ];
 
-  ngOnInit() {
+  /**
+   * Inicialización del ciclo de vida del componente.
+   * Realiza una llamada a la API para recuperar la identidad del administrador
+   * autenticado y compone los metadatos visuales del perfil (nombre e inicial).
+   */
+  ngOnInit(): void {
     this.userService.getMe().subscribe({
       next: (res) => {
         if (res.data) {
           this.adminName = res.data.displayName;
           this.adminInitial = this.adminName.charAt(0).toUpperCase();
 
-          // 3. ¡Avisar a Angular de que hay nuevos datos!
+          /* Notificación explícita al motor de Angular para conciliar el Virtual DOM 
+             con la vista tras la mutación del estado. */
           this.cdr.detectChanges();
         }
       },
     });
   }
 
-  logout() {
+  /**
+   * Delega la revocación de credenciales al servicio de identidad y
+   * efectúa la redirección programática a la pasarela pública.
+   */
+  logout(): void {
     this.authService.logout().subscribe({
       next: () => this.router.navigate(['/login']),
       error: () => this.router.navigate(['/login']),

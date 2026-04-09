@@ -1,3 +1,9 @@
+/**
+ * @file users.component.ts
+ * @description Componente contenedor (Smart Component) para la administración del ciclo de vida de las cuentas de usuario.
+ * Facilita operaciones críticas como la alteración de privilegios (RBAC) y la suspensión lógica (baneo).
+ * Implementa estrategias de optimización de renderizado (OnPush) y flujos reactivos para la búsqueda en tiempo real.
+ */
 import {
   Component,
   inject,
@@ -14,6 +20,9 @@ import { UserService } from '../../../core/services/user.service';
 import { User, Role } from '../../../shared/models/user.model';
 import { ConfirmModalComponent } from '../../../shared/modals/confirm-modal/confirm-modal.component';
 
+/**
+ * Contrato estricto para la gestión de estados de la ventana modal de confirmación.
+ */
 interface ModalState {
   isOpen: boolean;
   isLoading: boolean;
@@ -33,21 +42,25 @@ interface ModalState {
 export class UsersComponent implements OnInit, OnDestroy {
   private userService = inject(UserService);
   private cdr = inject(ChangeDetectorRef);
+
+  /** Sujeto emisor utilizado para la recolección de basura y cancelación de suscripciones activas. */
   private destroy$ = new Subject<void>();
 
   users: User[] = [];
   isLoading = false;
   errorMessage = '';
 
+  /* Instancia reactiva para el control de la entrada de búsqueda */
   searchControl = new FormControl('');
   searchTerm = '';
 
+  /* Atributos de metadatos de paginación */
   currentPage = 1;
   limit = 10;
   totalUsers = 0;
   totalPages = 0;
 
-  // --- NUEVO: Estado de Ordenación ---
+  /* Atributos de estado para el ordenamiento algorítmico algorítmico */
   sortColumn: keyof User | '' = '';
   sortDirection: 'asc' | 'desc' = 'asc';
 
@@ -60,22 +73,29 @@ export class UsersComponent implements OnInit, OnDestroy {
     isDestructive: false,
   };
 
+  /* Almacenes de memoria transaccional para la confirmación de acciones */
   selectedUser: User | null = null;
   pendingAction: 'role' | 'status' | null = null;
   pendingRole: Role | null = null;
   pendingStatus: boolean | null = null;
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.setupSearch();
     this.loadUsers();
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
+    /* Emisión de señal de finalización para destruir las tuberías activas de RxJS */
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  private setupSearch() {
+  /**
+   * Suscribe el componente a las mutaciones del control de búsqueda.
+   * Implementa una política de `debounceTime` para mitigar la saturación de
+   * peticiones a la API durante la escritura activa del usuario.
+   */
+  private setupSearch(): void {
     this.searchControl.valueChanges
       .pipe(debounceTime(300), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe((term) => {
@@ -85,7 +105,10 @@ export class UsersComponent implements OnInit, OnDestroy {
       });
   }
 
-  loadUsers() {
+  /**
+   * Invoca el endpoint del catálogo global de usuarios y sincroniza la paginación.
+   */
+  loadUsers(): void {
     this.isLoading = true;
     this.errorMessage = '';
     this.cdr.detectChanges();
@@ -96,6 +119,7 @@ export class UsersComponent implements OnInit, OnDestroy {
         this.totalUsers = response.data.totalDocs || this.users.length;
         this.totalPages = response.data.totalPages || 1;
 
+        /* Estrategia de filtrado compuesto combinando búsuqeda remota y local temporal */
         if (this.searchTerm) {
           const term = this.searchTerm.toLowerCase();
           this.users = this.users.filter(
@@ -104,14 +128,13 @@ export class UsersComponent implements OnInit, OnDestroy {
           );
         }
 
-        // Aplicar ordenación actual a los nuevos datos cargados
         this.applySort();
 
         this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error al cargar usuarios:', err);
+        console.error('Anomalía técnica en la extracción de la lista de usuarios:', err);
         this.errorMessage = 'No se pudieron cargar los usuarios.';
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -119,8 +142,11 @@ export class UsersComponent implements OnInit, OnDestroy {
     });
   }
 
-  // --- NUEVO: Métodos de Ordenación ---
-  toggleSort(column: keyof User) {
+  /**
+   * Alterna la columna de evaluación para la función de ordenación.
+   * @param {keyof User} column - Clave del modelo sobre la cual pivotar.
+   */
+  toggleSort(column: keyof User): void {
     if (this.sortColumn === column) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
@@ -131,19 +157,21 @@ export class UsersComponent implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  private applySort() {
+  /**
+   * Procesa la ordenación in-memory de la colección actual de usuarios.
+   * La mutación se realiza clonando la matriz original `[...this.users]` para
+   * satisfacer las exigencias de inmutabilidad del renderizador `OnPush`.
+   */
+  private applySort(): void {
     if (!this.sortColumn) return;
 
-    // Clonamos el array para forzar la detección de cambios (OnPush)
     this.users = [...this.users].sort((a, b) => {
       let valA = a[this.sortColumn as keyof User];
       let valB = b[this.sortColumn as keyof User];
 
-      // Manejo de nulos o indefinidos (ej: sewingLevel opcional)
       if (valA === null || valA === undefined) valA = '';
       if (valB === null || valB === undefined) valB = '';
 
-      // Comparación normalizada para textos
       if (typeof valA === 'string' && typeof valB === 'string') {
         valA = valA.toLowerCase();
         valB = valB.toLowerCase();
@@ -155,22 +183,25 @@ export class UsersComponent implements OnInit, OnDestroy {
     });
   }
 
-  goToPage(page: number) {
+  goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
       this.loadUsers();
     }
   }
 
-  nextPage() {
+  nextPage(): void {
     this.goToPage(this.currentPage + 1);
   }
 
-  prevPage() {
+  prevPage(): void {
     this.goToPage(this.currentPage - 1);
   }
 
-  requestToggleRole(user: User) {
+  /**
+   * Inicializa la fase transaccional para la modificación del rol de autorización.
+   */
+  requestToggleRole(user: User): void {
     this.selectedUser = user;
     this.pendingRole = user.role === 'Admin' ? 'User' : 'Admin';
     this.pendingAction = 'role';
@@ -185,7 +216,10 @@ export class UsersComponent implements OnInit, OnDestroy {
     };
   }
 
-  requestToggleStatus(user: User) {
+  /**
+   * Inicializa la fase transaccional para la suspensión lógica o restitución de la cuenta.
+   */
+  requestToggleStatus(user: User): void {
     this.selectedUser = user;
     this.pendingStatus = !user.isActive;
     this.pendingAction = 'status';
@@ -202,7 +236,10 @@ export class UsersComponent implements OnInit, OnDestroy {
     };
   }
 
-  executeAction() {
+  /**
+   * Ejecuta la petición HTTP de mutación correspondiente a la acción administrativa en curso.
+   */
+  executeAction(): void {
     if (!this.selectedUser || !this.pendingAction) return;
 
     this.modalState.isLoading = true;
@@ -214,7 +251,7 @@ export class UsersComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.selectedUser!.role = response.data.role;
           this.closeModal();
-          this.applySort(); // Reordenar si el cambio afecta a la tabla
+          this.applySort();
           this.cdr.detectChanges();
         },
         error: (err) => {
@@ -228,7 +265,7 @@ export class UsersComponent implements OnInit, OnDestroy {
         next: (response) => {
           this.selectedUser!.isActive = response.data.isActive;
           this.closeModal();
-          this.applySort(); // Reordenar si el cambio afecta a la tabla
+          this.applySort();
           this.cdr.detectChanges();
         },
         error: (err) => {
@@ -241,7 +278,7 @@ export class UsersComponent implements OnInit, OnDestroy {
     }
   }
 
-  closeModal() {
+  closeModal(): void {
     this.modalState.isOpen = false;
     this.modalState.isLoading = false;
     this.selectedUser = null;

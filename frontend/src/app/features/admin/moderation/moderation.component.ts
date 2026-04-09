@@ -1,3 +1,10 @@
+/**
+ * @file moderation.component.ts
+ * @description Componente contenedor del panel de administración para la moderación de contenido.
+ * Gestiona el ciclo de vida de los reportes emitidos por la comunidad, permitiendo su revisión,
+ * desestimación o la aplicación de sanciones (borrado de contenido, suspensión de usuarios).
+ * Se apoya en estrategias de renderizado OnPush y flujos reactivos (RxJS) para el filtrado por pestañas.
+ */
 import {
   Component,
   inject,
@@ -11,11 +18,13 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { CommunityService } from '../../../core/services/community.service';
-import { UserService } from '../../../core/services/user.service'; // <-- Inyectamos UserService para baneos
+import { UserService } from '../../../core/services/user.service';
 import { Report, ReportStatus } from '../../../shared/models/community.model';
 import { ConfirmModalComponent } from '../../../shared/modals/confirm-modal/confirm-modal.component';
 
-// Interfaz para centralizar el estado del modal de confirmación
+/**
+ * Contrato de estructura para centralizar el estado transaccional de la ventana modal.
+ */
 interface ModalState {
   isOpen: boolean;
   isLoading: boolean;
@@ -25,20 +34,25 @@ interface ModalState {
   isDestructive: boolean;
 }
 
-// Tipado para las acciones posibles en el panel
+/**
+ * Enumeración tipada de las directivas de moderación soportadas por el sistema.
+ */
 type ModerationAction = 'dismiss' | 'review' | 'delete_comment' | 'reopen' | 'ban_user';
 
 @Component({
   selector: 'app-admin-moderation',
   standalone: true,
-  imports: [DatePipe, ConfirmModalComponent, ReactiveFormsModule], // <-- Importar ReactiveFormsModule
+  imports: [DatePipe, ConfirmModalComponent, ReactiveFormsModule],
   templateUrl: './moderation.component.html',
-  changeDetection: ChangeDetectionStrategy.OnPush, // <-- Mejora 5: Optimización de rendimiento
+  /* Optimización estricta del árbol de componentes para minimizar los ciclos de renderizado. */
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ModerationComponent implements OnInit, OnDestroy {
   private communityService = inject(CommunityService);
   private userService = inject(UserService);
   private cdr = inject(ChangeDetectorRef);
+
+  /** Sujeto emisor para el control de fugas de memoria en las suscripciones activas. */
   private destroy$ = new Subject<void>();
 
   reports: Report[] = [];
@@ -46,16 +60,16 @@ export class ModerationComponent implements OnInit, OnDestroy {
   errorMessage = '';
   successMessage = '';
 
-  // --- Mejora 2: Pestañas de Estado Reactivas ---
+  /** Control reactivo para la navegación contextual entre estados del reporte. */
   statusTab = new FormControl<ReportStatus>('Pending');
 
-  // --- Mejora 5: Paginación Real ---
+  /* Metadatos de la estructura de paginación del lado del servidor. */
   currentPage = 1;
   limit = 20;
   totalDocs = 0;
   totalPages = 1;
 
-  // --- Mejora 4: Estado Centralizado del Modal ---
+  /** Estado centralizado de la interfaz de confirmación. */
   modalState: ModalState = {
     isOpen: false,
     isLoading: false,
@@ -68,25 +82,31 @@ export class ModerationComponent implements OnInit, OnDestroy {
   selectedReport: Report | null = null;
   pendingAction: ModerationAction | null = null;
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.setupTabListener();
     this.loadReports();
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
-  // Escucha los cambios de pestaña y recarga la tabla
-  private setupTabListener() {
+  /**
+   * Inicializa la escucha sobre el control reactivo de pestañas.
+   * Restablece el cursor de paginación y desencadena la actualización del repositorio de datos.
+   */
+  private setupTabListener(): void {
     this.statusTab.valueChanges.pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.currentPage = 1; // Volver a la primera página al cambiar de pestaña
+      this.currentPage = 1;
       this.loadReports();
     });
   }
 
-  loadReports() {
+  /**
+   * Sincroniza la vista con el estado persistente del servidor mediante peticiones HTTP.
+   */
+  loadReports(): void {
     this.isLoading = true;
     this.errorMessage = '';
     this.successMessage = '';
@@ -94,8 +114,6 @@ export class ModerationComponent implements OnInit, OnDestroy {
 
     const currentStatus = this.statusTab.value || 'Pending';
 
-    // Nota: Asumimos que getModerationQueue ahora acepta un tercer parámetro para el estado (status).
-    // Deberás actualizar la firma en community.service.ts -> getModerationQueue(page, limit, status)
     this.communityService
       .getModerationQueue(this.currentPage, this.limit, currentStatus as any)
       .subscribe({
@@ -109,7 +127,7 @@ export class ModerationComponent implements OnInit, OnDestroy {
           this.cdr.detectChanges();
         },
         error: (err) => {
-          console.error('Error al cargar reportes:', err);
+          console.error('Anomalía en la recuperación de la cola de moderación:', err);
           this.errorMessage = 'No se pudo cargar la cola de moderación.';
           this.isLoading = false;
           this.cdr.detectChanges();
@@ -117,24 +135,30 @@ export class ModerationComponent implements OnInit, OnDestroy {
       });
   }
 
-  // --- Métodos de Paginación ---
-  goToPage(page: number) {
+  /* ==========================================================================
+     MÉTODOS DE PAGINACIÓN ALGORÍTMICA
+     ========================================================================== */
+
+  goToPage(page: number): void {
     if (page >= 1 && page <= this.totalPages) {
       this.currentPage = page;
       this.loadReports();
     }
   }
 
-  nextPage() {
+  nextPage(): void {
     this.goToPage(this.currentPage + 1);
   }
-  prevPage() {
+
+  prevPage(): void {
     this.goToPage(this.currentPage - 1);
   }
 
-  // --- Preparación de Acciones (Abre el modal) ---
+  /* ==========================================================================
+     MÉTODOS DE PREPARACIÓN DE ACCIONES (Lógica de Interfaz)
+     ========================================================================== */
 
-  requestDismiss(report: Report) {
+  requestDismiss(report: Report): void {
     this.selectedReport = report;
     this.pendingAction = 'dismiss';
     this.setModalState(
@@ -145,7 +169,7 @@ export class ModerationComponent implements OnInit, OnDestroy {
     );
   }
 
-  requestReview(report: Report) {
+  requestReview(report: Report): void {
     this.selectedReport = report;
     this.pendingAction = 'review';
     this.setModalState(
@@ -156,8 +180,10 @@ export class ModerationComponent implements OnInit, OnDestroy {
     );
   }
 
-  // Mejora 3: Sistema "Undo"
-  requestReopen(report: Report) {
+  /**
+   * Facilita la reversión de decisiones administrativas devolviendo un incidente a la cola de atención.
+   */
+  requestReopen(report: Report): void {
     this.selectedReport = report;
     this.pendingAction = 'reopen';
     this.setModalState(
@@ -168,7 +194,7 @@ export class ModerationComponent implements OnInit, OnDestroy {
     );
   }
 
-  requestDeleteComment(report: Report) {
+  requestDeleteComment(report: Report): void {
     this.selectedReport = report;
     this.pendingAction = 'delete_comment';
     this.setModalState(
@@ -179,8 +205,7 @@ export class ModerationComponent implements OnInit, OnDestroy {
     );
   }
 
-  // Mejora 4: Acciones Sancionadoras
-  requestBanUser(report: Report) {
+  requestBanUser(report: Report): void {
     this.selectedReport = report;
     this.pendingAction = 'ban_user';
     this.setModalState(
@@ -196,7 +221,7 @@ export class ModerationComponent implements OnInit, OnDestroy {
     message: string,
     confirmText: string,
     isDestructive: boolean,
-  ) {
+  ): void {
     this.modalState = {
       isOpen: true,
       isLoading: false,
@@ -207,9 +232,16 @@ export class ModerationComponent implements OnInit, OnDestroy {
     };
   }
 
-  // --- Ejecución de la Acción Confirmada ---
+  /* ==========================================================================
+     RESOLUCIÓN DE EVENTOS DE NEGOCIO
+     ========================================================================== */
 
-  executeAction() {
+  /**
+   * Orquesta la ejecución final de la resolución evaluando el tipo de acción penal.
+   * Contempla escenarios de composición asíncrona, donde la sanción sobre un usuario
+   * o comentario desencadena, en cascada, la resolución exitosa del reporte original.
+   */
+  executeAction(): void {
     if (!this.selectedReport || !this.pendingAction) return;
     this.modalState.isLoading = true;
     this.errorMessage = '';
@@ -235,7 +267,7 @@ export class ModerationComponent implements OnInit, OnDestroy {
       case 'delete_comment':
         this.communityService.adminDeleteComment(this.selectedReport.targetId).subscribe({
           next: () => {
-            // Marcamos como revisado tras borrar el comentario
+            /* Ejecución anidada: Marcado como revisado tras corroborar la eliminación efectiva */
             this.communityService.resolveReport(this.selectedReport!._id, 'Reviewed').subscribe({
               next: () => this.handleSuccess('Comentario eliminado y reporte resuelto.'),
               error: (err) => this.handleError(err),
@@ -246,8 +278,7 @@ export class ModerationComponent implements OnInit, OnDestroy {
         break;
 
       case 'ban_user':
-        // Asumiendo que el modelo Report tiene la propiedad 'reportedUserId'
-        // Si tu backend no la expone aún, deberás añadirla en el controlador al devolver el reporte
+        /* Extracción segura del atributo analítico de la entidad */
         const userIdToBan = (this.selectedReport as any).reportedUserId;
 
         if (!userIdToBan) {
@@ -259,6 +290,7 @@ export class ModerationComponent implements OnInit, OnDestroy {
 
         this.userService.toggleUserStatus(userIdToBan, false).subscribe({
           next: () => {
+            /* Ejecución anidada: Resolución del reporte derivada del baneo */
             this.communityService.resolveReport(this.selectedReport!._id, 'Reviewed').subscribe({
               next: () => this.handleSuccess('Usuario baneado exitosamente y reporte resuelto.'),
               error: (err) => this.handleError(err),
@@ -270,19 +302,19 @@ export class ModerationComponent implements OnInit, OnDestroy {
     }
   }
 
-  private handleSuccess(message: string) {
+  private handleSuccess(message: string): void {
     this.successMessage = message;
     this.closeModal();
-    this.loadReports(); // Recargamos para que el reporte desaparezca/cambie en la pestaña actual
+    this.loadReports();
   }
 
-  private handleError(err: any) {
-    this.errorMessage = err.error?.message || 'Hubo un error al procesar la acción.';
+  private handleError(err: any): void {
+    this.errorMessage = err.error?.message || 'Hubo un error al procesar la acción de moderación.';
     this.closeModal();
     this.cdr.detectChanges();
   }
 
-  closeModal() {
+  closeModal(): void {
     this.modalState.isOpen = false;
     this.modalState.isLoading = false;
     this.selectedReport = null;
