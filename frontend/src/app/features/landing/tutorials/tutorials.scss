@@ -1,15 +1,27 @@
+/**
+ * @file tutorials.scss
+ * @description Composición gráfica para la recreación de un espacio tridimensional (3D).
+ * Implementa transformaciones aceleradas por hardware (GPU) y curvas Bézier para simular
+ * un carrusel de profundidad focal progresiva.
+ */
 @reference "../../../../styles.css";
 
-// Necesario para el efecto 3D del carrusel
+/* Configuración de la cámara virtual que define la profundidad del escenario */
 .perspective-1000 {
   perspective: 1000px;
 }
 
-// ─── Tutorial carousel 3D ───────────────────────────────────
+/* ==========================================================================
+   CINEMÁTICA DEL CARRUSEL 3D
+   ========================================================================== */
+
 .tutorial-carousel-item {
+  /* Interpolación natural y aviso anticipado al motor de renderizado (will-change) 
+     para reservar memoria gráfica exclusiva. */
   transition: all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
   will-change: transform, opacity, filter;
 
+  /* Nodo focalizado: Escala original, nitidez completa y Z-Index dominante. */
   &.center {
     transform: translateX(0) scale(1) rotateY(0deg);
     opacity: 1;
@@ -17,6 +29,8 @@
     z-index: 30;
   }
 
+  /* Nodos adyacentes (Izquierda/Derecha): Escala reducida, rotación Y para crear
+     el punto de fuga y desenfoque gausiano simulando profundidad de campo (DoF). */
   &.left {
     transform: translateX(-65%) scale(0.88) rotateY(8deg);
     opacity: 0.4;
@@ -47,12 +61,5 @@
       opacity: 0.65;
       filter: blur(1px);
     }
-  }
-
-  &.hidden-card {
-    transform: translateX(0) scale(0.7);
-    opacity: 0;
-    pointer-events: none;
-    z-index: 10;
   }
 }

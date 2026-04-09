@@ -1,9 +1,21 @@
-// ─── Hero entrance choreography ─────────────────────────────
+/**
+ * @file hero.scss
+ * @description Reglas de estilo y coreografía visual para la sección principal (Hero).
+ * Implementa una secuencia de entrada escalonada (Staggered Animation) aplicando
+ * retrasos (delays) incrementales para guiar la atención del usuario hacia la llamada a la acción (CTA).
+ */
+
+/* ==========================================================================
+   COREOGRAFÍA DE ENTRADA (STAGGERED ANIMATION)
+   ========================================================================== */
+
 .hero-badge {
+  /* Interpolación ease-out estándar para elementos periféricos */
   animation: fadeInDown 0.7s ease-out 0.2s both;
 }
 
 .hero-title {
+  /* Uso de curva de aceleración personalizada (Cubic-Bezier) para mayor contundencia visual */
   animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
 }
 
@@ -23,22 +35,14 @@
   animation: fadeInScale 1s cubic-bezier(0.16, 1, 0.3, 1) 0.4s both;
 }
 
-// ─── Carousel images ────────────────────────────────────────
+/* ==========================================================================
+   ESTADOS DEL CARRUSEL MULTIMEDIA
+   ========================================================================== */
+
 .carousel-image {
+  /* Transición simultánea de opacidad y escala espacial garantizando 60 FPS */
   transition:
     opacity 1.2s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 1.2s cubic-bezier(0.4, 0, 0.2, 1),
-    filter 1.2s ease;
-
-  &.active {
-    opacity: 1;
-    transform: scale(1);
-    filter: brightness(1);
-  }
-
-  &.inactive {
-    opacity: 0;
-    transform: scale(1.08);
-    filter: brightness(0.8);
-  }
+    transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: transform, opacity;
 }

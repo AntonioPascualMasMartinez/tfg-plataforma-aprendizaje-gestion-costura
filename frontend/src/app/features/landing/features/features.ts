@@ -1,18 +1,26 @@
+/**
+ * @file features.ts
+ * @description Componente presentacional encargado de exponer las propuestas de valor (Value Propositions)
+ * de la plataforma. Emplea un enfoque basado en datos (Data-driven UI) para renderizar de forma 
+ * iterativa las tarjetas de características utilizando un contrato estricto de tipado y directivas de animación.
+ */
 import { Component } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { ScrollAnimateDirective } from '../../../shared/directives/scroll-animate.directive';
 
+/**
+ * Modelo de datos para las tarjetas informativas. Incorpora la lógica de presentación
+ * encapsulando los tokens semánticos y reglas de Tailwind CSS específicos para cada instancia.
+ */
 interface FeatureCard {
   title: string;
   description: string;
   image: string;
   alt: string;
   icon: 'planning' | 'community' | 'learning';
-  // Clases estructurales
   containerClass: string;
   textContainerClass: string;
   imageContainerClass: string;
-  // Clases temáticas y hover
   gradientClass: string;
   iconBtnClass: string;
   iconColorClass: string;
@@ -23,11 +31,12 @@ interface FeatureCard {
 @Component({
   selector: 'app-features',
   standalone: true,
-  imports: [NgClass, ScrollAnimateDirective],
+  imports: [ScrollAnimateDirective],
   templateUrl: './features.html',
   styleUrl: './features.scss',
 })
 export class Features {
+  /** Catálogo de funcionalidades expuestas en la vista pública. */
   features: FeatureCard[] = [
     {
       title: 'Planificación Integral',

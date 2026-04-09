@@ -1,7 +1,14 @@
+/**
+ * @file works.ts
+ * @description Componente presentacional interactivo que ilustra el flujo de trabajo de la plataforma ("Cómo Funciona").
+ * Gestiona el estado de una interfaz por pasos (Stepper), apoyándose en directivas de animación
+ * y arreglos estáticos para la disposición posicional de elementos decorativos en el DOM.
+ */
 import { Component } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { ScrollAnimateDirective } from '../../../shared/directives/scroll-animate.directive';
 
+/** Contrato estricto para los elementos vectoriales flotantes de ambientación. */
 interface SewingDecoration {
   top?: string;
   bottom?: string;
@@ -23,9 +30,10 @@ interface SewingDecoration {
   styleUrl: './works.scss',
 })
 export class Works {
+  /** Puntero al índice del paso actualmente expandido/activo en la interfaz. */
   activeStep: number = 1;
 
-  // Adornos flotantes para el fondo cálido
+  /** Matriz de configuración posicional para las animaciones CSS flotantes. */
   backgroundDecorations: SewingDecoration[] = [
     {
       top: '10%',
@@ -45,27 +53,7 @@ export class Works {
       rotation: 'rotate-45',
       animation: 'float-element',
       delay: '1s',
-      type: 'needle',
-    },
-    {
-      bottom: '15%',
-      left: '8%',
-      size: 'w-12 h-12',
-      color: 'text-pink-400/20',
-      rotation: '-rotate-45',
-      animation: 'float-element-slow',
-      delay: '2s',
       type: 'pin',
-    },
-    {
-      bottom: '5%',
-      right: '10%',
-      size: 'w-28 h-28',
-      color: 'text-rose-400/15',
-      rotation: 'rotate-12',
-      animation: 'float-element',
-      delay: '0.5s',
-      type: 'button',
     },
   ];
 }

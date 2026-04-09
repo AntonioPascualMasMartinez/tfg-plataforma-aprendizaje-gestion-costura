@@ -1,3 +1,10 @@
+/**
+ * @file community.ts
+ * @description Componente presentacional de la sección "Comunidad" en la página de aterrizaje.
+ * Actúa como un escaparate visual (Showcase) utilizando datos estáticos simulados (Mock Data)
+ * para ilustrar las capacidades sociales de la plataforma a usuarios no autenticados, sin
+ * incurrir en llamadas costosas a la base de datos.
+ */
 import { Component } from '@angular/core';
 import { NgClass } from '@angular/common';
 import { ScrollAnimateDirective } from '../../../shared/directives/scroll-animate.directive';
@@ -6,6 +13,10 @@ import {
   CommunityProject,
 } from '../../../shared/components/community-card/community-card.component';
 
+/**
+ * Contrato de tipado para los elementos decorativos renderizados estáticamente en el DOM.
+ * Configura la posición absoluta y las clases utilitarias de animación.
+ */
 interface SewingDecoration {
   top?: string;
   bottom?: string;
@@ -27,6 +38,7 @@ interface SewingDecoration {
   styleUrl: './community.scss',
 })
 export class Community {
+  /** Colección de entidades de proyecto simuladas para la previsualización del feed. */
   communityPosts: CommunityProject[] = [
     {
       _id: 'landing-post-1',
@@ -37,7 +49,7 @@ export class Community {
       status: 'Finalizado',
       likesCount: 24,
       isLikedLocally: false,
-      ownerId: { displayName: 'Mark G.', avatar: '' } as any, // Sin avatar, usará el autogenerado
+      ownerId: { displayName: 'Mark G.', avatar: '' } as any,
     } as CommunityProject,
     {
       _id: 'landing-post-2',
@@ -63,6 +75,7 @@ export class Community {
     } as CommunityProject,
   ];
 
+  /** Disposición espacial de la utilería gráfica del fondo. */
   backgroundDecorations: SewingDecoration[] = [
     {
       top: '10%',
@@ -106,7 +119,12 @@ export class Community {
     },
   ];
 
-  handleMockLike(payload: { project: CommunityProject; event: Event }) {
+  /**
+   * Intercepta la interacción de valoración de la tarjeta y muta el estado local del componente.
+   * Evita la propagación del evento para mantener al usuario en la página de aterrizaje.
+   * @param {Object} payload - Objeto contenedor con el proyecto interactuado y el evento del DOM.
+   */
+  handleMockLike(payload: { project: CommunityProject; event: Event }): void {
     payload.event.preventDefault();
     payload.event.stopPropagation();
     const project = payload.project;

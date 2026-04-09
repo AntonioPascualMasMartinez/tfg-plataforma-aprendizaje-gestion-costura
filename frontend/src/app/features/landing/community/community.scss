@@ -1,32 +1,51 @@
-@reference "../../../../styles.css";
+/**
+ * @file community.scss
+ * @description Encapsulación de estilos para la sección comunitaria de la vista pública.
+ * Coordina las transiciones desencadenadas por la intersección de lectura (Scroll API)
+ * e implementa bucles infinitos de animación para la decoración del entorno (Ambient Motion).
+ */
 
-// ─── Envoltorio para Scroll Animation ─────────────────────────
+/* ==========================================================================
+   ENVOLTORIO DE INTERSECCIÓN (SCROLL ANIMATION)
+   ========================================================================== */
+
 .scroll-anim-wrapper {
+  /* Estado inicial: Oculto y desplazado en el eje Y */
   opacity: 0;
   transform: translateY(30px);
+  
+  /* Advertencia al motor de renderizado del navegador para la reserva de texturas (GPU) */
+  will-change: transform, opacity;
   transition:
     opacity 0.7s ease-out,
     transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1);
-  will-change: transform, opacity;
 
-  // Cuando appScrollAnimate le asigne la clase de visibilidad
+  /* Estado mutado dinámicamente por la directiva appScrollAnimate al entrar en el viewport */
   &.animate-visible {
     opacity: 1;
     transform: translateY(0);
   }
 }
 
-// ─── Polaroid community cards ───────────────────────────────
+/* ==========================================================================
+   INTERACTIVIDAD DE TARJETAS (POLAROID CARDS)
+   ========================================================================== */
+
 .polaroid-card {
   transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
   will-change: transform;
 
+  /* Elevación jerárquica temporal en el eje Z para evitar solapamientos durante el escalado */
   &:hover {
     z-index: 50;
   }
 }
 
-// ─── Mantenemos las animaciones flotantes del fondo ──────────
+/* ==========================================================================
+   ANIMACIONES AMBIENTALES DE FONDO
+   ========================================================================== */
+
+/** Animación de levitación estándar para partículas de fondo. */
 @keyframes float-element {
   0% {
     transform: translateY(0px) rotate(0deg);
@@ -39,22 +58,18 @@
   }
 }
 
+/** * Animación de levitación atenuada. 
+ * Su combinación con la animación estándar mediante diferentes retrasos (delays)
+ * genera un patrón pseudo-aleatorio que incrementa el valor estético de la interfaz.
+ */
 @keyframes float-element-slow {
   0% {
-    transform: translateY(0px) rotate(-1deg);
+    transform: translateY(0px) rotate(0deg);
   }
   50% {
-    transform: translateY(-15px) rotate(1deg);
+    transform: translateY(-15px) rotate(-2deg);
   }
   100% {
-    transform: translateY(0px) rotate(-1deg);
+    transform: translateY(0px) rotate(0deg);
   }
-}
-
-.float-element {
-  animation: float-element 6s ease-in-out infinite;
-}
-
-.float-element-slow {
-  animation: float-element-slow 9s ease-in-out infinite;
 }

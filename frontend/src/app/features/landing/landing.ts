@@ -1,3 +1,10 @@
+/**
+ * @file landing.ts
+ * @description Componente orquestador (Layout/Wrapper) de la página pública de inicio.
+ * Ensambla y coordina las distintas secciones presentacionales (Hero, Features, Works, etc.).
+ * Implementa un rastreador de progreso de desplazamiento (Scroll Progress) optimizado
+ * mediante el estrangulamiento de eventos (Throttling) con `requestAnimationFrame`.
+ */
 import { Component, OnInit, OnDestroy, HostListener, ElementRef } from '@angular/core';
 
 import { Navbar } from '../../shared/components/navbar/navbar';
@@ -11,27 +18,36 @@ import { Community } from './community/community';
 
 @Component({
   selector: 'app-landing',
+  standalone: true,
   imports: [Navbar, Footer, Hero, Features, Works, Tutorials, Community],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
 })
 export class Landing implements OnInit, OnDestroy {
-  // ─── Scroll ───────────────────────────────────────────────
+  /* ==========================================================================
+     ESTADO DEL SEGUIMIENTO DE DESPLAZAMIENTO (SCROLL SPY)
+     ========================================================================== */
+
+  /** Porcentaje de avance del usuario en el documento actual (0 a 100). */
   scrollProgress: number = 0;
+
+  /** Bandera de control (Mutex) para prevenir el apilamiento de llamadas al motor de renderizado. */
   private ticking = false;
 
   constructor(private el: ElementRef) {}
 
-  // ═══ Lifecycle ═══════════════════════════════════════════
+  ngOnInit(): void {}
 
-  ngOnInit() {}
+  ngOnDestroy(): void {}
 
-  ngOnDestroy() {}
-
-  // ═══ Scroll Progress (rAF-throttled) ═════════════════════
-
+  /**
+   * Intercepta el evento global de desplazamiento (scroll).
+   * Delega el cálculo de las métricas al API del navegador `requestAnimationFrame`
+   * para desacoplarlo del ciclo de detección de cambios sincrónico de Angular,
+   * garantizando los 60 FPS durante el redibujado de la interfaz.
+   */
   @HostListener('window:scroll', [])
-  onWindowScroll() {
+  onWindowScroll(): void {
     if (!this.ticking) {
       requestAnimationFrame(() => {
         const scrollPosition = window.scrollY || document.documentElement.scrollTop || 0;
@@ -40,7 +56,10 @@ export class Landing implements OnInit, OnDestroy {
 
         if (windowHeight > 0) {
           this.scrollProgress = (scrollPosition / windowHeight) * 100;
+        } else {
+          this.scrollProgress = 0;
         }
+
         this.ticking = false;
       });
       this.ticking = true;
