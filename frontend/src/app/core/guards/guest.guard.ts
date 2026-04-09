@@ -1,3 +1,8 @@
+/**
+ * @file guest.guard.ts
+ * @description Guardián de rutas (Guard) inverso, diseñado para gestionar el acceso de usuarios no autenticados (invitados).
+ * Previene que usuarios con una sesión activa accedan inadvertidamente a interfaces públicas como el inicio de sesión o registro.
+ */
 import { CanActivateFn, Router } from '@angular/router';
 import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
@@ -10,15 +15,14 @@ export const guestGuard: CanActivateFn = (route, state) => {
     const token = localStorage.getItem('accessToken');
 
     if (token) {
-      // Miramos si la URL trae el parámetro de redirección
-      // 'route' nos da acceso a los queryParams de la ruta a la que intentamos entrar
+      /* Recuperación de la URL previa almacenada en los parámetros de consulta,
+         estableciendo el módulo central del sistema como ruta de contingencia por defecto. */
       const returnUrl = route.queryParams['returnUrl'] || '/home/inicio';
 
-      // Lo mandamos a la ruta original (o a inicio si no había ninguna)
       return router.createUrlTree([returnUrl]);
     }
   }
 
-  // Si no hay token o es el servidor, le dejamos ver la vista pública (login/landing)
+  /* Permite el acceso a la ruta pública si no existe sesión o la evaluación se realiza desde el servidor (SSR) */
   return true;
 };

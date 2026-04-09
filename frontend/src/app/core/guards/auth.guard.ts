@@ -1,3 +1,9 @@
+/**
+ * @file auth.guard.ts
+ * @description Guardián de rutas (Guard) encargado de la autorización general de usuarios.
+ * Restringe el acceso a las vistas protegidas del sistema comprobando la existencia de un
+ * token de acceso en el almacenamiento local, adaptando su ejecución para evitar errores en SSR.
+ */
 import { CanActivateFn, Router } from '@angular/router';
 import { inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
@@ -6,7 +12,7 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const platformId = inject(PLATFORM_ID);
 
-  // 1. Si estamos en el navegador y hay token, pasa sin problema
+  /* Autorización concedida si la plataforma es el navegador web y existe un token vigente */
   if (isPlatformBrowser(platformId)) {
     const token = localStorage.getItem('accessToken');
     if (token) {
@@ -14,8 +20,7 @@ export const authGuard: CanActivateFn = (route, state) => {
     }
   }
 
-  // 2. Si no hay token O estamos en el servidor (SSR):
-  // Redirigimos al login, pero guardamos la URL a la que quería ir (ej. /home/tutoriales)
+  /* Denegación de acceso y redirección a la pasarela de identificación, almacenando la ruta interceptada */
   return router.createUrlTree(['/auth/login'], {
     queryParams: { returnUrl: state.url },
   });
