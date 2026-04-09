@@ -3,7 +3,7 @@
   (click)="closeModal()"
 >
   <div
-    class="bg-surface w-full max-w-5xl rounded-t-[32px] md:rounded-[32px] shadow-2xl border border-border-main/10 flex flex-col h-[92vh] md:max-h-[85vh] overflow-hidden animate-in slide-in-from-bottom-full md:slide-in-from-bottom-8 duration-300 cursor-default"
+    class="bg-surface w-full max-w-5xl rounded-t-4xl md:rounded-4xl shadow-2xl border border-border-main/10 flex flex-col h-[92vh] md:max-h-[85vh] overflow-hidden animate-in slide-in-from-bottom-full md:slide-in-from-bottom-8 duration-300 cursor-default"
     (click)="$event.stopPropagation()"
   >
     <div class="relative h-56 md:h-72 shrink-0 bg-surface-hover w-full group">
@@ -151,7 +151,7 @@
                 @for (step of tutorial.steps; track step.order; let i = $index) {
                   <div class="relative pl-6 md:pl-8 group">
                     <div
-                      class="absolute -left-[11px] top-0.5 w-5 h-5 rounded-full bg-surface border-2 border-border-main/30 flex items-center justify-center transition-colors group-hover:border-primary"
+                      class="absolute -left-2.75 top-0.5 w-5 h-5 rounded-full bg-surface border-2 border-border-main/30 flex items-center justify-center transition-colors group-hover:border-primary"
                     >
                       <div
                         class="w-1.5 h-1.5 rounded-full transition-colors"
@@ -180,7 +180,7 @@
 
         <div class="w-full lg:w-80 xl:w-96 shrink-0">
           <div
-            class="sticky top-0 bg-primary/5 rounded-[24px] border border-primary/15 p-6 md:p-8 overflow-hidden relative"
+            class="top-0 bg-primary/5 rounded-3xl border border-primary/15 p-6 md:p-8 overflow-hidden relative"
           >
             <div
               class="absolute -top-10 -right-10 w-40 h-40 bg-primary/10 rounded-full blur-3xl pointer-events-none"
@@ -227,7 +227,7 @@
                   </div>
                 </li>
               }
-              @if (!tutorial.materialsNeeded?.length) {
+              @if (!tutorial.materialsNeeded.length) {
                 <li class="text-[13px] text-muted italic text-center py-4">
                   No se especifican materiales previos.
                 </li>

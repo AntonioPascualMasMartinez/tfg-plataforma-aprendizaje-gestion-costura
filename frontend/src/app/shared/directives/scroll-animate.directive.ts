@@ -1,3 +1,11 @@
+/**
+ * @file scroll-animate.directive.ts
+ * @description Directiva estructural de Angular para la animación de elementos basada en el desplazamiento (scroll).
+ * Implementa la API nativa IntersectionObserver para detectar la entrada de elementos en el viewport,
+ * disparando transiciones CSS de forma optimizada. El diseño garantiza la compatibilidad total con
+ * Server-Side Rendering (SSR) aislando la lógica exclusiva del navegador.
+ */
+
 import { isPlatformBrowser } from '@angular/common';
 import {
   Directive,
@@ -14,6 +22,9 @@ import {
   standalone: true,
 })
 export class ScrollAnimateDirective implements AfterViewInit, OnDestroy {
+  /**
+   * Instancia del observador encargado de monitorizar la intersección del elemento con el viewport.
+   */
   private observer!: IntersectionObserver;
 
   constructor(
@@ -22,46 +33,54 @@ export class ScrollAnimateDirective implements AfterViewInit, OnDestroy {
     @Inject(PLATFORM_ID) private platformId: Object,
   ) {}
 
-  ngAfterViewInit() {
-    // 1. Configuramos las clases iniciales (estado oculto)
-    // Esto se ejecuta tanto en el servidor (SSR) como en el navegador.
-    // Al usar Renderer2, es totalmente seguro y evita parpadeos al cargar la página.
+  /**
+   * Método del ciclo de vida ejecutado tras la inicialización de la vista del componente.
+   * Configura el estado inicial opaco y registra el observador si el entorno de ejecución lo permite.
+   */
+  ngAfterViewInit(): void {
+    /* Inicialización del estado visual (oculto). El uso de Renderer2 garantiza la 
+       compatibilidad con el Server-Side Rendering (SSR), manipulando el DOM de forma 
+       segura y previniendo destellos de contenido sin estilo (FOUC) durante la carga inicial. */
     this.renderer.addClass(this.el.nativeElement, 'opacity-0');
     this.renderer.addClass(this.el.nativeElement, 'translate-y-8');
     this.renderer.addClass(this.el.nativeElement, 'transition-all');
     this.renderer.addClass(this.el.nativeElement, 'duration-700');
     this.renderer.addClass(this.el.nativeElement, 'ease-out');
 
-    // 2. Solo instanciamos el IntersectionObserver si estamos en el entorno del navegador
+    /* Instanciación condicional del observador exclusiva para el entorno del cliente (navegador web) */
     if (isPlatformBrowser(this.platformId)) {
-      const options = {
-        root: null, // Usa el viewport del navegador
+      const options: IntersectionObserverInit = {
+        root: null,
         rootMargin: '0px',
-        threshold: 0.15, // Se activa cuando el 15% del elemento es visible
+        threshold: 0.15 /* El evento se dispara al visualizar el 15% del área del elemento */,
       };
 
       this.observer = new IntersectionObserver((entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            // 3. Cuando entra en pantalla, cambiamos las clases (estado visible)
+            /* Transición al estado visible mediante la mutación de clases CSS */
             this.renderer.removeClass(this.el.nativeElement, 'opacity-0');
             this.renderer.removeClass(this.el.nativeElement, 'translate-y-8');
             this.renderer.addClass(this.el.nativeElement, 'opacity-100');
             this.renderer.addClass(this.el.nativeElement, 'translate-y-0');
 
-            // Dejamos de observar el elemento una vez animado para ahorrar recursos
+            /* Finalización de la observación del nodo para reducir la carga de procesamiento computacional */
             this.observer.unobserve(this.el.nativeElement);
           }
         });
       }, options);
 
-      // Iniciar la observación del elemento
       this.observer.observe(this.el.nativeElement);
     }
   }
 
-  ngOnDestroy() {
-    // Limpieza vital para evitar fugas de memoria (Memory Leaks)
+  /**
+   * Método del ciclo de vida ejecutado previa destrucción de la directiva.
+   * Responsable de la recolección de basura y limpieza de suscripciones.
+   */
+  ngOnDestroy(): void {
+    /* Liberación de recursos y desconexión total del observador para 
+       prevenir fugas de memoria (memory leaks) en la Single Page Application (SPA). */
     if (isPlatformBrowser(this.platformId) && this.observer) {
       this.observer.disconnect();
     }

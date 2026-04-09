@@ -2,7 +2,7 @@
   class="fixed inset-0 z-100 flex items-end md:items-center justify-center bg-text-main/60 backdrop-blur-sm md:p-4 animate-in fade-in duration-300"
 >
   <div
-    class="bg-surface w-full max-w-3xl rounded-t-[32px] md:rounded-[32px] shadow-2xl border border-border-main/10 flex flex-col h-[92vh] md:max-h-[85vh] overflow-hidden animate-in slide-in-from-bottom-full md:slide-in-from-bottom-8 duration-300"
+    class="bg-surface w-full max-w-3xl rounded-t-4xl md:rounded-4xl shadow-2xl border border-border-main/10 flex flex-col h-[92vh] md:max-h-[85vh] overflow-hidden animate-in slide-in-from-bottom-full md:slide-in-from-bottom-8 duration-300"
   >
     <div class="relative h-56 md:h-72 shrink-0 bg-surface-hover w-full group">
       @if (project.inspirationImageUrl) {
@@ -151,7 +151,7 @@
               d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"
             />
           </svg>
-          {{ project.steps?.length || 0 }} Pasos
+          {{ project.steps.length || 0 }} Pasos
         </span>
       </div>
 
@@ -204,7 +204,7 @@
                 </div>
               </li>
             }
-            @if (!project.materials?.length) {
+            @if (!project.materials.length) {
               <li class="text-[14px] text-muted italic">No se han especificado materiales.</li>
             }
           </ul>
@@ -292,7 +292,7 @@
       <button
         (click)="startProject()"
         [disabled]="isCloning"
-        class="btn btn-primary px-8 py-3.5 text-[15px] font-bold flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:hover:translate-y-0 disabled:shadow-none w-full max-w-[280px] ml-3"
+        class="btn btn-primary px-8 py-3.5 text-[15px] font-bold flex items-center justify-center gap-2 shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all disabled:hover:translate-y-0 disabled:shadow-none w-full max-w-70 ml-3"
       >
         @if (isCloning) {
           <svg class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">

@@ -1,3 +1,9 @@
+/**
+ * @file create-project.modal.ts
+ * @description Componente modal estructurado para la creación inicial de un proyecto ("Nuevo").
+ * Emplea formularios reactivos de Angular (ReactiveForms) con soporte para validación estructurada,
+ * arreglos dinámicos (FormArray) para la inserción de materiales y carga de archivos a través de un servicio externo.
+ */
 import { Component, EventEmitter, Output, inject, ChangeDetectorRef, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ProjectService } from '../../../core/services/project.service';
@@ -26,6 +32,7 @@ export class CreateProjectModal implements OnInit {
   isUploadingImage = false;
   imagePreview: string | null = null;
 
+  /** Estado del asistente de configuración (Wizard). */
   currentStep = 1;
   totalSteps = 2;
 
@@ -42,22 +49,23 @@ export class CreateProjectModal implements OnInit {
     { name: 'Botones', defaultQuantity: '3 uds' },
   ];
 
+  /** Definición reactiva de la estructura de datos del proyecto. */
   projectForm: FormGroup = this.fb.group({
     title: ['', [Validators.required, Validators.maxLength(100)]],
-    projectType: ['Nuevo'], // Lo dejamos por defecto, el usuario ya no lo elige
+    projectType: ['Nuevo'],
     category: ['', [Validators.required]],
     difficulty: ['', [Validators.required]],
     estimatedTime: [null, [Validators.min(1)]],
     inspirationImageUrl: [null],
     description: [''],
     status: ['Planificado'],
-    isPublic: [false], // Forzamos a que nazca como borrador (privado)
+    isPublic: [false],
     materials: this.fb.array([]),
   });
 
-  ngOnInit() {}
+  ngOnInit(): void {}
 
-  setControlValue(controlName: string, value: string) {
+  setControlValue(controlName: string, value: string): void {
     const control = this.projectForm.get(controlName);
     if (control) {
       control.setValue(value);
@@ -65,33 +73,41 @@ export class CreateProjectModal implements OnInit {
     }
   }
 
-  get materials() {
+  /**
+   * Accesor (Getter) para el subformulario dinámico de materiales.
+   * @returns {FormArray} Arreglo reactivo para manipulación de la lista de dependencias.
+   */
+  get materials(): FormArray {
     return this.projectForm.get('materials') as FormArray;
   }
 
-  addMaterial() {
+  addMaterial(): void {
     const materialForm = this.fb.group({
       name: ['', Validators.required],
       quantity: ['', Validators.required],
-      notes: [''], // NUEVO: Campo opcional para notas del material
+      notes: [''],
     });
     this.materials.push(materialForm);
   }
 
-  addPredefinedMaterial(name: string, quantity: string) {
+  addPredefinedMaterial(name: string, quantity: string): void {
     const materialForm = this.fb.group({
       name: [name, Validators.required],
       quantity: [quantity, Validators.required],
-      notes: [''], // NUEVO: Campo opcional para notas del material
+      notes: [''],
     });
     this.materials.push(materialForm);
   }
 
-  removeMaterial(index: number) {
+  removeMaterial(index: number): void {
     this.materials.removeAt(index);
   }
 
-  onFileSelected(event: Event) {
+  /**
+   * Transmisión del archivo binario e inyección de la URL resultante en el estado reactivo.
+   * @param {Event} event - Interacción del input tipo "file".
+   */
+  onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
 
@@ -108,19 +124,22 @@ export class CreateProjectModal implements OnInit {
         this.cdr.detectChanges();
       },
       error: () => {
-        this.errorMessage = 'Error al subir la imagen a Cloudinary.';
+        this.errorMessage = 'Error al subir la imagen al repositorio remoto.';
         this.isUploadingImage = false;
         this.cdr.detectChanges();
       },
     });
   }
 
-  removeImage() {
+  removeImage(): void {
     this.imagePreview = null;
     this.projectForm.patchValue({ inspirationImageUrl: null });
   }
 
-  nextStep() {
+  /**
+   * Transición progresiva del formulario y validación del paso actual.
+   */
+  nextStep(): void {
     const step1Controls = ['title', 'category', 'difficulty', 'status', 'estimatedTime'];
     let isStep1Valid = true;
 
@@ -137,17 +156,17 @@ export class CreateProjectModal implements OnInit {
     }
   }
 
-  previousStep() {
+  previousStep(): void {
     if (this.currentStep > 1) {
       this.currentStep--;
     }
   }
 
-  closeModal() {
+  closeModal(): void {
     this.close.emit();
   }
 
-  onSubmit() {
+  onSubmit(): void {
     if (this.projectForm.invalid) {
       this.projectForm.markAllAsTouched();
       return;
@@ -167,7 +186,8 @@ export class CreateProjectModal implements OnInit {
       },
       error: (err) => {
         this.isLoading = false;
-        this.errorMessage = err.error?.message || 'Error al crear el proyecto. Intenta de nuevo.';
+        this.errorMessage =
+          err.error?.message || 'Error en la instanciación del proyecto. Intenta de nuevo.';
         this.cdr.detectChanges();
       },
     });

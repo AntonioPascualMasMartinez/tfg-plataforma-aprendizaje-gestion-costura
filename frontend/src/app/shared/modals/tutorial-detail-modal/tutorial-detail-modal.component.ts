@@ -1,3 +1,9 @@
+/**
+ * @file tutorial-detail-modal.component.ts
+ * @description Componente modal encargado de presentar la ficha detallada de una unidad didáctica (Tutorial).
+ * Intermedia entre el catálogo formativo y la instanciación de un nuevo proyecto derivado,
+ * gestionando la llamada al servicio de clonación y la posterior redirección al entorno de trabajo.
+ */
 import { Component, EventEmitter, Input, Output, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
@@ -12,22 +18,24 @@ import { ToastService } from '../../../core/services/toast.service';
   templateUrl: './tutorial-detail-modal.component.html',
 })
 export class TutorialDetailModalComponent {
-  // Recibe el tutorial seleccionado al abrir el modal
+  /** Entidad del tutorial seleccionada para su visualización. */
   @Input({ required: true }) tutorial!: Tutorial;
 
-  // Evento para avisar al padre que cierre el modal
+  /** Evento emitido para notificar al componente contenedor la solicitud de cierre de la vista. */
   @Output() close = new EventEmitter<void>();
 
   private tutorialService = inject(TutorialService);
   private toastService = inject(ToastService);
   private router = inject(Router);
 
+  /** Bandera de estado para el control de la interfaz durante peticiones asíncronas. */
   isLoading = false;
 
   /**
-   * Obtiene la imagen de portada.
-   * Busca en orden inverso (desde el último paso hacia el primero)
-   * para mostrar el resultado final del tutorial.
+   * Propiedad computada que extrae la imagen de portada representativa.
+   * Itera la colección de pasos en orden inverso para priorizar la visualización
+   * del resultado final del tutorial.
+   * @returns {string | null} URL del activo multimedia o nulo si carece de él.
    */
   get coverImage(): string | null {
     if (this.tutorial.steps && this.tutorial.steps.length > 0) {
@@ -37,6 +45,10 @@ export class TutorialDetailModalComponent {
     return null;
   }
 
+  /**
+   * Formatea la duración estimada de la unidad didáctica a un formato legible por el usuario.
+   * @returns {string} Cadena de texto con formato (ej. "1h 30m").
+   */
   get formattedTime(): string {
     const mins = this.tutorial.estimatedTime || 0;
     if (mins < 60) return `${mins} min`;
@@ -45,6 +57,10 @@ export class TutorialDetailModalComponent {
     return m > 0 ? `${h}h ${m}m` : `${h}h`;
   }
 
+  /**
+   * Asigna dinámicamente clases utilitarias de Tailwind CSS según el nivel de complejidad del tutorial.
+   * @returns {string} Cadena con las clases de estilo correspondientes.
+   */
   get difficultyColorClass(): string {
     switch (this.tutorial.difficultyLevel) {
       case 'Principiante':
@@ -58,36 +74,39 @@ export class TutorialDetailModalComponent {
     }
   }
 
-  closeModal() {
+  /**
+   * Gestiona el cierre del componente previniendo la interrupción de procesos en curso.
+   */
+  closeModal(): void {
     if (!this.isLoading) {
       this.close.emit();
     }
   }
 
   /**
-   * Llamada al backend para clonar e iniciar el tutorial
+   * Invoca el endpoint de vinculación para iniciar la formación.
+   * Efectúa el control de flujo transaccional y la redirección programática
+   * al nuevo entorno de proyecto generado (Clon).
    */
-  startTutorial() {
+  startTutorial(): void {
     this.isLoading = true;
     this.tutorialService.startTutorial(this.tutorial._id).subscribe({
       next: (response) => {
         this.isLoading = false;
         this.toastService.success('¡Tutorial iniciado! Preparando tu mesa de trabajo...');
 
-        // El backend devuelve el proyecto clonado, tomamos su ID para redirigir
+        /* Extracción del identificador del proyecto clonado y navegación hacia el taller inmersivo */
         const newProjectId = response.data.clonedProject._id;
-
-        // Cerramos el modal y navegamos a la vista inmersiva del Workshop
         this.closeModal();
         this.router.navigate(['/home/proyectos', newProjectId]);
       },
       error: (err) => {
-        console.error('Error al iniciar el tutorial:', err);
+        console.error('Excepción capturada durante la inicialización del tutorial:', err);
         this.isLoading = false;
 
-        // Manejo inteligente de error: Si ya lo había iniciado, lo llevamos a su Taller
         const errorMessage = err.error?.message?.toLowerCase() || '';
 
+        /* Manejo de contingencia: Redirección condicional si el usuario ya posee un clon activo de la unidad */
         if (
           errorMessage.includes('iniciado') ||
           errorMessage.includes('ya existe') ||
@@ -95,7 +114,6 @@ export class TutorialDetailModalComponent {
         ) {
           this.toastService.info('Ya estabas realizando este tutorial. Abriendo tu taller...');
           this.closeModal();
-          // Como no tenemos el ID del clon exacto en el error, lo llevamos a la pestaña de sus tutoriales
           this.router.navigate(['/home/proyectos']);
         } else {
           this.toastService.error('Error al preparar el tutorial. Por favor, intenta de nuevo.');

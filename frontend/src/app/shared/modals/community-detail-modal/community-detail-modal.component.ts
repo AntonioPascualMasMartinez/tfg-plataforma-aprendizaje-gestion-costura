@@ -1,3 +1,10 @@
+/**
+ * @file community-detail-modal.component.ts
+ * @description Componente modal interactivo para la visualización en detalle de un proyecto de la comunidad.
+ * Permite al usuario revisar la información del proyecto, leer comentarios, reportar contenido
+ * y, de manera central, orquestar el proceso de clonación ("Adaptado de la Comunidad")
+ * hacia el entorno de trabajo personal (taller).
+ */
 import {
   Component,
   EventEmitter,
@@ -33,8 +40,13 @@ import { ReportModalComponent } from '../report-modal/report-modal.component';
   templateUrl: './community-detail-modal.component.html',
 })
 export class CommunityDetailModalComponent implements OnInit {
+  /** Instancia del proyecto de la comunidad a visualizar. */
   @Input({ required: true }) project!: CommunityProject;
+
+  /** Evento emitido para solicitar el cierre de la ventana modal. */
   @Output() close = new EventEmitter<void>();
+
+  /** Evento emitido al producirse una actualización relevante en el proyecto. */
   @Output() projectUpdated = new EventEmitter<CommunityProject>();
 
   private communityService = inject(CommunityService);
@@ -43,26 +55,26 @@ export class CommunityDetailModalComponent implements OnInit {
   private router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
-  // Estados de carga
+  /** Indicador de estado para la carga asíncrona de comentarios. */
   isLoadingComments = true;
+
+  /** Indicador de estado para el bloqueo de interfaz durante la clonación del proyecto. */
   isCloning = false;
 
-  // Datos de comunidad
   comments: Comment[] = [];
   totalComments = 0;
 
-  // Reportes
   showReportModal = false;
   projectToReport: any = null;
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadComments();
   }
 
   /**
-   * Carga los comentarios del proyecto para mostrarlos como valoraciones
+   * Recupera de forma paginada los comentarios asociados al proyecto.
    */
-  loadComments() {
+  loadComments(): void {
     this.isLoadingComments = true;
     this.communityService.getProjectComments(this.project._id, 1, 10).subscribe({
       next: (res) => {
@@ -79,17 +91,16 @@ export class CommunityDetailModalComponent implements OnInit {
   }
 
   /**
-   * Orquestación de clonado:
-   * 1. Crea el proyecto base.
-   * 2. Itera y añade los pasos uno a uno para mantener el orden.
+   * Ejecuta la orquestación secuencial para clonar un proyecto de la comunidad.
+   * Inicializa la instancia base del proyecto y encadena la inserción de pasos iterativos
+   * manteniendo la integridad relacional y de orden.
    */
-  startProject() {
+  startProject(): void {
     if (this.isCloning) return;
 
     this.isCloning = true;
     this.cdr.detectChanges();
 
-    // Preparamos el payload base
     const createPayload: CreateProjectPayload = {
       title: this.project.title,
       projectType: 'Adaptado de la Comunidad',
@@ -107,12 +118,12 @@ export class CommunityDetailModalComponent implements OnInit {
       })),
     };
 
-    // 1. Creamos el proyecto
+    /* 1. Persistencia de la entidad raíz (Proyecto) */
     this.projectService.createProject(createPayload).subscribe({
       next: (response) => {
         const newProject = response.data;
 
-        // 2. Si hay pasos, los añadimos secuencialmente para garantizar el orden
+        /* 2. Inserción secuencial de pasos para evitar condiciones de carrera (Race Conditions) */
         if (this.project.steps && this.project.steps.length > 0) {
           from(this.project.steps)
             .pipe(
@@ -125,7 +136,7 @@ export class CommunityDetailModalComponent implements OnInit {
                 };
                 return this.projectService.addStepToProject(newProject._id, stepPayload);
               }),
-              toArray(), // Esperamos a que todos terminen
+              toArray(),
             )
             .subscribe({
               next: () => this.finalizeCloning(newProject._id),
@@ -139,24 +150,33 @@ export class CommunityDetailModalComponent implements OnInit {
     });
   }
 
-  private finalizeCloning(newId: string) {
+  /**
+   * Finaliza el flujo de clonación de manera exitosa y redirige al taller.
+   * @param {string} newId - Identificador del nuevo proyecto generado.
+   */
+  private finalizeCloning(newId: string): void {
     this.isCloning = false;
     this.toastService.success('¡Patrón añadido! Abriendo tu mesa de trabajo...');
     this.closeModal();
-    this.router.navigate(['/home/proyectos', newId]); // Vamos directo al workshop
+    this.router.navigate(['/home/proyectos', newId]);
   }
 
-  private handleCloneError() {
+  /**
+   * Gestiona excepciones durante la creación secuencial del clon.
+   */
+  private handleCloneError(): void {
     this.isCloning = false;
     this.toastService.error('Hubo un error al preparar el taller. Inténtalo de nuevo.');
     this.cdr.detectChanges();
   }
 
-  closeModal() {
+  closeModal(): void {
     this.close.emit();
   }
 
-  // Helpers de visualización
+  /**
+   * Resolución de seguridad del identificador de autor para prevenir errores de referencia nula.
+   */
   getAuthorName(ownerId: any): string {
     if (ownerId && typeof ownerId === 'object' && 'displayName' in ownerId) {
       return ownerId.displayName || 'Anónimo';
@@ -164,6 +184,9 @@ export class CommunityDetailModalComponent implements OnInit {
     return 'Anónimo';
   }
 
+  /**
+   * Obtiene la imagen de avatar del autor o genera un placeholder visual.
+   */
   getAuthorAvatar(ownerId: any): string {
     if (ownerId && typeof ownerId === 'object' && 'avatar' in ownerId && ownerId.avatar) {
       return ownerId.avatar;
@@ -172,7 +195,10 @@ export class CommunityDetailModalComponent implements OnInit {
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=ffedd5&color=ea580c&rounded=true&bold=true`;
   }
 
-  openReportModal(target: any, type: 'Project' | 'Comment') {
+  /**
+   * Inicializa la vista de reporte para el proyecto o para un comentario.
+   */
+  openReportModal(target: any, type: 'Project' | 'Comment'): void {
     this.projectToReport = {
       targetId: target._id,
       targetType: type,
@@ -183,9 +209,11 @@ export class CommunityDetailModalComponent implements OnInit {
     this.cdr.detectChanges();
   }
 
-  onReportSubmitted(eventData: CreateReportPayload) {
-    // <-- Mejoramos el tipado
-    // El modal hijo ya nos envía el payload completo, pero usamos el reason por seguridad
+  /**
+   * Gestiona el envío del reporte capturando el evento del modal hijo y procediendo
+   * a la petición HTTP de creación.
+   */
+  onReportSubmitted(eventData: CreateReportPayload): void {
     const payload: CreateReportPayload = {
       targetId: this.projectToReport.targetId,
       targetType: this.projectToReport.targetType,
@@ -201,7 +229,6 @@ export class CommunityDetailModalComponent implements OnInit {
       },
       error: () => {
         this.toastService.error('Error al enviar el reporte. Inténtalo de nuevo.');
-        // NUEVO: Cerramos el modal también en caso de error para no dejar el spinner bloqueado
         this.showReportModal = false;
         this.projectToReport = null;
         this.cdr.detectChanges();

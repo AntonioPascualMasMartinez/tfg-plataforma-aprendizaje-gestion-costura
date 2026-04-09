@@ -1,3 +1,10 @@
+/**
+ * @file create-tutorial-modal.component.ts
+ * @description Componente de interfaz modal complejo para la autoría y edición de unidades didácticas (Tutoriales).
+ * Permite tanto la inserción inicial como la mutación del registro gracias al ciclo de vida OnChanges.
+ * Emplea FormArrays anidados para la organización de materiales y pasos secuenciales, integrando
+ * capacidades de reordenamiento de nodos (Drag & Drop lógico).
+ */
 import {
   Component,
   EventEmitter,
@@ -15,7 +22,7 @@ import {
   DifficultyLevel,
   Tutorial,
 } from '../../../shared/models/tutorial.model';
-import { UploadService } from '../../../core/services/upload.service'; // <-- Importar el servicio
+import { UploadService } from '../../../core/services/upload.service';
 
 @Component({
   selector: 'app-create-tutorial-modal',
@@ -26,7 +33,9 @@ import { UploadService } from '../../../core/services/upload.service'; // <-- Im
 export class CreateTutorialModalComponent implements OnInit, OnChanges {
   @Input() isOpen = false;
   @Input() isLoading = false;
-  @Input() tutorialData: Tutorial | null = null; // <-- 1. Soporte para Edición
+
+  /** Identificador de edición. Si se proporciona, el modal opera en modo "Actualización". */
+  @Input() tutorialData: Tutorial | null = null;
 
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<CreateTutorialPayload>();
@@ -38,19 +47,21 @@ export class CreateTutorialModalComponent implements OnInit, OnChanges {
   tutorialForm!: FormGroup;
   difficulties: DifficultyLevel[] = ['Principiante', 'Intermedio', 'Avanzado'];
 
-  // <-- 2. Estado para el spinner de subida de imágenes (guardará el índice del paso actual)
+  /** Puntero al índice del paso (Step) cuya imagen se encuentra en tránsito. */
   uploadingStepIndex: number | null = null;
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.initForm();
     if (!this.tutorialData) {
-      this.addStep(); // Solo añade el paso vacío inicial si estamos creando de cero
+      this.addStep();
     }
   }
 
-  // --- 1. LÓGICA DE EDICIÓN ---
-  // ngOnChanges detecta cuando el @Input() tutorialData o isOpen cambian
-  ngOnChanges(changes: SimpleChanges) {
+  /**
+   * Monitoriza modificaciones externas en los parámetros de entrada (Inputs).
+   * Responsable de instanciar el modo edición poblado el formulario si se detecta un objeto `tutorialData`.
+   */
+  ngOnChanges(changes: SimpleChanges): void {
     if (changes['isOpen'] && this.isOpen) {
       if (this.tutorialData && this.tutorialForm) {
         this.populateForm(this.tutorialData);
@@ -60,7 +71,10 @@ export class CreateTutorialModalComponent implements OnInit, OnChanges {
     }
   }
 
-  private initForm() {
+  /**
+   * Construcción de la jerarquía base del modelo de formulario (ReactiveForms).
+   */
+  private initForm(): void {
     this.tutorialForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(5)]],
       category: ['', Validators.required],
@@ -72,12 +86,14 @@ export class CreateTutorialModalComponent implements OnInit, OnChanges {
     });
   }
 
-  // Rellena el formulario reactivo con los datos del backend
-  private populateForm(data: Tutorial) {
+  /**
+   * Sincroniza la estructura de datos entrante (Backend) con el árbol de controles reactivos (Frontend).
+   * @param {Tutorial} data - Entidad con datos consolidados.
+   */
+  private populateForm(data: Tutorial): void {
     this.materialsNeeded.clear();
     this.steps.clear();
 
-    // Valores básicos
     this.tutorialForm.patchValue({
       title: data.title,
       category: data.category,
@@ -86,7 +102,7 @@ export class CreateTutorialModalComponent implements OnInit, OnChanges {
       description: data.description,
     });
 
-    // Reconstruir Array de Materiales
+    /* Reconstrucción iterativa de sub-arreglos */
     if (data.materialsNeeded && data.materialsNeeded.length > 0) {
       data.materialsNeeded.forEach((mat) => {
         this.materialsNeeded.push(
@@ -98,7 +114,6 @@ export class CreateTutorialModalComponent implements OnInit, OnChanges {
       });
     }
 
-    // Reconstruir Array de Pasos (asegurando el orden)
     if (data.steps && data.steps.length > 0) {
       const sortedSteps = [...data.steps].sort((a, b) => a.order - b.order);
       sortedSteps.forEach((step) => {
@@ -114,7 +129,7 @@ export class CreateTutorialModalComponent implements OnInit, OnChanges {
     }
   }
 
-  private resetFormState() {
+  private resetFormState(): void {
     this.tutorialForm.reset({
       difficultyLevel: 'Principiante',
       estimatedTime: 60,
@@ -124,7 +139,6 @@ export class CreateTutorialModalComponent implements OnInit, OnChanges {
     this.addStep();
   }
 
-  // --- GETTERS PARA LOS ARRAYS ---
   get materialsNeeded(): FormArray {
     return this.tutorialForm.get('materialsNeeded') as FormArray;
   }
@@ -133,8 +147,7 @@ export class CreateTutorialModalComponent implements OnInit, OnChanges {
     return this.tutorialForm.get('steps') as FormArray;
   }
 
-  // --- GESTIÓN DE MATERIALES ---
-  addMaterial() {
+  addMaterial(): void {
     this.materialsNeeded.push(
       this.fb.group({
         name: ['', Validators.required],
@@ -144,13 +157,12 @@ export class CreateTutorialModalComponent implements OnInit, OnChanges {
     this.tutorialForm.markAsDirty();
   }
 
-  removeMaterial(index: number) {
+  removeMaterial(index: number): void {
     this.materialsNeeded.removeAt(index);
     this.tutorialForm.markAsDirty();
   }
 
-  // --- GESTIÓN DE PASOS Y 3. REORDENACIÓN DINÁMICA ---
-  addStep() {
+  addStep(): void {
     const stepOrder = this.steps.length + 1;
     this.steps.push(
       this.fb.group({
@@ -163,13 +175,19 @@ export class CreateTutorialModalComponent implements OnInit, OnChanges {
     this.tutorialForm.markAsDirty();
   }
 
-  removeStep(index: number) {
+  removeStep(index: number): void {
     this.steps.removeAt(index);
     this.recalculateStepOrders();
     this.tutorialForm.markAsDirty();
   }
 
-  moveStep(index: number, direction: 'up' | 'down') {
+  /**
+   * Gestión de reubicación espacial de pasos formativos alterando el índice dentro del `FormArray`.
+   * Invoca un recalculo lógico del atributo persistido `order`.
+   * @param {number} index - Índice temporal actual.
+   * @param {'up' | 'down'} direction - Sentido de desplazamiento.
+   */
+  moveStep(index: number, direction: 'up' | 'down'): void {
     if (direction === 'up' && index > 0) {
       const current = this.steps.at(index);
       this.steps.removeAt(index);
@@ -183,24 +201,22 @@ export class CreateTutorialModalComponent implements OnInit, OnChanges {
     this.tutorialForm.markAsDirty();
   }
 
-  private recalculateStepOrders() {
+  private recalculateStepOrders(): void {
     this.steps.controls.forEach((control, i) => {
       control.get('order')?.setValue(i + 1);
     });
   }
 
-  // --- 2. SUBIDA NATIVA A CLOUDINARY ---
-  onFileSelected(event: Event, stepIndex: number) {
+  onFileSelected(event: Event, stepIndex: number): void {
     const input = event.target as HTMLInputElement;
     if (!input.files || input.files.length === 0) return;
 
     const file = input.files[0];
     this.uploadingStepIndex = stepIndex;
-    this.cdr.detectChanges(); // Forzamos la vista para mostrar el spinner
+    this.cdr.detectChanges();
 
     this.uploadService.uploadImage(file, 'needly_tutorials').subscribe({
       next: (response: any) => {
-        // La API de Cloudinary devuelve la URL final en la propiedad 'secure_url'
         const imageUrl = response.secure_url;
         this.steps.at(stepIndex).get('mediaUrl')?.setValue(imageUrl);
 
@@ -209,7 +225,7 @@ export class CreateTutorialModalComponent implements OnInit, OnChanges {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error al subir la imagen:', err);
+        console.error('Error durante la transmisión binaria de imagen:', err);
         this.uploadingStepIndex = null;
         this.cdr.detectChanges();
         alert('Hubo un error al subir la imagen. Por favor, inténtalo de nuevo.');
@@ -217,34 +233,33 @@ export class CreateTutorialModalComponent implements OnInit, OnChanges {
     });
   }
 
-  removeImage(stepIndex: number) {
+  removeImage(stepIndex: number): void {
     this.steps.at(stepIndex).get('mediaUrl')?.setValue(null);
     this.tutorialForm.markAsDirty();
   }
 
-  // --- 4. ACCIONES DEL MODAL (PREVENCIÓN DE CIERRE) ---
-  onSubmit() {
+  onSubmit(): void {
     if (this.tutorialForm.valid) {
       this.save.emit(this.tutorialForm.value as CreateTutorialPayload);
-      // Nota: No cerramos el modal aquí. El componente padre es quien
-      // cambia isOpen a false cuando el backend responde correctamente.
     } else {
       this.tutorialForm.markAllAsTouched();
     }
   }
 
-  requestClose() {
-    // Si el usuario ha tocado algo (dirty) y no estamos en medio de un guardado
+  /**
+   * Previene la pérdida accidental de datos en progreso ante un cierre prematuro del modal.
+   */
+  requestClose(): void {
     if (this.tutorialForm.dirty && !this.isLoading) {
       const confirm = window.confirm(
         'Tienes cambios sin guardar. ¿Estás seguro de que deseas salir y perder tu progreso?',
       );
-      if (!confirm) return; // Si dice "Cancelar", abortamos el cierre
+      if (!confirm) return;
     }
     this.executeClose();
   }
 
-  private executeClose() {
+  private executeClose(): void {
     this.resetFormState();
     this.close.emit();
   }

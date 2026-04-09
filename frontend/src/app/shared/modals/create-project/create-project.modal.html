@@ -195,7 +195,7 @@
 
                 @if (!imagePreview) {
                   <label
-                    class="flex-1 flex flex-col items-center justify-center w-full px-4 transition bg-surface border-2 border-border-main/20 border-dashed rounded-2xl cursor-pointer hover:border-primary/40 hover:bg-primary/5 focus:outline-none min-h-[120px]"
+                    class="flex-1 flex flex-col items-center justify-center w-full px-4 transition bg-surface border-2 border-border-main/20 border-dashed rounded-2xl cursor-pointer hover:border-primary/40 hover:bg-primary/5 focus:outline-none min-h-30"
                     [class.opacity-50]="isUploadingImage"
                     [class.cursor-not-allowed]="isUploadingImage"
                   >
@@ -235,7 +235,7 @@
                   </label>
                 } @else {
                   <div
-                    class="flex-1 relative w-full rounded-2xl border border-border-main/20 overflow-hidden group min-h-[120px]"
+                    class="flex-1 relative w-full rounded-2xl border border-border-main/20 overflow-hidden group min-h-30"
                   >
                     <img
                       [src]="imagePreview"
@@ -500,7 +500,7 @@
           type="submit"
           form="projectForm"
           [disabled]="projectForm.invalid || isLoading"
-          class="cursor-pointer btn btn-primary px-8 py-2.5 text-[14px] font-bold flex items-center justify-center min-w-[140px] shadow-md hover:shadow-primary/25 hover:-translate-y-0.5 transition-all disabled:hover:translate-y-0 disabled:shadow-none"
+          class="cursor-pointer btn btn-primary px-8 py-2.5 text-[14px] font-bold flex items-center justify-center min-w-35 shadow-md hover:shadow-primary/25 hover:-translate-y-0.5 transition-all disabled:hover:translate-y-0 disabled:shadow-none"
         >
           Crear proyecto
         </button>

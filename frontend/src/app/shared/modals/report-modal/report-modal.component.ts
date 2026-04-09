@@ -1,3 +1,9 @@
+/**
+ * @file report-modal.component.ts
+ * @description Componente modal interactivo para la generación de reportes de moderación.
+ * Permite a los usuarios tipificar infracciones en el contenido (proyectos o comentarios)
+ * y recolecta el Payload validado para su procesamiento por el contenedor padre.
+ */
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,16 +16,22 @@ import { CreateReportPayload, ReportTargetType } from '../../models/community.mo
   templateUrl: './report-modal.component.html',
 })
 export class ReportModalComponent {
-  // Datos del objetivo obligatorios
+  /** Identificador unívoco del recurso a reportar. */
   @Input({ required: true }) targetId!: string;
-  @Input({ required: true }) targetType!: ReportTargetType;
-  @Input() targetTitle?: string; // Opcional, para mostrar "Reportar 'Nombre del Proyecto'"
 
+  /** Categoría del recurso a reportar (Ej. 'Project', 'Comment'). */
+  @Input({ required: true }) targetType!: ReportTargetType;
+
+  /** Metadato descriptivo opcional para contextualizar la interfaz de usuario. */
+  @Input() targetTitle?: string;
+
+  /** Emisor de evento para la solicitud de destrucción del componente. */
   @Output() close = new EventEmitter<void>();
-  // Emitimos el payload final listo para el servicio
+
+  /** Emisor de evento que transmite la carga útil estructuralmente válida. */
   @Output() submitted = new EventEmitter<CreateReportPayload>();
 
-  // Motivos predefinidos frecuentes
+  /** Colección estática de causales de denuncia tipificadas. */
   predefinedReasons = [
     'Spam o contenido comercial',
     'Contenido inapropiado / Ofensivo',
@@ -31,16 +43,22 @@ export class ReportModalComponent {
   otherReason: string = '';
   isSubmitting = false;
 
+  /** Evalúa si el usuario requiere introducir una justificación manual. */
   get isOtherSelected(): boolean {
     return this.selectedReason === 'Otro';
   }
 
+  /**
+   * Validación reactiva del formulario.
+   * @returns {boolean} Autoriza el envío si los requisitos de información están satisfechos.
+   */
   get canSubmit(): boolean {
     if (!this.selectedReason) return false;
     if (this.isOtherSelected && !this.otherReason.trim()) return false;
     return true;
   }
 
+  /** Normaliza la justificación final componiendo la cadena en caso de motivos personalizados. */
   get finalReason(): string {
     if (this.isOtherSelected) {
       return `Otro: ${this.otherReason.trim()}`;
@@ -48,14 +66,21 @@ export class ReportModalComponent {
     return this.selectedReason || '';
   }
 
-  selectReason(reason: string) {
+  /**
+   * Gestiona la selección de la tipología de reporte.
+   * @param {string} reason - Causal predefinida seleccionada.
+   */
+  selectReason(reason: string): void {
     this.selectedReason = reason;
     if (reason !== 'Otro') {
-      this.otherReason = ''; // Limpiamos el campo "Otro" si selecciona una predefinida
+      this.otherReason = '';
     }
   }
 
-  onSubmit() {
+  /**
+   * Ensambla el Payload y emite el evento de confirmación.
+   */
+  onSubmit(): void {
     if (!this.canSubmit) return;
 
     this.isSubmitting = true;
@@ -67,11 +92,15 @@ export class ReportModalComponent {
     };
 
     this.submitted.emit(payload);
-    // Nota: No cerramos el modal aquí, dejamos que el padre decida tras el éxito/error de la API
+    /* La delegación del cierre del componente recae sobre el contenedor padre 
+       para mantener coherencia con la resolución de la petición HTTP. */
   }
 
-  closeModal() {
-    if (this.isSubmitting) return; // Evitar cerrar mientras se envía
+  /**
+   * Solicita el desmontaje del componente mitigando interrupciones de concurrencia.
+   */
+  closeModal(): void {
+    if (this.isSubmitting) return;
     this.close.emit();
   }
 }
