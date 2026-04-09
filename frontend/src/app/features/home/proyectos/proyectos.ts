@@ -1,3 +1,10 @@
+/**
+ * @file proyectos.ts
+ * @description Componente gestor del área de trabajo principal del usuario.
+ * Coordina la visualización, filtrado y administración del ciclo de vida de los proyectos personales.
+ * Segmenta la información en múltiples contextos de negocio (taller, portafolio, adaptaciones)
+ * apoyándose en formularios reactivos para consultas dinámicas al servidor.
+ */
 import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
@@ -11,6 +18,7 @@ import { ProjectCardComponent } from '../../../shared/components/project-card/pr
 import { CreateProjectModal } from '../../../shared/modals/create-project/create-project.modal';
 import { ToastService } from '../../../core/services/toast.service';
 
+/** Definición tipada de los contextos de visualización disponibles en el área de trabajo. */
 type ViewMode = 'taller' | 'portafolio' | 'tutoriales' | 'comunidad';
 
 @Component({
@@ -26,55 +34,68 @@ type ViewMode = 'taller' | 'portafolio' | 'tutoriales' | 'comunidad';
   templateUrl: './proyectos.html',
 })
 export class Proyectos implements OnInit, OnDestroy {
+  /* Inyección de dependencias para servicios de datos, notificaciones y enrutamiento */
   private projectService = inject(ProjectService);
   private cdr = inject(ChangeDetectorRef);
   private toastService = inject(ToastService);
   private router = inject(Router);
 
-  // Estado principal
+  /** Colección activa de proyectos renderizados en la vista actual */
   projects: Project[] = [];
   isLoading = true;
-  activeView: ViewMode = 'taller'; // Por defecto mostramos los borradores propios
+  /** Contexto de navegación inicial establecido en el área de desarrollo privado */
+  activeView: ViewMode = 'taller';
 
-  // Controles de filtrado
+  /* Controles reactivos para el motor de filtrado y ordenación */
   searchTerm = new FormControl('');
   statusFilter = new FormControl('Todos');
-  difficultyFilter = new FormControl('Todas'); // Nota: el backend actual no filtra por dificultad directamente, habría que añadirlo al service si se quiere filtrado real
+  difficultyFilter = new FormControl('Todas');
   sortByFilter = new FormControl('nuevo');
 
-  // Paginación
+  /* Metadatos de paginación del lado del servidor */
   currentPage = 1;
   totalPages = 1;
   totalResults = 0;
 
-  // Control de interfaz
+  /** Estado de despliegue de la ventana modal de creación */
   isCreateModalOpen = false;
+  /** Referencia de suscripción para prevenir fugas de memoria del sistema de filtros */
   private filterSubscription?: Subscription;
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadProjects();
     this.setupFilters();
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     if (this.filterSubscription) {
       this.filterSubscription.unsubscribe();
     }
   }
 
-  // --- NAVEGACIÓN Y VISTAS ---
+  /* ==========================================================================
+     MÉTODOS DE ORQUESTACIÓN DE VISTAS Y FILTROS
+     ========================================================================== */
 
-  switchView(view: ViewMode) {
+  /**
+   * Ejecuta la transición entre contextos de visualización del área de trabajo.
+   * Purga el estado de los filtros para evitar cruces de datos inconsistentes.
+   * @param view Identificador del nuevo contexto a cargar.
+   */
+  switchView(view: ViewMode): void {
     if (this.activeView === view) return;
 
     this.activeView = view;
     this.currentPage = 1;
-    // Limpiamos los filtros al cambiar de contexto para evitar resultados confusos
     this.resetFilters(false);
     this.loadProjects();
   }
 
-  private resetFilters(reload: boolean = true) {
+  /**
+   * Restablece los valores por defecto de los controles de filtrado.
+   * @param reload Determina si se debe desencadenar una nueva petición de red tras el reseteo.
+   */
+  private resetFilters(reload: boolean = true): void {
     this.searchTerm.setValue('', { emitEvent: false });
     this.statusFilter.setValue('Todos', { emitEvent: false });
     this.difficultyFilter.setValue('Todas', { emitEvent: false });
@@ -86,7 +107,11 @@ export class Proyectos implements OnInit, OnDestroy {
     }
   }
 
-  private setupFilters() {
+  /**
+   * Configura la topología reactiva para escuchar cambios en los parámetros de búsqueda.
+   * Implementa retardos (debounce) en la entrada de texto para optimizar el tráfico de red.
+   */
+  private setupFilters(): void {
     const search$ = this.searchTerm.valueChanges.pipe(debounceTime(400), distinctUntilChanged());
     const status$ = this.statusFilter.valueChanges;
     const difficulty$ = this.difficultyFilter.valueChanges;
@@ -98,9 +123,15 @@ export class Proyectos implements OnInit, OnDestroy {
     });
   }
 
-  // --- CARGA DE DATOS ---
+  /* ==========================================================================
+     MÉTODOS DE ACCESO A DATOS (Integración con API)
+     ========================================================================== */
 
-  loadProjects() {
+  /**
+   * Compone y ejecuta la petición al servidor evaluando el estado de la vista activa
+   * y los parámetros definidos en los controles de filtrado.
+   */
+  loadProjects(): void {
     this.isLoading = true;
     this.cdr.markForCheck();
 
@@ -108,34 +139,29 @@ export class Proyectos implements OnInit, OnDestroy {
     const status = this.statusFilter.value || 'Todos';
     const sortBy = this.sortByFilter.value || 'nuevo';
 
-    // Determinamos qué pedirle al backend basándonos en la pestaña activa
     let projectType: string | undefined = undefined;
     let isPublic: boolean | undefined = undefined;
 
+    /* Resolución paramétrica en función del contexto de negocio seleccionado */
     switch (this.activeView) {
       case 'taller':
-        // Mis borradores: Proyectos creados por mí que NO son públicos
         projectType = 'Nuevo';
         isPublic = false;
         break;
       case 'portafolio':
-        // Mis publicaciones: Proyectos creados por mí que SÍ son públicos
         projectType = 'Nuevo';
         isPublic = true;
         break;
       case 'tutoriales':
-        // Clonados de tutoriales
         projectType = 'Comenzado desde Tutorial';
-        isPublic = false; // Los clones siempre son privados
+        isPublic = false;
         break;
       case 'comunidad':
-        // Clonados de la comunidad
         projectType = 'Adaptado de la Comunidad';
-        isPublic = false; // Los clones siempre son privados
+        isPublic = false;
         break;
     }
 
-    // Petición al backend con todos los filtros correctos aplicados
     this.projectService
       .getMyProjects(this.currentPage, 9, status, sortBy, search, projectType, isPublic)
       .subscribe({
@@ -143,7 +169,7 @@ export class Proyectos implements OnInit, OnDestroy {
           if (response.data) {
             let fetchedDocs = response.data.docs;
 
-            // Filtro local de dificultad (Idealmente esto debería hacerlo el backend)
+            /* Procesamiento local complementario para el filtrado por dificultad */
             const difficulty = this.difficultyFilter.value || 'Todas';
             if (difficulty !== 'Todas') {
               fetchedDocs = fetchedDocs.filter((p: Project) => p.difficulty === difficulty);
@@ -162,7 +188,7 @@ export class Proyectos implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         },
         error: (err) => {
-          console.error('Error cargando proyectos:', err);
+          console.error('Anomalía en la recuperación del repositorio de proyectos:', err);
           this.projects = [];
           this.isLoading = false;
           this.cdr.markForCheck();
@@ -170,18 +196,29 @@ export class Proyectos implements OnInit, OnDestroy {
       });
   }
 
-  // --- ACCIONES DE PROYECTO ---
+  /* ==========================================================================
+     OPERACIONES TRANSACCIONALES (CRUD)
+     ========================================================================== */
 
-  openCreateModal() {
+  openCreateModal(): void {
     this.isCreateModalOpen = true;
   }
 
-  handleProjectCreated(project: Project) {
+  /**
+   * Cierra el diálogo de inicialización y enruta al usuario al editor de detalles
+   * tras la instanciación exitosa de un nuevo proyecto en la base de datos.
+   */
+  handleProjectCreated(project: Project): void {
     this.isCreateModalOpen = false;
     this.router.navigate(['/home/proyectos', project._id, 'edit']);
   }
 
-  deleteProject(id: string) {
+  /**
+   * Remueve permanentemente un proyecto del sistema.
+   * Realiza un ajuste algorítmico sobre la paginación si se elimina el último elemento de una página.
+   * @param id Identificador único de la entidad a eliminar.
+   */
+  deleteProject(id: string): void {
     this.projectService.deleteProject(id).subscribe({
       next: () => {
         if (this.projects.length === 1 && this.currentPage > 1) {
@@ -191,14 +228,20 @@ export class Proyectos implements OnInit, OnDestroy {
         this.toastService.success('El diseño ha sido eliminado correctamente.');
       },
       error: (err) => {
-        console.error('Error al eliminar:', err);
+        console.error('Fallo en la operación de borrado:', err);
         this.toastService.error('Hubo un problema al eliminar el proyecto. Inténtalo de nuevo.');
       },
     });
   }
 
-  // --- VALIDACIÓN Y VISIBILIDAD ---
+  /* ==========================================================================
+     LÓGICA DE VALIDACIÓN Y VISIBILIDAD (Reglas de Negocio)
+     ========================================================================== */
 
+  /**
+   * Evalúa la integridad estructural de un proyecto garantizando que cumple
+   * los requisitos mínimos para su publicación en el ecosistema comunitario.
+   */
   isProjectComplete(project: Project): boolean {
     const hasImage = !!project.inspirationImageUrl;
     const hasMaterials = project.materials && project.materials.length > 0;
@@ -206,12 +249,17 @@ export class Proyectos implements OnInit, OnDestroy {
     return hasImage && hasMaterials && hasSteps;
   }
 
-  toggleProjectVisibility(project: Project) {
+  /**
+   * Conmuta el estado de privacidad del proyecto previa validación de requisitos.
+   * Restringe la propagación a la comunidad si la entidad está incompleta.
+   */
+  toggleProjectVisibility(project: Project): void {
     const isCurrentlyPublic = project.isPublic;
 
-    // Validación antes de publicar
     if (!isCurrentlyPublic && !this.isProjectComplete(project)) {
-      this.toastService.warning('El proyecto debe tener foto, materiales y pasos para publicarse.');
+      this.toastService.warning(
+        'El proyecto debe contener una imagen de portada, listado de materiales y al menos un paso para autorizar su publicación.',
+      );
       return;
     }
 
@@ -223,24 +271,26 @@ export class Proyectos implements OnInit, OnDestroy {
     this.projectService.updateProject(project._id, payload).subscribe({
       next: () => {
         const message = isCurrentlyPublic
-          ? 'Proyecto retirado de la comunidad. Ahora es privado.'
-          : '¡Proyecto publicado! Ya es visible para la comunidad.';
+          ? 'Proyecto retirado de la comunidad. Restablecido como ámbito privado.'
+          : '¡Proyecto publicado! La estructura es ahora visible para la comunidad global.';
 
         this.toastService.success(message);
         this.loadProjects();
       },
       error: (err) => {
-        console.error('Error actualizando visibilidad:', err);
-        this.toastService.error('Error al actualizar el estado del proyecto.');
+        console.error('Inconsistencia al transaccionar el estado de visibilidad:', err);
+        this.toastService.error('Error al actualizar el estado de exposición del proyecto.');
         this.isLoading = false;
         this.cdr.markForCheck();
       },
     });
   }
 
-  // --- PAGINACIÓN ---
+  /* ==========================================================================
+     MÉTODOS DE PAGINACIÓN ALGORÍTMICA
+     ========================================================================== */
 
-  changePage(newPage: number) {
+  changePage(newPage: number): void {
     if (newPage >= 1 && newPage <= this.totalPages) {
       this.currentPage = newPage;
       this.loadProjects();

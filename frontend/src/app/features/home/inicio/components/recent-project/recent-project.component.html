@@ -12,7 +12,7 @@
     ></div>
 
     <div
-      class="relative w-full sm:w-44 md:w-52 aspect-video sm:aspect-square rounded-[1.5rem] overflow-hidden shrink-0 bg-bg shadow-[inner_0_4px_10px_rgba(0,0,0,0.03)] border border-border-main/5 flex items-center justify-center group-hover:shadow-[inner_0_4px_15px_rgba(0,0,0,0.08)] transition-all duration-500 z-10"
+      class="relative w-full sm:w-44 md:w-52 aspect-video sm:aspect-square rounded-3xl overflow-hidden shrink-0 bg-bg shadow-[inner_0_4px_10px_rgba(0,0,0,0.03)] border border-border-main/5 flex items-center justify-center group-hover:shadow-[inner_0_4px_15px_rgba(0,0,0,0.08)] transition-all duration-500 z-10"
     >
       @if (project.inspirationImageUrl) {
         <img
@@ -108,7 +108,7 @@
                 d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H6.911a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661Z"
               />
             </svg>
-            <span>{{ project.materials?.length || 0 }} mats.</span>
+            <span>{{ project.materials.length || 0 }} mats.</span>
           </div>
           <div class="flex items-center gap-1.5">
             <svg
@@ -124,7 +124,7 @@
                 d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0Z"
               />
             </svg>
-            <span>{{ project.steps?.length || 0 }} Pasos</span>
+            <span>{{ project.steps.length || 0 }} Pasos</span>
           </div>
         </div>
 

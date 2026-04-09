@@ -1,7 +1,13 @@
+/**
+ * @file inicio.ts
+ * @description Componente contenedor (Smart Component) del panel principal (Dashboard) del usuario.
+ * Actúa como orquestador de datos, recuperando el estado global de la sesión, los proyectos recientes
+ * y las recomendaciones del catálogo. Delega la renderización visual a sus componentes hijos
+ * y centraliza la gestión de ventanas modales y eventos de la interfaz.
+ */
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { Router } from '@angular/router';
 
-// Servicios y Modelos
 import { UserService } from '../../../core/services/user.service';
 import { ProjectService } from '../../../core/services/project.service';
 import { TutorialService } from '../../../core/services/tutorial.service';
@@ -9,12 +15,10 @@ import { User } from '../../../shared/models/user.model';
 import { Project } from '../../../shared/models/project.model';
 import { Tutorial } from '../../../shared/models/tutorial.model';
 
-// Modales
 import { CreateProjectModal } from '../../../shared/modals/create-project/create-project.modal';
 import { TutorialDetailModalComponent } from '../../../shared/modals/tutorial-detail-modal/tutorial-detail-modal.component';
 import { PublishProjectModal } from '../../../shared/modals/publish-project/publish-project.modal';
 
-// Nuevos Subcomponentes (Asumiendo que los crearás)
 import { MobileHeaderComponent } from './components/mobile-header/mobile-header.component';
 import { RecentProjectComponent } from './components/recent-project/recent-project.component';
 import { QuickActionsComponent } from './components/quick-actions/quick-actions.component';
@@ -37,37 +41,51 @@ import { RecommendedTutorialComponent } from './components/recommended-tutorial/
   templateUrl: './inicio.html',
 })
 export class Inicio implements OnInit {
+  /* Inyección de dependencias mediante el paradigma funcional de Angular */
   private userService = inject(UserService);
   private projectService = inject(ProjectService);
   private tutorialService = inject(TutorialService);
   private cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
 
-  // Estados
+  /* --- ESTADO DE LA APLICACIÓN --- */
+
+  /** Entidad del usuario autenticado */
   user: User | null = null;
+  /** Referencia al proyecto con actividad más reciente para reanudación rápida */
   recentProject: Project | null = null;
+  /** Colección completa de proyectos asociados al usuario */
   myProjects: Project[] = [];
+  /** Entidad de tutorial sugerido algorítmicamente */
   recommendedTutorial: Tutorial | null = null;
+  /** Referencia al tutorial seleccionado para visualización en ventana modal */
   selectedTutorial: Tutorial | null = null;
 
-  // Loaders
+  /* --- INDICADORES DE CARGA ASÍNCRONA --- */
   isLoadingUser = true;
   isLoadingProjects = true;
   isLoadingTutorial = true;
 
-  // Control de Modales
+  /* --- CONTROLADORES DE ESTADO PARA COMPONENTES FLOTANTES (MODALES) --- */
   isCreateModalOpen = false;
   isTutorialModalOpen = false;
   isPublishModalOpen = false;
 
-  ngOnInit() {
+  /**
+   * Inicializa el ciclo de vida del componente desencadenando las peticiones
+   * concurrentes para hidratar el panel principal.
+   */
+  ngOnInit(): void {
     this.loadUserData();
     this.loadMyProjects();
     this.loadRandomTutorial();
   }
 
-  // --- MÉTODOS DE DATOS ---
-  private loadUserData() {
+  /* ==========================================================================
+     MÉTODOS DE RECUPERACIÓN DE DATOS (Interacción con Servicios)
+     ========================================================================== */
+
+  private loadUserData(): void {
     this.isLoadingUser = true;
     this.userService.getMe().subscribe({
       next: (response) => {
@@ -82,7 +100,11 @@ export class Inicio implements OnInit {
     });
   }
 
-  private loadMyProjects() {
+  /**
+   * Recupera el repositorio de proyectos del usuario y determina algorítmicamente
+   * el proyecto más relevante (priorizando aquellos en estado 'En curso').
+   */
+  private loadMyProjects(): void {
     this.isLoadingProjects = true;
     this.projectService.getMyProjects(1, 20).subscribe({
       next: (response) => {
@@ -104,7 +126,11 @@ export class Inicio implements OnInit {
     });
   }
 
-  private loadRandomTutorial() {
+  /**
+   * Solicita el catálogo de tutoriales y realiza una selección pseudoaleatoria
+   * en el cliente para diversificar las recomendaciones mostradas en el panel.
+   */
+  private loadRandomTutorial(): void {
     this.isLoadingTutorial = true;
     this.tutorialService.getCatalog(1, 20).subscribe({
       next: (response) => {
@@ -126,30 +152,42 @@ export class Inicio implements OnInit {
     });
   }
 
-  // --- MANEJO DE EVENTOS DE COMPONENTES HIJOS ---
-  openCreateModal() {
+  /* ==========================================================================
+     MANEJO DE EVENTOS EMITIDOS POR COMPONENTES HIJOS
+     ========================================================================== */
+
+  openCreateModal(): void {
     this.isCreateModalOpen = true;
   }
 
-  handleProjectCreated(project: Project) {
+  /**
+   * Intercepta la confirmación de creación de un nuevo proyecto, cierra el modal
+   * y enruta al usuario al flujo de edición detallada del mismo.
+   */
+  handleProjectCreated(project: Project): void {
     this.isCreateModalOpen = false;
     this.router.navigate(['/home/proyectos', project._id, 'edit']);
   }
 
-  handleProjectPublished(project: Project) {
+  /**
+   * Actualiza el estado visual tras la publicación de un proyecto, forzando
+   * la recarga del repositorio local para reflejar el cambio de estado.
+   */
+  handleProjectPublished(project: Project): void {
     this.isPublishModalOpen = false;
-    this.loadMyProjects(); 
+    this.loadMyProjects();
   }
-  openTutorialModal(tutorial: Tutorial) {
+
+  openTutorialModal(tutorial: Tutorial): void {
     this.selectedTutorial = tutorial;
     this.isTutorialModalOpen = true;
   }
 
-  openPublishModal() {
+  openPublishModal(): void {
     this.isPublishModalOpen = true;
   }
 
-  closeTutorialModal() {
+  closeTutorialModal(): void {
     this.isTutorialModalOpen = false;
     setTimeout(() => {
       this.selectedTutorial = null;

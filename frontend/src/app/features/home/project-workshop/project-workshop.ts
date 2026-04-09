@@ -1,3 +1,10 @@
+/**
+ * @file project-workshop.ts
+ * @description Componente controlador del "Taller", el entorno interactivo donde el usuario
+ * ejecuta y documenta su progreso en un proyecto de costura.
+ * Gestiona la navegación secuencial de pasos, el marcado de materiales, una bitácora con
+ * autoguardado y la integración con el feed de comentarios de la comunidad original.
+ */
 import {
   Component,
   OnInit,
@@ -9,8 +16,8 @@ import {
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink, Router } from '@angular/router';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Subject, forkJoin, of } from 'rxjs';
-import { debounceTime, takeUntil, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Subject, forkJoin } from 'rxjs';
+import { debounceTime, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
 import { ProjectService } from '../../../core/services/project.service';
 import { CommunityService } from '../../../core/services/community.service';
@@ -19,7 +26,7 @@ import { ToastService } from '../../../core/services/toast.service';
 import { Project } from '../../../shared/models/project.model';
 import { Comment } from '../../../shared/models/community.model';
 
-// Definición de las pestañas del taller, incluyendo la pestaña dinámica de comunidad
+/** Definición de las áreas funcionales del taller */
 type WorkshopTab = 'pasos' | 'materiales' | 'bitacora' | 'comunidad';
 
 @Component({
@@ -29,6 +36,7 @@ type WorkshopTab = 'pasos' | 'materiales' | 'bitacora' | 'comunidad';
   templateUrl: './project-workshop.html',
 })
 export class ProjectWorkshop implements OnInit, OnDestroy {
+  /* Inyección de servicios para lógica de negocio y navegación */
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private projectService = inject(ProjectService);
@@ -37,30 +45,31 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
   private toastService = inject(ToastService);
   private cdr = inject(ChangeDetectorRef);
 
-  // --- ESTADO DEL PROYECTO ACTUAL ---
+  /* --- ESTADO DE LA ENTIDAD Y CONTEXTO DE USUARIO --- */
   project: Project | null = null;
   isLoading = true;
   currentUserId: string | null = null;
   isOwner = false;
 
-  // --- ESTADO DEL PROYECTO ORIGINAL (Para Créditos y Comunidad) ---
+  /* --- ATRIBUCIÓN Y DATOS DE ORIGEN (Para proyectos adaptados) --- */
   originalProject: Project | null = null;
   comments: Comment[] = [];
   isLoadingComments = false;
 
-  // --- CONTROL DE INTERFAZ ---
+  /* --- CONTROL DE LA INTERFAZ DE USUARIO --- */
   activeTab: WorkshopTab = 'pasos';
   activeStepIndex = 0;
 
-  // --- SISTEMA DE BITÁCORA (Privada) ---
+  /* --- SISTEMA DE BITÁCORA PRIVADA (Gestión Reactiva) --- */
   notesControl = new FormControl('');
   isSavingNotes = false;
   lastSavedTime: Date | null = null;
 
-  // --- SISTEMA DE COMENTARIOS (Públicos) ---
+  /* --- GESTIÓN DE INTERACCIONES PÚBLICAS --- */
   newCommentControl = new FormControl('', [Validators.required]);
   isSubmittingComment = false;
 
+  /** Sujeto para la gestión de ciclo de vida y limpieza de observables */
   private destroy$ = new Subject<void>();
 
   ngOnInit() {
@@ -69,7 +78,6 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
       this.router.navigate(['/home/proyectos']);
       return;
     }
-
     this.initWorkshop(projectId);
   }
 
@@ -79,10 +87,11 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
   }
 
   /**
-   * Orquestación inicial: Carga el proyecto, el usuario actual y,
-   * si es una adaptación, los datos del autor original.
+   * Inicializa el entorno del taller recuperando simultáneamente los datos del usuario
+   * y del proyecto. Configura la propiedad de autoría y el sistema de autoguardado.
+   * @param id Identificador único del proyecto (clon o propio).
    */
-  private initWorkshop(id: string) {
+  private initWorkshop(id: string): void {
     this.isLoading = true;
 
     forkJoin({
@@ -93,18 +102,18 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
         this.project = projectRes.data;
         this.currentUserId = userRes.data._id;
 
-        // Verificamos si el usuario actual es el dueño del clon
+        // Evaluación de autoría para permisos de edición
         const ownerId =
           typeof this.project.ownerId === 'string'
             ? this.project.ownerId
             : this.project.ownerId?._id;
         this.isOwner = this.currentUserId === ownerId;
 
-        // Inicializar bitácora
+        // Inicialización de la bitácora de aprendizaje
         this.notesControl.setValue(this.project.learningNotes || '', { emitEvent: false });
         this.setupAutoSave();
 
-        // Si es adaptado, cargamos los créditos y comentarios del original
+        // En proyectos adaptados, se recupera la información de la fuente original para atribución
         if (
           this.project.projectType === 'Adaptado de la Comunidad' &&
           this.project.originalProjectId
@@ -123,9 +132,9 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
   }
 
   /**
-   * Carga los datos del proyecto original para mostrar la atribución y los comentarios.
+   * Recupera la entidad original para gestionar créditos y el flujo de comentarios.
    */
-  private loadOriginalData(originalId: string) {
+  private loadOriginalData(originalId: string): void {
     this.projectService.getProjectById(originalId).subscribe({
       next: (res) => {
         this.originalProject = res.data;
@@ -135,23 +144,29 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
     });
   }
 
-  // --- GESTIÓN DE PASOS Y PROGRESO ---
+  /* ==========================================================================
+     GESTIÓN DE PROGRESO Y PASOS INSTRUCTIVOS
+     ========================================================================== */
 
-  nextStep() {
+  nextStep(): void {
     if (this.project && this.activeStepIndex < this.project.steps.length - 1) {
       this.activeStepIndex++;
       this.scrollToTop();
     }
   }
 
-  prevStep() {
+  prevStep(): void {
     if (this.activeStepIndex > 0) {
       this.activeStepIndex--;
       this.scrollToTop();
     }
   }
 
-  toggleStepStatus(index: number) {
+  /**
+   * Actualiza el estado de completado de un paso.
+   * Implementa una transición automática al siguiente paso tras una actualización exitosa.
+   */
+  toggleStepStatus(index: number): void {
     if (!this.project) return;
     const step = this.project.steps[index];
     step.status = step.status === 'Completado' ? 'Pendiente' : 'Completado';
@@ -174,7 +189,7 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
       });
   }
 
-  toggleMaterial(index: number) {
+  toggleMaterial(index: number): void {
     if (!this.project) return;
     const mat = this.project.materials[index];
     mat.isAcquired = !mat.isAcquired;
@@ -189,15 +204,21 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
       });
   }
 
-  // --- SISTEMA DE BITÁCORA (AUTOGUARDADO) ---
+  /* ==========================================================================
+     SISTEMA DE BITÁCORA (Estrategia de Autoguardado)
+     ========================================================================== */
 
-  private setupAutoSave() {
+  /**
+   * Configura la persistencia automática de las notas de aprendizaje utilizando
+   * operadores de RxJS para minimizar el impacto en el ancho de banda.
+   */
+  private setupAutoSave(): void {
     this.notesControl.valueChanges
       .pipe(debounceTime(1000), distinctUntilChanged(), takeUntil(this.destroy$))
       .subscribe((notes) => this.saveLearningNotes(notes || ''));
   }
 
-  private saveLearningNotes(notes: string) {
+  private saveLearningNotes(notes: string): void {
     if (!this.project) return;
     this.isSavingNotes = true;
     this.cdr.detectChanges();
@@ -215,9 +236,14 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
     });
   }
 
-  // --- SISTEMA DE COMUNIDAD (COMENTARIOS PÚBLICOS) ---
+  /* ==========================================================================
+     INTEGRACIÓN CON LA COMUNIDAD (Comentarios Públicos)
+     ========================================================================== */
 
-  loadComments() {
+  /**
+   * Recupera el repositorio de comentarios del proyecto raíz.
+   */
+  loadComments(): void {
     const targetId = this.project?.originalProjectId || this.project?._id;
     if (!targetId) return;
 
@@ -235,7 +261,10 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
     });
   }
 
-  postComment() {
+  /**
+   * Publica una nueva interacción en la comunidad original del proyecto.
+   */
+  postComment(): void {
     const targetId = this.project?.originalProjectId || this.project?._id;
     if (!targetId || this.newCommentControl.invalid) return;
 
@@ -246,7 +275,7 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
       next: () => {
         this.newCommentControl.reset();
         this.isSubmittingComment = false;
-        this.loadComments(); // Recargamos para ver el nuevo comentario
+        this.loadComments();
         this.toastService.success('Comentario publicado en la comunidad.');
       },
       error: () => {
@@ -256,19 +285,22 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
     });
   }
 
-  // --- HELPERS ---
+  /* ==========================================================================
+     MÉTODOS AUXILIARES Y ACCESIBILIDAD
+     ========================================================================== */
 
-  switchTab(tab: WorkshopTab) {
+  switchTab(tab: WorkshopTab): void {
     this.activeTab = tab;
     if (tab === 'comunidad') {
       this.loadComments();
     }
   }
 
-  private scrollToTop() {
+  private scrollToTop(): void {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  /** Cálculo en tiempo real del porcentaje de cumplimiento del proyecto */
   get progressPercentage(): number {
     if (!this.project?.steps.length) return 0;
     const completed = this.project.steps.filter((s) => s.status === 'Completado').length;
@@ -280,6 +312,7 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
     return 'Anónimo';
   }
 
+  /** Gestión de accesibilidad mediante atajos de teclado para la navegación de pasos */
   @HostListener('window:keydown', ['$event'])
   handleKeyDown(event: KeyboardEvent) {
     if (this.activeTab === 'pasos') {

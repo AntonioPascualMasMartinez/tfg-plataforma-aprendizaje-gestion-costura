@@ -1,3 +1,11 @@
+/**
+ * @file tutoriales.ts
+ * @description Componente gestor del catálogo interactivo de tutoriales.
+ * Implementa un sistema de exploración estructurado con filtrado multicriterio,
+ * apoyándose en flujos reactivos (RxJS) para optimizar la carga de datos.
+ * Incluye un motor de visualización adaptativa que jerarquiza el contenido (destacado vs. cuadrícula)
+ * en función del estado de la búsqueda.
+ */
 import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
@@ -16,30 +24,34 @@ import { TutorialDetailModalComponent } from '../../../shared/modals/tutorial-de
   templateUrl: './tutoriales.html',
 })
 export class Tutoriales implements OnInit, OnDestroy {
+  /* Inyección de dependencias para persistencia y renderizado optimizado */
   private tutorialService = inject(TutorialService);
   private cdr = inject(ChangeDetectorRef);
 
-  // --- ESTADOS ---
+  /** Entidad principal resaltada en la vista (hero section) */
   featuredTutorial: Tutorial | null = null;
+  /** Colección de tutoriales listados en formato de cuadrícula */
   gridTutorials: Tutorial[] = [];
 
   isLoading = true;
   errorMessage = '';
 
+  /* Atributos de control de paginación posicional */
   currentPage = 1;
   totalPages = 1;
-  limit = 10; // Si hay destacado, 1 para él y 9 para el grid. Si hay filtros, los 10 van al grid.
+  limit = 10;
 
+  /* Estado de visualización y datos del modal de detalles */
   selectedTutorial: Tutorial | null = null;
   showDetailModal = false;
 
-  // --- FILTROS INTERACTIVOS ---
-  searchTerm = new FormControl(''); // <-- NUEVO: Buscador de texto
+  /* Form Controls para la captura reactiva de criterios de búsqueda */
+  searchTerm = new FormControl('');
   categoryFilter = new FormControl('Todos');
   difficultyFilter = new FormControl('Todos');
   timeFilter = new FormControl('Todos');
 
-  // Opciones de filtros
+  /* Constantes de dominio para la parametrización de la interfaz */
   readonly categories = ['Todos', 'Bolsos', 'Monederos', 'Carteras'];
   readonly difficulties: ('Todos' | DifficultyLevel)[] = [
     'Todos',
@@ -49,47 +61,55 @@ export class Tutoriales implements OnInit, OnDestroy {
   ];
   readonly times = ['Todos', 'Menos de 30 min', '30 a 60 min', 'Más de 1 hora'];
 
+  /** Suscripción de control para evitar fugas de memoria en la escucha de filtros */
   private filterSubscription?: Subscription;
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.loadTutorials();
     this.setupFilters();
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     if (this.filterSubscription) {
       this.filterSubscription.unsubscribe();
     }
   }
 
-  private setupFilters() {
-    // Configuramos RxJS para que reaccione a cualquier cambio en los filtros
+  /**
+   * Inicializa la composición de eventos reactivos sobre los campos de filtrado.
+   * Implementa retardos (debounce) para mitigar ráfagas de peticiones HTTP durante la escritura.
+   */
+  private setupFilters(): void {
     const search$ = this.searchTerm.valueChanges.pipe(debounceTime(400), distinctUntilChanged());
     const cat$ = this.categoryFilter.valueChanges;
     const diff$ = this.difficultyFilter.valueChanges;
     const time$ = this.timeFilter.valueChanges;
 
     this.filterSubscription = merge(search$, cat$, diff$, time$).subscribe(() => {
-      this.currentPage = 1; // Al filtrar, siempre volvemos a la página 1
+      this.currentPage = 1;
       this.loadTutorials();
     });
   }
 
-  loadTutorials() {
+  /**
+   * Sincroniza el estado del componente con el origen de datos.
+   * Ejecuta procesamiento híbrido: filtrado base en el servidor y refinamiento
+   * condicional (texto y rangos de tiempo) en el cliente.
+   */
+  loadTutorials(): void {
     this.isLoading = true;
     this.errorMessage = '';
     this.cdr.markForCheck();
 
-    // 1. Preparamos los parámetros exactos para el Backend
     const search = this.searchTerm.value || '';
     const category = this.categoryFilter.value === 'Todos' ? undefined : this.categoryFilter.value!;
     const difficulty =
       this.difficultyFilter.value === 'Todos' ? undefined : this.difficultyFilter.value!;
 
-    // Mapeo del filtro de texto a minutos reales
     let maxTime: number | undefined = undefined;
     let minTime: number | undefined = undefined;
 
+    /* Transformación heurística del filtro de tiempo a límites numéricos */
     if (this.timeFilter.value === 'Menos de 30 min') maxTime = 30;
     if (this.timeFilter.value === '30 a 60 min') {
       maxTime = 60;
@@ -97,7 +117,6 @@ export class Tutoriales implements OnInit, OnDestroy {
     }
     if (this.timeFilter.value === 'Más de 1 hora') minTime = 60;
 
-    // Llamada al servicio pasando la carga al backend
     this.tutorialService
       .getCatalog(this.currentPage, this.limit, category, difficulty, maxTime)
       .subscribe({
@@ -105,7 +124,7 @@ export class Tutoriales implements OnInit, OnDestroy {
           if (response.data) {
             let fetchedDocs = response.data.docs;
 
-            // *Nota: Fallback local temporal para `search` y `minTime` hasta que actualicemos tu Backend
+            /* Procesamiento local en memoria para criterios no delegados al backend */
             if (search) {
               const query = search.toLowerCase();
               fetchedDocs = fetchedDocs.filter(
@@ -121,7 +140,9 @@ export class Tutoriales implements OnInit, OnDestroy {
             this.totalPages = response.data.totalPages;
             this.currentPage = response.data.page;
 
-            // 2. Lógica del "Destacado Inteligente"
+            /* * Jerarquización inteligente:
+             * El modo de presentación varía según la existencia de filtros activos.
+             */
             const isFiltering =
               search !== '' ||
               category !== undefined ||
@@ -129,12 +150,10 @@ export class Tutoriales implements OnInit, OnDestroy {
               maxTime !== undefined ||
               minTime !== undefined;
 
-            // Solo mostramos el destacado si estamos en la página 1 y NO hay ningún filtro activo
             if (this.currentPage === 1 && !isFiltering && fetchedDocs.length > 0) {
               this.featuredTutorial = fetchedDocs[0];
               this.gridTutorials = fetchedDocs.slice(1);
             } else {
-              // Si el usuario está buscando algo, ocultamos el gigante y mostramos todo en el grid
               this.featuredTutorial = null;
               this.gridTutorials = fetchedDocs;
             }
@@ -147,7 +166,7 @@ export class Tutoriales implements OnInit, OnDestroy {
           this.cdr.markForCheck();
         },
         error: (err) => {
-          console.error('Error cargando el catálogo:', err);
+          console.error('Anomalía en la recuperación del catálogo:', err);
           this.errorMessage = 'No se pudieron cargar los tutoriales. Por favor, intenta de nuevo.';
           this.isLoading = false;
           this.cdr.markForCheck();
@@ -155,11 +174,19 @@ export class Tutoriales implements OnInit, OnDestroy {
       });
   }
 
-  setCategory(cat: string) {
+  /**
+   * Facilita la asignación pragmática de la categoría desde la interfaz.
+   * @param cat Identificador textual de la categoría.
+   */
+  setCategory(cat: string): void {
     this.categoryFilter.setValue(cat);
   }
 
-  changePage(newPage: number) {
+  /**
+   * Desplaza el marco de datos mediante paginación indexada.
+   * @param newPage Índice de destino.
+   */
+  changePage(newPage: number): void {
     if (newPage >= 1 && newPage <= this.totalPages) {
       this.currentPage = newPage;
       this.loadTutorials();
@@ -167,18 +194,24 @@ export class Tutoriales implements OnInit, OnDestroy {
     }
   }
 
-  openTutorialModal(tutorial: Tutorial) {
+  openTutorialModal(tutorial: Tutorial): void {
     this.selectedTutorial = tutorial;
     this.showDetailModal = true;
   }
 
-  closeTutorialModal() {
+  closeTutorialModal(): void {
     this.showDetailModal = false;
     setTimeout(() => {
       this.selectedTutorial = null;
     }, 300);
   }
 
+  /**
+   * Resuelve algorítmicamente la imagen de portada de un tutorial explorando
+   * de forma inversa la secuencia de pasos hasta hallar un recurso multimedia válido.
+   * @param tutorial Entidad del tutorial a evaluar.
+   * @returns URL de la imagen resultante o nulo en su defecto.
+   */
   getTutorialCover(tutorial: Tutorial): string | null {
     if (!tutorial.steps || tutorial.steps.length === 0) return null;
     const lastStepWithMedia = [...tutorial.steps].reverse().find((s) => s.mediaUrl);

@@ -1,3 +1,9 @@
+/**
+ * @file comunidad.ts
+ * @description Componente principal del feed de la comunidad.
+ * Gestiona la visualización de proyectos públicos, integrando capacidades de filtrado dinámico,
+ * búsqueda reactiva, paginación y gestión de interacciones sociales (likes y reportes).
+ */
 import { Component, OnInit, OnDestroy, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
@@ -23,7 +29,6 @@ import { ToastService } from '../../../core/services/toast.service';
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink,
     ReactiveFormsModule,
     CommunityCardComponent,
     CommunityDetailModalComponent,
@@ -33,47 +38,44 @@ import { ToastService } from '../../../core/services/toast.service';
   styleUrl: './comunidad.scss',
 })
 export class Comunidad implements OnInit, OnDestroy {
+  /* Inyección de servicios mediante el patrón Functional Inject de Angular */
   private projectService = inject(ProjectService);
   private communityService = inject(CommunityService);
   private userService = inject(UserService);
   private cdr = inject(ChangeDetectorRef);
   private toastService = inject(ToastService);
 
-  // --- ESTADOS DE DATOS ---
+  /** Referencia al proyecto destacado (normalmente el más reciente o relevante) */
   featuredProject: CommunityProject | null = null;
+  /** Colección de proyectos destinados a la visualización en cuadrícula */
   gridProjects: CommunityProject[] = [];
+  /** Estado de control para el modal de reportes */
   projectToReport: CommunityProject | null = null;
+  /** Referencia para el detalle expandido de un proyecto */
   selectedProject: CommunityProject | null = null;
 
-  // --- PAGINACIÓN ---
+  /* Atributos de control de paginación y estado de carga */
   currentPage = 1;
   totalPages = 1;
-  limit = 13; // 1 Destacado + 12 para el Grid (en la página 1)
-
+  limit = 13;
   isLoading = true;
   currentUserId: string | null = null;
 
-  // --- FILTROS INTERACTIVOS ---
+  /* Controles reactivos para el filtrado de la interfaz */
   searchTerm = new FormControl('');
   categoryFilter = new FormControl('Todas');
   difficultyFilter = new FormControl('Todas');
   sortByFilter = new FormControl('populares');
 
+  /* Definiciones constantes para los selectores de la vista */
   readonly categories = ['Todas', 'Bolsos', 'Monederos', 'Ropa', 'Hogar', 'Accesorios'];
   readonly difficulties = ['Todas', 'Fácil', 'Intermedio', 'Avanzado'];
 
+  /** Suscripción única para la gestión de múltiples flujos de entrada (filtros) */
   private filterSub?: Subscription;
 
   ngOnInit() {
-    this.userService.getMe().subscribe({
-      next: (res) => {
-        this.currentUserId = res.data._id;
-        this.initFeed();
-      },
-      error: () => {
-        this.initFeed(); // Cargar como invitado si falla
-      },
-    });
+    this.identifyUserContext();
   }
 
   ngOnDestroy() {
@@ -82,44 +84,69 @@ export class Comunidad implements OnInit, OnDestroy {
     }
   }
 
-  private initFeed() {
+  /**
+   * Determina el contexto de identidad del usuario para personalizar la experiencia
+   * (detección de likes propios) antes de inicializar el feed.
+   */
+  private identifyUserContext(): void {
+    this.userService.getMe().subscribe({
+      next: (res) => {
+        this.currentUserId = res.data._id;
+        this.initFeed();
+      },
+      error: () => {
+        this.initFeed(); // Carga en modo invitado ante ausencia de sesión
+      },
+    });
+  }
+
+  /**
+   * Inicializa la configuración de observadores y ejecuta la carga inicial de datos.
+   */
+  private initFeed(): void {
     this.setupFilters();
     this.loadFeed();
   }
 
-  private setupFilters() {
+  /**
+   * Configura la lógica reactiva para los filtros. Implementa técnicas de
+   * 'debounce' para optimizar las peticiones de búsqueda y combina flujos mediante 'merge'.
+   */
+  private setupFilters(): void {
     const search$ = this.searchTerm.valueChanges.pipe(debounceTime(400), distinctUntilChanged());
     const cat$ = this.categoryFilter.valueChanges;
     const diff$ = this.difficultyFilter.valueChanges;
     const sort$ = this.sortByFilter.valueChanges;
 
-    // Escuchamos cualquier cambio en cualquier filtro para resetear la página a 1 y recargar
     this.filterSub = merge(search$, cat$, diff$, sort$).subscribe(() => {
       this.currentPage = 1;
       this.loadFeed();
     });
   }
 
-  loadFeed() {
+  /**
+   * Sincroniza el estado del componente con el servidor mediante el servicio de proyectos.
+   * Realiza un post-procesamiento de los datos para gestionar la lógica de likes,
+   * ordenamiento local y asignación del proyecto destacado.
+   */
+  loadFeed(): void {
     this.isLoading = true;
     this.cdr.detectChanges();
 
     const search = this.searchTerm.value || '';
 
-    // Llamada al backend (Asumiendo la firma actual de tu Angular Service)
     this.projectService.getPublicFeed(this.currentPage, this.limit, search).subscribe({
       next: (response) => {
         let fetchedDocs = response.data.docs as CommunityProject[];
 
-        // 1. Cálculos de Likes (necesario antes de ordenar)
+        // Procesamiento de metadatos de interacción
         fetchedDocs.forEach((p) => {
           p.likesCount = p.likes ? p.likes.length : 0;
           p.isLikedLocally =
             this.currentUserId && p.likes ? p.likes.includes(this.currentUserId) : false;
         });
 
-        // 2. Filtros Locales Temporales
-        // *Nota: Idealmente esto debería pasarse como parámetro en getPublicFeed hacia el backend*
+        // Aplicación de lógica de filtrado complementaria en cliente
         const cat = this.categoryFilter.value;
         if (cat !== 'Todas') {
           fetchedDocs = fetchedDocs.filter((p) => p.category === cat);
@@ -130,7 +157,7 @@ export class Comunidad implements OnInit, OnDestroy {
           fetchedDocs = fetchedDocs.filter((p) => p.difficulty === diff);
         }
 
-        // 3. Ordenamiento
+        // Resolución del criterio de ordenación seleccionado
         const sortBy = this.sortByFilter.value;
         if (sortBy === 'populares') {
           fetchedDocs.sort((a, b) => (b.likesCount || 0) - (a.likesCount || 0));
@@ -143,9 +170,8 @@ export class Comunidad implements OnInit, OnDestroy {
         this.totalPages = response.data.totalPages || 1;
         this.currentPage = response.data.page || 1;
 
-        // 4. Lógica del Destacado Inteligente
+        // Distribución de la jerarquía visual de los proyectos
         const isFiltering = search !== '' || cat !== 'Todas' || diff !== 'Todas';
-
         if (this.currentPage === 1 && !isFiltering && fetchedDocs.length > 0) {
           this.featuredProject = fetchedDocs[0];
           this.gridProjects = fetchedDocs.slice(1);
@@ -158,15 +184,18 @@ export class Comunidad implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: (err) => {
-        console.error('Error cargando el feed', err);
+        console.error('Error en la recuperación del feed:', err);
         this.isLoading = false;
         this.cdr.detectChanges();
       },
     });
   }
 
-  // --- PAGINACIÓN ---
-  changePage(newPage: number) {
+  /**
+   * Gestiona el cambio de página y desplaza el scroll a la posición inicial.
+   * @param newPage Índice de la página solicitada.
+   */
+  changePage(newPage: number): void {
     if (newPage >= 1 && newPage <= this.totalPages) {
       this.currentPage = newPage;
       this.loadFeed();
@@ -174,8 +203,11 @@ export class Comunidad implements OnInit, OnDestroy {
     }
   }
 
-  // --- INTERACCIONES ---
-  handleLike(payload: { project: CommunityProject; event: Event }) {
+  /**
+   * Ejecuta la lógica de interacción para el sistema de likes.
+   * Implementa una actualización optimista en la UI antes de la confirmación del servidor.
+   */
+  handleLike(payload: { project: CommunityProject; event: Event }): void {
     const { project, event } = payload;
     event.stopPropagation();
     event.preventDefault();
@@ -191,7 +223,7 @@ export class Comunidad implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       },
       error: () => {
-        // Reversión optimista en caso de error
+        // Reversión del estado ante fallo en la transacción asíncrona
         project.isLikedLocally = wasLiked;
         project.likesCount = (project.likesCount || 0) + (wasLiked ? 1 : -1);
         this.cdr.detectChanges();
@@ -199,18 +231,22 @@ export class Comunidad implements OnInit, OnDestroy {
     });
   }
 
-  handleReport(payload: { project: CommunityProject; event: Event }) {
+  /**
+   * Prepara la entidad del proyecto para ser procesada por el módulo de reportes.
+   */
+  handleReport(payload: { project: CommunityProject; event: Event }): void {
     payload.event.stopPropagation();
     payload.event.preventDefault();
     this.projectToReport = payload.project;
   }
 
-  handleProjectUpdated(updatedProject: CommunityProject) {
-    // Buscar si el proyecto actualizado es el destacado
+  /**
+   * Sincroniza la instancia local de un proyecto con cambios emitidos por componentes hijos.
+   */
+  handleProjectUpdated(updatedProject: CommunityProject): void {
     if (this.featuredProject && this.featuredProject._id === updatedProject._id) {
       this.featuredProject = updatedProject;
     } else {
-      // Si no, buscar en el grid
       const index = this.gridProjects.findIndex((p) => p._id === updatedProject._id);
       if (index !== -1) {
         this.gridProjects[index] = updatedProject;
@@ -219,22 +255,26 @@ export class Comunidad implements OnInit, OnDestroy {
     this.cdr.detectChanges();
   }
 
-  openModal(project: CommunityProject) {
+  openModal(project: CommunityProject): void {
     this.selectedProject = project;
   }
 
-  closeModal() {
+  closeModal(): void {
     this.selectedProject = null;
   }
 
-  onReportSubmitted(payload: CreateReportPayload) {
+  /**
+   * Persiste la denuncia de un proyecto en el sistema de moderación.
+   * @param payload Estructura de datos que contiene el motivo y contexto del reporte.
+   */
+  onReportSubmitted(payload: CreateReportPayload): void {
     this.communityService.createReport(payload).subscribe({
       next: () => {
         this.toastService.success('Proyecto reportado correctamente. Gracias por ayudarnos.');
         this.projectToReport = null;
       },
       error: (err) => {
-        console.error('Error al reportar', err);
+        console.error('Fallo en el envío del reporte:', err);
         this.toastService.error('Hubo un error al enviar el reporte.');
       },
     });

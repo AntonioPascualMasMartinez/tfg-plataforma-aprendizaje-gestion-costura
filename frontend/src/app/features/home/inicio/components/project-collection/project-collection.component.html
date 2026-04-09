@@ -48,7 +48,7 @@
 
   @if (isLoading) {
     <div
-      class="flex flex-col items-center justify-center h-50 md:h-60 bg-bg rounded-[1.5rem] border border-border-main/10 shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)]"
+      class="flex flex-col items-center justify-center h-50 md:h-60 bg-bg rounded-3xl border border-border-main/10 shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)]"
     >
       <div class="relative flex items-center justify-center w-14 h-14 mb-4">
         <div class="absolute inset-0 border-4 border-primary/20 rounded-full"></div>
@@ -156,7 +156,7 @@
         @for (project of filteredProjects; track project._id) {
           <div
             [routerLink]="['/home/proyectos', project._id]"
-            class="group relative flex flex-col bg-bg border border-border-main/10 rounded-[1.5rem] shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)] hover:border-primary/30 hover:shadow-[0_12px_30px_-10px_rgba(255,89,0,0.15)] hover:-translate-y-1.5 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer w-[75%] sm:w-64 lg:w-[270px] shrink-0 snap-start overflow-hidden"
+            class="group relative flex flex-col bg-bg border border-border-main/10 rounded-3xl shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)] hover:border-primary/30 hover:shadow-[0_12px_30px_-10px_rgba(255,89,0,0.15)] hover:-translate-y-1.5 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] cursor-pointer w-[75%] sm:w-64 lg:w-67.5 shrink-0 snap-start overflow-hidden"
           >
             <div
               class="relative w-full aspect-2/1 bg-surface overflow-hidden flex items-center justify-center border-b border-border-main/5 shadow-[inner_0_-4px_10px_rgba(0,0,0,0.02)]"
@@ -227,7 +227,7 @@
               </div>
             </div>
 
-            <div class="p-4 md:p-5 flex flex-col flex-1 bg-bg rounded-b-[1.5rem]">
+            <div class="p-4 md:p-5 flex flex-col flex-1 bg-bg rounded-b-3xl">
               <div class="flex items-center justify-between gap-2 mb-2.5">
                 <span
                   class="text-[10px] font-bold text-primary uppercase tracking-wider px-2 py-1 bg-primary/10 rounded-md"
@@ -262,7 +262,7 @@
                       d="M2.25 13.5h3.86a2.25 2.25 0 012.012 1.244l.256.512a2.25 2.25 0 002.013 1.244h3.218a2.25 2.25 0 002.013-1.244l.256-.512a2.25 2.25 0 012.013-1.244h3.859m-19.5.338V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18v-4.162c0-.224-.034-.447-.1-.661L19.24 5.338a2.25 2.25 0 00-2.15-1.588H6.911a2.25 2.25 0 00-2.15 1.588L2.35 13.177a2.25 2.25 0 00-.1.661Z"
                     />
                   </svg>
-                  <span>{{ project.materials?.length || 0 }} mats.</span>
+                  <span>{{ project.materials.length || 0 }} mats.</span>
                 </div>
                 <div class="flex items-center gap-1.5">
                   <svg
@@ -278,7 +278,7 @@
                       d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75Zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0ZM3.75 12h.007v.008H3.75V12Zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0Zm-.375 5.25h.007v.008H3.75v-.008Zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0Z"
                     />
                   </svg>
-                  <span>{{ project.steps?.length || 0 }} pasos</span>
+                  <span>{{ project.steps.length || 0 }} pasos</span>
                 </div>
               </div>
             </div>
@@ -338,7 +338,7 @@
     </a>
   } @else {
     <div
-      class="flex flex-col items-center justify-center flex-1 min-h-[280px] text-muted bg-surface rounded-[2rem] border border-border-main/5 shadow-[inner_0_2px_10px_rgba(0,0,0,0.02),_inner_0_10px_30px_rgba(0,0,0,0.03)] transition-all duration-300"
+      class="flex flex-col items-center justify-center flex-1 min-h-70 text-muted bg-surface rounded-4xl border border-border-main/5 shadow-[inner_0_2px_10px_rgba(0,0,0,0.02),inner_0_10px_30px_rgba(0,0,0,0.03)] transition-all duration-300"
     >
       <div class="relative w-24 h-24 md:w-28 md:h-28 mb-4 flex items-center justify-center">
         <div class="absolute inset-0 bg-primary/5 rounded-full blur-2xl"></div>
@@ -349,9 +349,7 @@
         />
       </div>
       <h3 class="text-[16px] md:text-[18px] font-bold text-text-main mb-1.5">Aún no hay diseños</h3>
-      <p
-        class="text-[13px] md:text-[14px] font-medium max-w-[260px] text-center px-4 leading-relaxed"
-      >
+      <p class="text-[13px] md:text-[14px] font-medium max-w-65 text-center px-4 leading-relaxed">
         Tu biblioteca textil está lista para estrenarse.
       </p>
     </div>

@@ -1,8 +1,15 @@
+/**
+ * @file perfil.ts
+ * @description Componente para la gestión integral del perfil de usuario.
+ * Proporciona interfaces para la actualización de datos personales, carga de avatares,
+ * modificación de credenciales de seguridad y eliminación de cuenta.
+ * Implementa validaciones reactivas y sincronización de estados con servicios externos.
+ */
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router } from '@angular/router'; // NUEVO
+import { Router } from '@angular/router';
 import { UserService } from '../../../core/services/user.service';
-import { AuthService } from '../../../core/services/auth.service'; // NUEVO
+import { AuthService } from '../../../core/services/auth.service';
 import { UploadService } from '../../../core/services/upload.service';
 import { User, SewingLevel, UpdateProfilePayload } from '../../../shared/models/user.model';
 import { ConfirmModalComponent } from '../../../shared/modals/confirm-modal/confirm-modal.component';
@@ -14,18 +21,23 @@ import { ConfirmModalComponent } from '../../../shared/modals/confirm-modal/conf
   templateUrl: './perfil.html',
 })
 export class Perfil implements OnInit {
+  /* Inyección de dependencias para lógica de negocio y navegación */
   private userService = inject(UserService);
-  private authService = inject(AuthService); // Inyectado
+  private authService = inject(AuthService);
   private uploadService = inject(UploadService);
-  private router = inject(Router); // Inyectado
+  private router = inject(Router);
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
 
+  /** Entidad del usuario autenticado */
   user: User | null = null;
 
+  /** Formulario reactivo para datos demográficos y de interés */
   profileForm: FormGroup;
+  /** Formulario reactivo para la gestión de credenciales de acceso */
   passwordForm: FormGroup;
 
+  /* Estados de carga y feedback transaccional */
   isLoading = true;
   isSaving = false;
   isSavingPassword = false;
@@ -34,10 +46,14 @@ export class Perfil implements OnInit {
   successMessage = '';
   errorMessage = '';
 
+  /** URL temporal o persistente para la previsualización del avatar */
   avatarPreview: string | null = null;
+  /** Opciones predefinidas para el nivel de competencia técnica del usuario */
   sewingLevels: SewingLevel[] = ['Principiante', 'Intermedio', 'Experto'];
 
+  /** Control de visibilidad para el diálogo de confirmación de borrado de cuenta */
   isDeleteModalOpen = false;
+  /** Estado de bloqueo durante el proceso de eliminación en el servidor */
   isDeletingAccount = false;
 
   constructor() {
@@ -58,6 +74,10 @@ export class Perfil implements OnInit {
     );
   }
 
+  /**
+   * Validador personalizado para asegurar la paridad entre la nueva contraseña y su confirmación.
+   * @param g Grupo de controles que contiene los campos de contraseña.
+   */
   passwordMatchValidator(g: FormGroup) {
     return g.get('newPassword')?.value === g.get('confirmPassword')?.value
       ? null
@@ -68,6 +88,10 @@ export class Perfil implements OnInit {
     this.loadUserData();
   }
 
+  /**
+   * Recupera la información del usuario desde el servicio de persistencia
+   * e inicializa los valores de los formularios reactivos.
+   */
   loadUserData() {
     this.isLoading = true;
     this.cdr.detectChanges();
@@ -87,7 +111,7 @@ export class Perfil implements OnInit {
         this.isLoading = false;
         this.cdr.detectChanges();
       },
-      error: (err) => {
+      error: () => {
         this.errorMessage = 'No se pudieron cargar los datos del perfil.';
         this.isLoading = false;
         this.cdr.detectChanges();
@@ -95,6 +119,11 @@ export class Perfil implements OnInit {
     });
   }
 
+  /**
+   * Gestiona la selección y carga asíncrona de archivos multimedia a la nube.
+   * Valida restricciones de tamaño antes de iniciar la transferencia.
+   * @param event Evento de selección del input file.
+   */
   onFileSelected(event: Event) {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
@@ -123,6 +152,10 @@ export class Perfil implements OnInit {
     }
   }
 
+  /**
+   * Procesa la actualización de la información del perfil.
+   * Transforma la cadena de intereses en un array sanitizado antes del envío al backend.
+   */
   onSubmit() {
     if (this.profileForm.invalid) {
       this.profileForm.markAllAsTouched();
@@ -164,8 +197,9 @@ export class Perfil implements OnInit {
     });
   }
 
-  // --- MÉTODOS DE SEGURIDAD REALES ---
-
+  /**
+   * Ejecuta el cambio de contraseña tras validar la identidad con la clave actual.
+   */
   onPasswordSubmit() {
     if (this.passwordForm.invalid) {
       this.passwordForm.markAllAsTouched();
@@ -199,6 +233,9 @@ export class Perfil implements OnInit {
       });
   }
 
+  /**
+   * Inicia el flujo de recuperación de contraseña enviando un correo electrónico al usuario.
+   */
   onRecoverPassword() {
     if (!this.user?.email) return;
 
@@ -220,26 +257,31 @@ export class Perfil implements OnInit {
     this.isDeleteModalOpen = false;
   }
 
+  /**
+   * Realiza la eliminación definitiva de la cuenta.
+   * Al completarse, invalida la sesión local y redirige al usuario a la vista de login.
+   */
   confirmDeleteAccount() {
     this.isDeletingAccount = true;
     this.cdr.detectChanges();
 
     this.userService.deleteMe().subscribe({
       next: () => {
-        // Al terminar bien, limpiamos y redirigimos (no hace falta cerrar modal porque nos vamos de la vista)
         localStorage.removeItem('accessToken');
         this.router.navigate(['/auth/login']);
       },
       error: (err) => {
         this.showError(err.error?.message || 'No se pudo eliminar la cuenta en este momento.');
         this.isDeletingAccount = false;
-        this.isDeleteModalOpen = false; // Cerramos el modal en caso de error
+        this.isDeleteModalOpen = false;
         this.cdr.detectChanges();
-      }
+      },
     });
   }
 
-  // Helpers para mensajes
+  /**
+   * Gestiona la visualización temporal de mensajes de confirmación.
+   */
   private showSuccess(msg: string) {
     this.errorMessage = '';
     this.successMessage = msg;
@@ -250,6 +292,9 @@ export class Perfil implements OnInit {
     }, 4000);
   }
 
+  /**
+   * Gestiona la visualización temporal de mensajes de error.
+   */
   private showError(msg: string) {
     this.successMessage = '';
     this.errorMessage = msg;

@@ -221,9 +221,9 @@
       @if (featuredTutorial) {
         <div
           (click)="openTutorialModal(featuredTutorial)"
-          class="group relative w-full rounded-[32px] overflow-hidden bg-surface border border-border-main/10 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.05)] cursor-pointer hover:border-primary/30 transition-all duration-500 hover:shadow-2xl mb-10 flex flex-col md:flex-row"
+          class="group relative w-full rounded-4xl overflow-hidden bg-surface border border-border-main/10 shadow-[0_15px_40px_-10px_rgba(0,0,0,0.05)] cursor-pointer hover:border-primary/30 transition-all duration-500 hover:shadow-2xl mb-10 flex flex-col md:flex-row"
         >
-          <div class="w-full md:w-3/5 h-64 md:h-[400px] relative overflow-hidden bg-surface-hover">
+          <div class="w-full md:w-3/5 h-64 md:h-100 relative overflow-hidden bg-surface-hover">
             @if (getTutorialCover(featuredTutorial)) {
               <img
                 [src]="getTutorialCover(featuredTutorial)"

@@ -1,3 +1,10 @@
+/**
+ * @file project-detail.ts
+ * @description Componente controlador para el editor detallado de proyectos.
+ * Gestiona la configuración modular de pasos instructivos y listas de materiales,
+ * permitiendo una edición granular y previsualización en tiempo real.
+ * Implementa una interfaz de pestañas para la segmentación de la lógica de negocio.
+ */
 import { Component, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -10,15 +17,17 @@ import { Project, AddStepPayload, ProjectMaterial } from '../../../shared/models
 
 import { ConfirmModalComponent } from '../../../shared/modals/confirm-modal/confirm-modal.component';
 
+/** Definición de tipos para la navegación interna del editor */
 type EditorTab = 'pasos' | 'materiales' | 'preview';
 
 @Component({
-  selector: 'app-project-detail', // Mantenemos el selector actual por compatibilidad de rutas
+  selector: 'app-project-detail',
   standalone: true,
   imports: [CommonModule, RouterLink, ReactiveFormsModule, ConfirmModalComponent],
   templateUrl: './project-detail.html',
 })
 export class ProjectDetail implements OnInit {
+  /* Inyección de servicios para la gestión de datos, rutas y feedback */
   private route = inject(ActivatedRoute);
   private projectService = inject(ProjectService);
   private uploadService = inject(UploadService);
@@ -26,28 +35,33 @@ export class ProjectDetail implements OnInit {
   private fb = inject(FormBuilder);
   private cdr = inject(ChangeDetectorRef);
 
-  // Estado del proyecto
+  /** Entidad del proyecto actual en edición */
   project: Project | null = null;
+  /** Estado de carga asíncrona de los datos iniciales */
   isLoading = true;
   errorMessage = '';
 
-  // Control de interfaz del Editor
+  /** Pestaña activa en la interfaz del editor */
   activeTab: EditorTab = 'pasos';
 
-  // Formularios
+  /** Formulario reactivo para la creación y edición de pasos */
   stepForm: FormGroup;
+  /** Formulario reactivo para la definición de materiales requeridos */
   materialForm: FormGroup;
 
-  // Estados de carga y adición
+  /* Estados de control para operaciones de inserción y carga de archivos */
   isAddingStep = false;
   isAddingMaterial = false;
   isUploadingStepImage = false;
   stepImagePreview: string | null = null;
 
+  /* Control de ventanas modales para operaciones destructivas */
   showDeleteStepModal = false;
   stepToDeleteIndex: number | null = null;
   showDeleteMaterialModal = false;
   materialToDeleteIndex: number | null = null;
+
+  /** Índice de referencia cuando se activa el modo edición en un paso existente */
   editingStepIndex: number | null = null;
 
   constructor() {
@@ -71,23 +85,28 @@ export class ProjectDetail implements OnInit {
     }
   }
 
-  // --- NAVEGACIÓN DEL EDITOR ---
-
-  switchTab(tab: EditorTab) {
+  /**
+   * Gestiona el cambio de contexto en el editor, reseteando los estados de inserción.
+   * @param tab Identificador de la pestaña de destino.
+   */
+  switchTab(tab: EditorTab): void {
     this.activeTab = tab;
-    // Reseteamos los estados de edición al cambiar de pestaña
     this.isAddingStep = false;
     this.isAddingMaterial = false;
   }
 
-  loadProject(id: string) {
+  /**
+   * Recupera el estado persistente del proyecto desde el servidor.
+   * @param id Identificador único del proyecto.
+   */
+  loadProject(id: string): void {
     this.isLoading = true;
     this.projectService.getProjectById(id).subscribe({
       next: (res) => {
         this.project = res.data;
         this.isLoading = false;
 
-        // Si el proyecto no tiene pasos, forzamos la pestaña de pasos para que comience a crear
+        // Comportamiento por defecto: forzar creación si el proyecto está vacío
         if (this.project?.steps.length === 0) {
           this.activeTab = 'pasos';
           this.isAddingStep = true;
@@ -103,22 +122,28 @@ export class ProjectDetail implements OnInit {
     });
   }
 
-  // --- GESTIÓN DE PASOS ---
+  /* ==========================================================================
+     LÓGICA DE GESTIÓN DE PASOS (Workflow Instructivo)
+     ========================================================================== */
 
-  toggleAddStep() {
+  toggleAddStep(): void {
     this.isAddingStep = !this.isAddingStep;
     if (!this.isAddingStep) {
       this.resetStepForm();
     }
   }
 
-  private resetStepForm() {
+  private resetStepForm(): void {
     this.stepForm.reset();
     this.stepImagePreview = null;
     this.editingStepIndex = null;
   }
 
-  onStepImageSelected(event: Event) {
+  /**
+   * Procesa la carga de recursos gráficos vinculados a un paso específico.
+   * Delega la transferencia al servicio de almacenamiento Cloudinary.
+   */
+  onStepImageSelected(event: Event): void {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (!file) return;
 
@@ -140,13 +165,16 @@ export class ProjectDetail implements OnInit {
     });
   }
 
-  removeStepImage() {
+  removeStepImage(): void {
     this.stepImagePreview = null;
     this.stepForm.patchValue({ mediaUrl: null });
   }
 
-  // --- EDICIÓN Y GUARDADO DE PASOS ---
-  editStep(index: number) {
+  /**
+   * Carga los datos de un paso en el formulario para su modificación.
+   * @param index Posición del paso en el array de la entidad.
+   */
+  editStep(index: number): void {
     if (!this.project) return;
 
     this.editingStepIndex = index;
@@ -163,14 +191,17 @@ export class ProjectDetail implements OnInit {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  onSaveStep() {
-    // Reemplaza a onAddStep
+  /**
+   * Orquesta la persistencia del paso, diferenciando entre la creación
+   * de una nueva entrada o la actualización de una existente.
+   */
+  onSaveStep(): void {
     if (this.stepForm.invalid || !this.project) return;
 
     const stepData = this.stepForm.value;
 
     if (this.editingStepIndex !== null) {
-      // Modo Edición: Actualizamos el paso en el array
+      // Flujo de actualización: Reemplazo inmutable en el array de pasos
       const updatedSteps = [...this.project.steps];
       updatedSteps[this.editingStepIndex] = { ...updatedSteps[this.editingStepIndex], ...stepData };
 
@@ -186,7 +217,7 @@ export class ProjectDetail implements OnInit {
           error: () => this.toastService.error('Error al actualizar el paso.'),
         });
     } else {
-      // Modo Creación: Añadimos uno nuevo
+      // Flujo de creación: Inserción al final de la secuencia
       const payload: AddStepPayload = { ...stepData, status: 'Pendiente' };
       this.projectService.addStepToProject(this.project._id, payload).subscribe({
         next: (res) => {
@@ -200,13 +231,12 @@ export class ProjectDetail implements OnInit {
     }
   }
 
-  // --- ELIMINACIÓN SEGURA DE PASOS ---
-  requestDeleteStep(index: number) {
+  requestDeleteStep(index: number): void {
     this.stepToDeleteIndex = index;
     this.showDeleteStepModal = true;
   }
 
-  confirmDeleteStep() {
+  confirmDeleteStep(): void {
     if (!this.project || this.stepToDeleteIndex === null) return;
     const updatedSteps = this.project.steps.filter((_, i) => i !== this.stepToDeleteIndex);
 
@@ -222,26 +252,31 @@ export class ProjectDetail implements OnInit {
     });
   }
 
-  cancelDeleteStep() {
+  cancelDeleteStep(): void {
     this.showDeleteStepModal = false;
     this.stepToDeleteIndex = null;
   }
 
-  // --- GESTIÓN DE MATERIALES ---
+  /* ==========================================================================
+     LÓGICA DE GESTIÓN DE MATERIALES
+     ========================================================================== */
 
-  toggleAddMaterial() {
+  toggleAddMaterial(): void {
     this.isAddingMaterial = !this.isAddingMaterial;
     if (!this.isAddingMaterial) {
       this.materialForm.reset();
     }
   }
 
-  onAddMaterial() {
+  /**
+   * Agrega un nuevo material a la lista del proyecto actualizando la colección inmutablemente.
+   */
+  onAddMaterial(): void {
     if (this.materialForm.invalid || !this.project) return;
 
     const newMaterial: ProjectMaterial = {
       ...this.materialForm.value,
-      isAcquired: false, // Por defecto al crear la plantilla
+      isAcquired: false,
     };
 
     const updatedMaterials = [...this.project.materials, newMaterial];
@@ -261,13 +296,12 @@ export class ProjectDetail implements OnInit {
       });
   }
 
-  // --- ELIMINACIÓN SEGURA DE MATERIALES ---
-  requestDeleteMaterial(index: number) {
+  requestDeleteMaterial(index: number): void {
     this.materialToDeleteIndex = index;
     this.showDeleteMaterialModal = true;
   }
 
-  confirmDeleteMaterial() {
+  confirmDeleteMaterial(): void {
     if (!this.project || this.materialToDeleteIndex === null) return;
     const updatedMaterials = this.project.materials.filter(
       (_, i) => i !== this.materialToDeleteIndex,
@@ -287,7 +321,7 @@ export class ProjectDetail implements OnInit {
       });
   }
 
-  cancelDeleteMaterial() {
+  cancelDeleteMaterial(): void {
     this.showDeleteMaterialModal = false;
     this.materialToDeleteIndex = null;
   }
