@@ -1,12 +1,18 @@
+/**
+ * @fileoverview Middleware de autenticación para validar tokens JWT y el estado del usuario.
+ */
 const jwt = require('jsonwebtoken');
-// IMPORTANTE: Ajusta esta ruta a donde tengas tu modelo de usuario
 const User = require('../modules/users/user.model');
 
 /**
- * Middleware para validar el Access Token JWT y comprobar si el usuario está activo.
+ * Valida el Access Token JWT y verifica que el usuario exista y esté activo.
+ * @param {Object} req - Objeto de petición Express.
+ * @param {Object} res - Objeto de respuesta Express.
+ * @param {Function} next - Función callback para continuar la ejecución.
+ * @returns {Promise<void>}
  */
+
 const authenticate = async (req, res, next) => {
-  // <-- Añadido async
   try {
     const authHeader = req.headers.authorization;
 
@@ -20,11 +26,8 @@ const authenticate = async (req, res, next) => {
     const token = authHeader.split(' ')[1];
     const decodedPayload = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
 
-    // NUEVO: Buscar al usuario en la base de datos usando el ID del payload
-    // Asegúrate de que tu payload incluye el 'id'. (A veces se guarda como '_id')
     const user = await User.findById(decodedPayload.id);
 
-    // 1. Verificar si el usuario fue eliminado de la base de datos
     if (!user) {
       return res.status(401).json({
         code: 401,
@@ -32,12 +35,10 @@ const authenticate = async (req, res, next) => {
       });
     }
 
-    // 2. Verificar si el usuario está baneado
     if (!user.isActive) {
       return res.status(403).json({
-        // 403 Forbidden es el código semánticamente correcto para baneos
         code: 403,
-        message: 'Tu cuenta ha sido suspendida. Contacta con soporte para más información.',
+        message: 'Cuenta suspendida. Contacte con soporte para más información.',
       });
     }
 
@@ -46,7 +47,7 @@ const authenticate = async (req, res, next) => {
   } catch (error) {
     const message =
       error.name === 'TokenExpiredError'
-        ? 'El token de acceso ha expirado. Por favor, solicite uno nuevo con su refresh token.'
+        ? 'El token de acceso ha expirado. Solicite uno nuevo mediante el refresh token.'
         : 'Token de acceso inválido o corrupto.';
 
     return res.status(401).json({

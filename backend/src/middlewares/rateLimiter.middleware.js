@@ -1,14 +1,16 @@
+/**
+ * @fileoverview Middlewares para la limitación de la tasa de peticiones (Rate Limiting).
+ */
 const rateLimit = require('express-rate-limit');
 
 /**
- * Limitador Genérico: Aplicable a la mayoría de rutas (ej. lectura de proyectos).
- * Límite moderado para prevenir abusos (Scraping o DoS).
+ * Limitador general aplicable a la mayoría de las rutas públicas de la API.
  */
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // Ventana de 15 minutos
-  max: 10000, // Máximo 100 peticiones por IP en esa ventana
-  standardHeaders: true, // Retorna la info del límite en las cabeceras `RateLimit-*`
-  legacyHeaders: false, // Deshabilita cabeceras `X-RateLimit-*`
+  windowMs: 15 * 60 * 1000,
+  max: 10000,
+  standardHeaders: true,
+  legacyHeaders: false,
   message: {
     code: 429,
     message: 'Demasiadas peticiones desde esta IP. Por favor, inténtelo de nuevo más tarde.',
@@ -16,17 +18,16 @@ const apiLimiter = rateLimit({
 });
 
 /**
- * Limitador Estricto: Específico para rutas de autenticación (/login, /register).
- * Mitiga ataques de fuerza bruta contra credenciales.
+ * Limitador estricto para rutas sensibles como la autenticación.
  */
 const authLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // Ventana de 15 minutos
-  max: 50, // Máximo 5 intentos de inicio de sesión por IP
+  windowMs: 15 * 60 * 1000,
+  max: 50,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
     code: 429,
-    message: 'Demasiados intentos de acceso fallidos. Por seguridad, su IP ha sido bloqueada temporalmente por 15 minutos.',
+    message: 'Demasiados intentos fallidos. Por seguridad, su IP ha sido bloqueada temporalmente.',
   },
 });
 
