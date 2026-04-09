@@ -1,7 +1,9 @@
+/**
+ * @fileoverview Esquemas de validación (Joi) para las peticiones del módulo de autenticación.
+ */
 const Joi = require('joi');
 
 const authValidator = {
-  // Reglas estrictas para el registro de nuevos usuarios
   register: Joi.object({
     email: Joi.string().email().required().messages({
       'string.email': 'El formato del correo electrónico es inválido.',
@@ -20,12 +22,19 @@ const authValidator = {
     }),
     interests: Joi.array().items(Joi.string()).optional(),
   }),
+
+  login: Joi.object({
+    email: Joi.string().email().required(),
+    password: Joi.string().required(),
+  }),
+
   recoverPassword: Joi.object({
     email: Joi.string().email().required().messages({
       'string.email': 'El formato del correo electrónico es inválido.',
       'any.required': 'El correo electrónico es obligatorio.',
     }),
   }),
+
   resetPassword: Joi.object({
     token: Joi.string().required(),
     newPassword: Joi.string().min(8).required().messages({
@@ -33,14 +42,10 @@ const authValidator = {
       'any.required': 'La contraseña es obligatoria.',
     }),
   }),
-  // Reglas para el inicio de sesión
-  login: Joi.object({
-    email: Joi.string().email().required(),
-    password: Joi.string().required(),
-  }),
+
   googleAuth: Joi.object({
     idToken: Joi.string().required().messages({
-      'any.required': 'El token de Google es obligatorio.',
+      'any.required': 'El token de autenticación es obligatorio.',
     }),
   }),
 };

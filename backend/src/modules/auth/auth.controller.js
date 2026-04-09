@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Controlador responsable de la gestión de identidades, autenticación y sesiones.
+ */
 const AuthService = require('./auth.service');
 const ResponseFormatter = require('../../utils/responseFormatter');
 const authValidator = require('./auth.validator');
@@ -5,19 +8,23 @@ const ApiError = require('../../utils/apiError');
 
 class AuthController {
   /**
-   * Opciones de seguridad para la Cookie del Refresh Token
+   * Genera la configuración de seguridad para las cookies de sesión (Refresh Token).
+   * @returns {Object} Opciones de configuración para la cookie.
    */
   static getCookieOptions() {
     return {
-      httpOnly: true, // Mitiga XSS: JavaScript del cliente no puede leerla
-      secure: process.env.NODE_ENV === 'production', // Solo viaja por HTTPS en producción
-      sameSite: 'strict', // Mitiga CSRF: Solo se envía en peticiones del mismo dominio
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 días en milisegundos
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     };
   }
 
   /**
-   * POST /api/v1/auth/register
+   * Procesa el registro de un nuevo usuario en la plataforma.
+   * @param {Object} req - Petición Express.
+   * @param {Object} res - Respuesta Express.
+   * @param {Function} next - Callback de manejo de errores.
    */
   static async register(req, res, next) {
     try {
@@ -39,22 +46,25 @@ class AuthController {
   }
 
   /**
-   * POST /api/v1/auth/login
+   * Autentica a un usuario mediante credenciales y establece su sesión.
+   * @param {Object} req - Petición Express.
+   * @param {Object} res - Respuesta Express.
+   * @param {Function} next - Callback de manejo de errores.
    */
   static async login(req, res, next) {
     try {
       const { error, value } = authValidator.login.validate(req.body);
-      if (error) throw new ApiError(400, 'Credenciales malformadas');
+      if (error) {
+        throw new ApiError(400, 'Credenciales malformadas');
+      }
 
       const { user, accessToken, refreshToken } = await AuthService.loginUser(
         value.email,
         value.password,
       );
 
-      // Inyectar el Refresh Token en una Cookie segura
       res.cookie('refreshToken', refreshToken, AuthController.getCookieOptions());
 
-      // Devolver solo el Access Token y el perfil en el cuerpo JSON
       return ResponseFormatter.success(res, 200, 'Inicio de sesión exitoso', {
         user,
         accessToken,
@@ -65,31 +75,33 @@ class AuthController {
   }
 
   /**
-   * POST /api/v1/auth/refresh
+   * Renueva el Access Token utilizando un Refresh Token válido almacenado en las cookies.
+   * @param {Object} req - Petición Express.
+   * @param {Object} res - Respuesta Express.
+   * @param {Function} next - Callback de manejo de errores.
    */
   static async refresh(req, res, next) {
     try {
-      // Extraer el Refresh Token de las cookies parseadas (gracias a cookie-parser)
       const refreshToken = req.cookies.refreshToken;
-
       const newAccessToken = await AuthService.refreshSession(refreshToken);
 
       return ResponseFormatter.success(res, 200, 'Sesión renovada con éxito', {
         accessToken: newAccessToken,
       });
     } catch (error) {
-      // Si el refresh falla, limpiamos la cookie corrupta o expirada
       res.clearCookie('refreshToken', AuthController.getCookieOptions());
       next(error);
     }
   }
 
   /**
-   * POST /api/v1/auth/logout
+   * Cierra la sesión activa del usuario invalidando su cookie de sesión.
+   * @param {Object} req - Petición Express.
+   * @param {Object} res - Respuesta Express.
+   * @param {Function} next - Callback de manejo de errores.
    */
   static async logout(req, res, next) {
     try {
-      // Invalida la sesión eliminando la cookie del cliente
       res.clearCookie('refreshToken', AuthController.getCookieOptions());
       return ResponseFormatter.success(res, 200, 'Sesión cerrada exitosamente');
     } catch (error) {
@@ -98,16 +110,20 @@ class AuthController {
   }
 
   /**
-   * POST /api/v1/auth/recover-password
+   * Inicia el flujo de recuperación de contraseña generando un token temporal.
+   * @param {Object} req - Petición Express.
+   * @param {Object} res - Respuesta Express.
+   * @param {Function} next - Callback de manejo de errores.
    */
   static async recoverPassword(req, res, next) {
     try {
       const { error, value } = authValidator.recoverPassword.validate(req.body);
-      if (error) throw new ApiError(400, 'Correo no válido', true, error.details);
+      if (error) {
+        throw new ApiError(400, 'Correo no válido', true, error.details);
+      }
 
       await AuthService.recoverPassword(value.email);
 
-      // Siempre devolvemos el mismo mensaje para no revelar qué emails existen
       return ResponseFormatter.success(
         res,
         200,
@@ -119,12 +135,17 @@ class AuthController {
   }
 
   /**
-   * POST /api/v1/auth/reset-password
+   * Restablece la contraseña de un usuario utilizando un token de recuperación válido.
+   * @param {Object} req - Petición Express.
+   * @param {Object} res - Respuesta Express.
+   * @param {Function} next - Callback de manejo de errores.
    */
   static async resetPassword(req, res, next) {
     try {
       const { error, value } = authValidator.resetPassword.validate(req.body);
-      if (error) throw new ApiError(400, 'Datos inválidos', true, error.details);
+      if (error) {
+        throw new ApiError(400, 'Datos inválidos', true, error.details);
+      }
 
       await AuthService.resetPassword(value.token, value.newPassword);
 
@@ -139,20 +160,23 @@ class AuthController {
   }
 
   /**
-   * POST /api/v1/auth/google
+   * Autentica o registra a un usuario mediante el proveedor de identidad de Google (OAuth).
+   * @param {Object} req - Petición Express.
+   * @param {Object} res - Respuesta Express.
+   * @param {Function} next - Callback de manejo de errores.
    */
   static async googleAuth(req, res, next) {
     try {
       const { error, value } = authValidator.googleAuth.validate(req.body);
-      if (error) throw new ApiError(400, 'Falta el token de Google', true, error.details);
+      if (error) {
+        throw new ApiError(400, 'Falta el token de proveedor de identidad', true, error.details);
+      }
 
-      // AuthService.googleAuth devuelve { user, accessToken, refreshToken }
       const { user, accessToken, refreshToken } = await AuthService.googleAuth(value.idToken);
 
-      // Inyectamos el Refresh Token en la cookie igual que en el login normal
       res.cookie('refreshToken', refreshToken, AuthController.getCookieOptions());
 
-      return ResponseFormatter.success(res, 200, 'Autenticación con Google exitosa', {
+      return ResponseFormatter.success(res, 200, 'Autenticación externa exitosa', {
         user,
         accessToken,
       });
