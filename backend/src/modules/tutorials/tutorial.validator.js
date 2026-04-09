@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Esquemas de validación (Joi) para el módulo de tutoriales y su progreso.
+ */
 const Joi = require('joi');
 
 const tutorialValidator = {
@@ -42,7 +45,7 @@ const tutorialValidator = {
   updateProgress: Joi.object({
     currentStep: Joi.number().integer().min(1).required().messages({
       'number.base': 'El paso actual debe ser un número.',
-      'any.required': 'Debes especificar el paso que acabas de completar.',
+      'any.required': 'Debe especificar el paso que acaba de completar.',
     }),
   }),
 };

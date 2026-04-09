@@ -1,7 +1,9 @@
+/**
+ * @fileoverview Definición del esquema y modelo de Mongoose para la entidad Tutorial.
+ */
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 
-// Subesquema para los pasos maestros del tutorial
 const tutorialStepSchema = new mongoose.Schema({
   order: { type: Number, required: true },
   title: { type: String, required: true },
@@ -19,7 +21,7 @@ const tutorialSchema = new mongoose.Schema(
       default: 'Principiante',
     },
     category: { type: String, required: true, trim: true },
-    estimatedTime: { type: Number, default: 0 }, // En minutos
+    estimatedTime: { type: Number, default: 0 },
     steps: [tutorialStepSchema],
     materialsNeeded: [
       {
