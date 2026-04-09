@@ -1,13 +1,16 @@
+/**
+ * @fileoverview Configuración de la especificación de OpenAPI/Swagger para la documentación de la API.
+ */
 const swaggerJSDoc = require('swagger-jsdoc');
 
 const swaggerOptions = {
   definition: {
     openapi: '3.0.0',
     info: {
-      title: '🧵 API - Plataforma de Proyectos de Costura',
+      title: 'API - Plataforma de Proyectos de Costura',
       version: '1.0.0',
       description:
-        'Documentación oficial de la API REST para el Trabajo de Fin de Grado (TFG) en Ingeniería Multimedia. Contiene los endpoints para la gestión de usuarios, proyectos textiles, tutoriales y comunidad.',
+        'Documentación oficial de la API REST para el Trabajo de Fin de Grado en Ingeniería Multimedia. Contiene los endpoints para la gestión de usuarios, proyectos textiles, tutoriales y comunidad.',
       contact: {
         name: 'Soporte Técnico TFG',
       },
@@ -24,7 +27,7 @@ const swaggerOptions = {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
-          description: 'Introduce tu Access Token JWT para autenticar las peticiones.',
+          description: 'Introduce el Access Token JWT para autenticar las peticiones.',
         },
       },
       schemas: {
@@ -39,14 +42,12 @@ const swaggerOptions = {
         },
       },
     },
-    // Aplicar seguridad global por defecto a todas las rutas
     security: [
       {
         bearerAuth: [],
       },
     ],
   },
-  // Le indicamos a Swagger dónde buscar la documentación de los endpoints
   apis: ['./src/modules/**/*.routes.js'],
 };
 
