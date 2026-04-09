@@ -1,10 +1,13 @@
+/**
+ * @fileoverview Esquemas de validación de Joi para el módulo de usuarios.
+ */
 const Joi = require('joi');
 
-/**
- * Esquemas de validación para las peticiones del módulo de usuarios.
- */
 const userValidator = {
-  // Validación para cuando un usuario actualiza su propio perfil
+  /**
+   * Validación para la actualización del perfil propio.
+   * Requiere al menos un campo para procesar la petición.
+   */
   updateProfile: Joi.object({
     displayName: Joi.string().min(3).max(50).messages({
       'string.min': 'El nombre debe tener un mínimo de 3 caracteres.',
@@ -15,19 +18,31 @@ const userValidator = {
     }),
     sewingLevel: Joi.string().valid('Principiante', 'Intermedio', 'Experto').allow(null),
     interests: Joi.array().items(Joi.string()).allow(null),
-  }).min(1), // Obliga a que al menos se envíe un campo para actualizar
+  }).min(1),
+
+  /**
+   * Validación para el cambio de rol por parte del administrador.
+   */
   changeRole: Joi.object({
     role: Joi.string().valid('User', 'Admin').required().messages({
       'any.only': 'El rol debe ser "User" o "Admin".',
       'any.required': 'El rol es obligatorio.',
     }),
   }),
+
+  /**
+   * Validación para activar/desactivar (banear) un usuario.
+   */
   toggleStatus: Joi.object({
     isActive: Joi.boolean().required().messages({
       'any.required': 'El estado de activación es obligatorio.',
       'boolean.base': 'El estado debe ser un valor booleano (true o false).',
     }),
   }),
+
+  /**
+   * Validación para la actualización de contraseña.
+   */
   updatePassword: Joi.object({
     currentPassword: Joi.string().required().messages({
       'any.required': 'La contraseña actual es obligatoria.',

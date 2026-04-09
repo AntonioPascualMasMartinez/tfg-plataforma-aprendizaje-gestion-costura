@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Servicio que encapsula la lógica de negocio y las interacciones con la base de datos para los usuarios.
+ */
 const User = require('./user.model');
 const ApiError = require('../../utils/apiError');
 const bcrypt = require('bcrypt');
@@ -8,7 +11,10 @@ const Progress = require('../tutorials/progress.model');
 
 class UserService {
   /**
-   * Obtiene un usuario por su ID.
+   * Localiza y devuelve un usuario por su identificador único.
+   * @param {string} userId - Identificador del usuario.
+   * @returns {Promise<Object>} Documento del usuario.
+   * @throws {ApiError} Si el usuario no existe.
    */
   static async getUserById(userId) {
     const user = await User.findById(userId);
@@ -19,10 +25,13 @@ class UserService {
   }
 
   /**
-   * Actualiza los datos permitidos del perfil de un usuario.
+   * Actualiza la información del perfil de un usuario.
+   * @param {string} userId - Identificador del usuario.
+   * @param {Object} updateData - Objeto con los datos a actualizar.
+   * @returns {Promise<Object>} Documento del usuario actualizado.
+   * @throws {ApiError} Si el usuario no existe.
    */
   static async updateUserProfile(userId, updateData) {
-    // findByIdAndUpdate devuelve el documento actualizado gracias a { new: true }
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { $set: updateData },
@@ -30,34 +39,41 @@ class UserService {
     );
 
     if (!updatedUser) {
-      throw new ApiError(404, 'No se pudo actualizar. Usuario no encontrado.');
+      throw new ApiError(404, 'No se pudo actualizar el perfil. Usuario no encontrado.');
     }
 
     return updatedUser;
   }
 
   /**
-   * Obtiene una lista paginada de usuarios (Uso administrativo).
+   * Devuelve una colección paginada de todos los usuarios registrados.
+   * Omitiendo información sensible (contraseñas).
+   * @param {number|string} [page=1] - Número de página.
+   * @param {number|string} [limit=10] - Cantidad de resultados por página.
+   * @returns {Promise<Object>} Objeto de paginación.
    */
   static async getPaginatedUsers(page = 1, limit = 10) {
     const options = {
       page: parseInt(page, 10),
       limit: parseInt(limit, 10),
-      sort: { createdAt: -1 }, // Los más recientes primero
-      select: '-password', // Doble seguridad para no devolver passwords
+      sort: { createdAt: -1 },
+      select: '-password',
     };
 
-    const result = await User.paginate({}, options);
-    return result;
+    return await User.paginate({}, options);
   }
 
   /**
-   * Cambia el rol de un usuario (RF7 - Uso administrativo)
+   * Modifica el rol de sistema de un usuario. Implementa restricciones para prevenir la auto-degradación de permisos.
+   * @param {string} adminId - Identificador del administrador ejecutando la acción.
+   * @param {string} targetUserId - Identificador del usuario a modificar.
+   * @param {string} newRole - Nuevo rol a asignar ('User' o 'Admin').
+   * @returns {Promise<Object>} Documento del usuario actualizado.
+   * @throws {ApiError} Si el admin intenta modificar su propio rol o si el usuario no existe.
    */
   static async changeUserRole(adminId, targetUserId, newRole) {
-    // Regla de negocio: Un admin no debería poder quitarse su propio rol de admin por error
     if (adminId.toString() === targetUserId.toString()) {
-      throw new ApiError(400, 'No puedes modificar tu propio rol administrativo.');
+      throw new ApiError(400, 'No es posible modificar su propio rol administrativo.');
     }
 
     const updatedUser = await User.findByIdAndUpdate(
@@ -74,30 +90,31 @@ class UserService {
   }
 
   /**
-   * Actualiza la contraseña del usuario comprobando la actual.
+   * Procesa la actualización de la contraseña del usuario comprobando la validez de la contraseña vigente.
+   * @param {string} userId - Identificador del usuario.
+   * @param {string} currentPassword - Contraseña actual sin cifrar.
+   * @param {string} newPassword - Nueva contraseña sin cifrar.
+   * @returns {Promise<void>}
+   * @throws {ApiError} Si el usuario no existe, utiliza autenticación externa (ej. Google) o la contraseña actual es incorrecta.
    */
   static async updatePassword(userId, currentPassword, newPassword) {
-    // 1. Buscar al usuario y pedir explícitamente el campo password (que tiene select: false en el modelo)
     const user = await User.findById(userId).select('+password');
     if (!user) {
       throw new ApiError(404, 'Usuario no encontrado.');
     }
 
-    // 2. Si el usuario no tiene contraseña (ej. se registró con Google y nunca la estableció)
     if (!user.password) {
       throw new ApiError(
         400,
-        'Este usuario no tiene una contraseña configurada (cuenta de Google).',
+        'Este usuario no dispone de una contraseña configurada debido al uso de un proveedor de identidad externo.',
       );
     }
 
-    // 3. Comprobar que la contraseña actual es correcta
     const isMatch = await bcrypt.compare(currentPassword, user.password);
     if (!isMatch) {
-      throw new ApiError(401, 'La contraseña actual es incorrecta.');
+      throw new ApiError(401, 'La contraseña actual proporcionada es incorrecta.');
     }
 
-    // 4. Hashear la nueva contraseña y guardarla
     const salt = await bcrypt.genSalt(10);
     user.password = await bcrypt.hash(newPassword, salt);
 
@@ -105,23 +122,30 @@ class UserService {
   }
 
   /**
-   * Elimina la cuenta de un usuario.
+   * Elimina un usuario de la base de datos de manera irreversible.
+   * @param {string} userId - Identificador del usuario a eliminar.
+   * @returns {Promise<Object>} Documento del usuario eliminado.
+   * @throws {ApiError} Si el usuario no existe.
    */
   static async deleteUserAccount(userId) {
     const deletedUser = await User.findByIdAndDelete(userId);
     if (!deletedUser) {
-      throw new ApiError(404, 'No se pudo eliminar. Usuario no encontrado.');
+      throw new ApiError(404, 'No se pudo procesar la eliminación. Usuario no encontrado.');
     }
     return deletedUser;
   }
 
   /**
-   * Cambia el estado de cuenta de un usuario (Banear/Desbanear)
+   * Modifica el estado activo de un usuario (activación/desactivación de cuenta). Implementa restricciones para prevenir el autobloqueo.
+   * @param {string} adminId - Identificador del administrador ejecutando la acción.
+   * @param {string} targetUserId - Identificador del usuario a modificar.
+   * @param {boolean} isActiveStatus - Nuevo estado de activación.
+   * @returns {Promise<Object>} Documento del usuario actualizado.
+   * @throws {ApiError} Si el admin intenta modificar su propio estado o si el usuario no existe.
    */
   static async toggleUserStatus(adminId, targetUserId, isActiveStatus) {
-    // Regla de negocio: Un admin no debería poder banearse a sí mismo
     if (adminId.toString() === targetUserId.toString()) {
-      throw new ApiError(400, 'No puedes banear o desbanear tu propia cuenta.');
+      throw new ApiError(400, 'No es posible modificar su propio estado de cuenta.');
     }
 
     const updatedUser = await User.findByIdAndUpdate(
@@ -138,55 +162,51 @@ class UserService {
   }
 
   /**
-   * Obtiene todas las estadísticas unificadas para el Dashboard del Admin.
+   * Calcula y agrupa métricas estadísticas transversales del sistema para su representación visual en el panel de administración.
+   * @returns {Promise<Object>} Objeto compuesto por métricas globales y datos procesados para gráficas.
    */
   static async getDashboardStats() {
-    // 1. Conteos básicos en paralelo para máxima velocidad
     const [totalUsers, totalTutorials, pendingReports] = await Promise.all([
       User.countDocuments(),
       Tutorial.countDocuments(),
-      Report.countDocuments({ status: 'Pending' })
+      Report.countDocuments({ status: 'Pending' }),
     ]);
 
-    // 2. Gráfica de Crecimiento (Últimos 6 meses)
     const sixMonthsAgo = new Date();
     sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-    
+
     const userGrowth = await User.aggregate([
       { $match: { createdAt: { $gte: sixMonthsAgo } } },
       {
         $group: {
           _id: { month: { $month: '$createdAt' }, year: { $year: '$createdAt' } },
-          count: { $sum: 1 }
-        }
+          count: { $sum: 1 },
+        },
       },
-      { $sort: { '_id.year': 1, '_id.month': 1 } }
+      { $sort: { '_id.year': 1, '_id.month': 1 } },
     ]);
 
-    // 3. Gráfica de Demografía (Nivel de Costura)
     const demographics = await User.aggregate([
       {
         $group: {
-          // Si el campo es null o no existe, lo agrupamos como 'No especificado'
           _id: { $ifNull: ['$sewingLevel', 'No especificado'] },
-          count: { $sum: 1 }
-        }
-      }
+          count: { $sum: 1 },
+        },
+      },
     ]);
 
-    // 4. Gráfica de Engagement (Éxito en tutoriales)
     const engagement = await Progress.aggregate([
       {
         $group: {
-          _id: '$status', // Agrupa por 'En curso' o 'Completado'
-          count: { $sum: 1 }
-        }
-      }
+          _id: '$status',
+          count: { $sum: 1 },
+        },
+      },
     ]);
 
     return {
       counts: { totalUsers, totalTutorials, pendingReports },
-      charts: { userGrowth, demographics, engagement }
+      charts: { userGrowth, demographics, engagement },
     };
   }
 }

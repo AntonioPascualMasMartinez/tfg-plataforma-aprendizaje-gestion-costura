@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Definición del esquema y modelo de Mongoose para la entidad de Usuario.
+ */
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 
@@ -13,7 +16,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: [true, 'La contraseña es obligatoria'],
-      select: false, // Por seguridad, nunca se incluye en los resultados a menos que se pida explícitamente
+      select: false,
     },
     displayName: {
       type: String,
@@ -23,7 +26,7 @@ const userSchema = new mongoose.Schema(
     },
     avatar: {
       type: String,
-      default: null, // URL que vendrá de Cloudinary en el futuro
+      default: null,
     },
     role: {
       type: String,
@@ -33,7 +36,7 @@ const userSchema = new mongoose.Schema(
     sewingLevel: {
       type: String,
       enum: ['Principiante', 'Intermedio', 'Experto'],
-      default: null, // Es opcional
+      default: null,
     },
     interests: [
       {
@@ -44,7 +47,7 @@ const userSchema = new mongoose.Schema(
     googleId: {
       type: String,
       unique: true,
-      sparse: true, // Permite múltiples valores null sin violar la restricción unique
+      sparse: true,
     },
     isActive: {
       type: Boolean,
@@ -60,12 +63,11 @@ const userSchema = new mongoose.Schema(
     },
   },
   {
-    timestamps: true, // Añade automáticamente createdAt y updatedAt
+    timestamps: true,
     versionKey: false,
   },
 );
 
-// Inyectar el plugin de paginación para las vistas de administración
 userSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model('User', userSchema);
