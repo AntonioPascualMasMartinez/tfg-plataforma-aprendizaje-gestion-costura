@@ -5,5 +5,5 @@
  */
 export const environment = {
   production: true,
-  apiUrl: 'https://api.tu-dominio-costura.com/api/v1',
+  apiUrl: 'https://tfg-plataforma-aprendizaje-gestion.vercel.app/api/v1',
 };
