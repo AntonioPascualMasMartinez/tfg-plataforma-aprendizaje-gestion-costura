@@ -1,5 +1,9 @@
+/**
+ * @file environment.ts
+ * @description Configuración de variables de entorno para el despliegue en producción.
+ * Establece los parámetros definitivos para el entorno real, incluyendo la URL del backend alojado de forma remota.
+ */
 export const environment = {
   production: true,
-  // Aquí irá la URL de tu backend cuando lo subas a un servidor real (ej. Render, Heroku, VPS)
   apiUrl: 'https://api.tu-dominio-costura.com/api/v1',
 };
