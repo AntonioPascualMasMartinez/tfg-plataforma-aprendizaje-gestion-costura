@@ -1,48 +1,51 @@
 /**
- * @fileoverview Punto de entrada adaptado para Vercel (Serverless) y Local.
+ * @fileoverview Punto de entrada robusto para Vercel Serverless.
  */
 require('dotenv').config();
 const mongoose = require('mongoose');
 const app = require('./app');
 
-const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI;
 
-// Variable global para cachear la conexión a la base de datos en Vercel
-let isConnected;
+// Cache de conexión para reutilizarla entre ejecuciones de la función
+let cachedDb = null;
 
-const connectToDatabase = async () => {
-  if (isConnected) {
-    console.info('Utilizando conexión a MongoDB existente.');
-    return;
+async function connectToDatabase() {
+  // Si ya estamos conectados, no hacemos nada
+  if (cachedDb && mongoose.connection.readyState === 1) {
+    return cachedDb;
   }
 
-  try {
-    if (!MONGO_URI) throw new Error('MONGO_URI no definido.');
-
-    console.info('Estableciendo nueva conexión con MongoDB Atlas...');
-    const db = await mongoose.connect(MONGO_URI);
-    isConnected = db.connections[0].readyState;
-    console.info('Conexión a la base de datos establecida exitosamente.');
-  } catch (error) {
-    console.error('Fallo crítico durante la inicialización de la BD:', error.message);
-    process.exit(1);
+  // Si hay una conexión en curso, esperamos a que termine
+  if (mongoose.connection.readyState === 2) {
+    return mongoose.connection;
   }
-};
 
-// Middleware: Asegurar que la BD está conectada antes de cualquier petición en Vercel
-app.use(async (req, res, next) => {
-  await connectToDatabase();
-  next();
-});
+  console.info('Iniciando nueva conexión a MongoDB Atlas...');
+  
+  // Forzamos opciones que evitan el "buffering" infinito en serverless
+  const opts = {
+    bufferCommands: false,
+    serverSelectionTimeoutMS: 5000,
+  };
 
-// Entorno Local: Solo usamos app.listen si no estamos en producción (Vercel)
-if (process.env.NODE_ENV !== 'production') {
-  app.listen(PORT, async () => {
-    await connectToDatabase();
-    console.info(`Servidor local inicializado en el puerto ${PORT}`);
-  });
+  cachedDb = await mongoose.connect(MONGO_URI, opts);
+  return cachedDb;
 }
 
-// Exportamos la app para que Vercel la ejecute como Función Serverless
-module.exports = app;
+// Exportamos el handler asíncrono para Vercel
+module.exports = async (req, res) => {
+  try {
+    // 1. Esperamos obligatoriamente a la base de datos
+    await connectToDatabase();
+    
+    // 2. Una vez conectados, procesamos la petición con Express
+    return app(req, res);
+  } catch (error) {
+    console.error('Error en el Handler de Vercel:', error);
+    res.status(500).json({ 
+      message: 'Error de conexión con la base de datos',
+      error: error.message 
+    });
+  }
+};
