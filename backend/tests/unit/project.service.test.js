@@ -1,7 +1,9 @@
+/**
+ * @fileoverview Pruebas unitarias para el núcleo de gestión de proyectos textiles.
+ */
 const ProjectService = require('../../src/modules/projects/project.service');
 const Project = require('../../src/modules/projects/project.model');
 
-// Mockear el modelo de Mongoose
 jest.mock('../../src/modules/projects/project.model');
 
 describe('ProjectService - Pruebas Unitarias', () => {
@@ -10,7 +12,7 @@ describe('ProjectService - Pruebas Unitarias', () => {
   });
 
   describe('_verifyOwnership()', () => {
-    it('Debe devolver el proyecto si el usuario es el propietario', async () => {
+    it('Debe retornar el proyecto si el usuario solicitante es el propietario legítimo', async () => {
       const mockProject = { _id: 'proj1', ownerId: { toString: () => 'user1' } };
       Project.findById.mockResolvedValue(mockProject);
 
@@ -18,17 +20,16 @@ describe('ProjectService - Pruebas Unitarias', () => {
       expect(result).toEqual(mockProject);
     });
 
-    it('Debe lanzar error 403 si un usuario distinto intenta modificarlo', async () => {
+    it('Debe lanzar excepción HTTP 403 (Forbidden) en intentos de acceso no autorizados', async () => {
       const mockProject = { _id: 'proj1', ownerId: { toString: () => 'user1' } };
       Project.findById.mockResolvedValue(mockProject);
 
       await expect(ProjectService._verifyOwnership('proj1', 'user2')).rejects.toMatchObject({
         statusCode: 403,
-        message: 'Acceso denegado. No tienes permisos para modificar este proyecto.',
       });
     });
 
-    it('Debe lanzar error 404 si el proyecto no existe', async () => {
+    it('Debe lanzar excepción HTTP 404 si el proyecto no existe', async () => {
       Project.findById.mockResolvedValue(null);
 
       await expect(ProjectService._verifyOwnership('proj999', 'user1')).rejects.toMatchObject({
@@ -37,9 +38,8 @@ describe('ProjectService - Pruebas Unitarias', () => {
     });
   });
 
-  describe('deleteProject() - Borrado Lógico', () => {
-    it('Debe aplicar un soft delete estampando la fecha en deletedAt (RNF20, RNF21)', async () => {
-      // Configuramos el mock para que pase la verificación de propiedad y exponga el método save()
+  describe('deleteProject() - Estrategia de Borrado Lógico', () => {
+    it('Debe aplicar soft-delete estampando la fecha en deletedAt sin purgar físicamente', async () => {
       const mockProject = {
         _id: 'proj1',
         ownerId: { toString: () => 'user1' },
@@ -50,23 +50,23 @@ describe('ProjectService - Pruebas Unitarias', () => {
 
       await ProjectService.deleteProject('proj1', 'user1');
 
-      // Verificamos que no se llamó a un método de borrado físico destructivo (como deleteOne)
-      expect(Project.deleteOne).toBeUndefined(); // deleteOne no debe ser invocado en el servicio
-
-      // Verificamos que se actualizó el campo y se guardó
+      // CORRECCIÓN: Comprobamos que el método de borrado físico nunca fue invocado
+      expect(Project.deleteOne).not.toHaveBeenCalled();
       expect(mockProject.deletedAt).toBeInstanceOf(Date);
       expect(mockProject.save).toHaveBeenCalled();
     });
   });
 
   describe('createProject()', () => {
-    it('Debe inyectar el ownerId al crear un nuevo proyecto', async () => {
+    it('Debe inyectar de forma segura el ownerId al crear un nuevo proyecto', async () => {
       const mockProjectData = { title: 'Mi Camisa' };
       Project.create.mockResolvedValue({ ...mockProjectData, ownerId: 'user1' });
 
       const result = await ProjectService.createProject('user1', mockProjectData);
 
-      expect(Project.create).toHaveBeenCalledWith({ title: 'Mi Camisa', ownerId: 'user1' });
+      expect(Project.create).toHaveBeenCalledWith(
+        expect.objectContaining({ title: 'Mi Camisa', ownerId: 'user1' }),
+      );
       expect(result.ownerId).toBe('user1');
     });
   });

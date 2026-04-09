@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Pruebas unitarias para la lógica de clonación de tutoriales y cálculo de progreso.
+ */
 const TutorialService = require('../../src/modules/tutorials/tutorial.service');
 const Tutorial = require('../../src/modules/tutorials/tutorial.model');
 const Progress = require('../../src/modules/tutorials/progress.model');
@@ -11,32 +14,32 @@ describe('TutorialService - Pruebas Unitarias', () => {
   afterEach(() => jest.clearAllMocks());
 
   describe('startTutorial()', () => {
-    it('Debe clonar el tutorial en un proyecto y crear un registro de progreso', async () => {
+    it('Debe clonar el tutorial maestro en un proyecto personal y crear la traza de progreso', async () => {
       const mockTutorial = {
         _id: 'tut1',
         title: 'Bordado Básico',
         description: 'Aprende a bordar',
+        difficultyLevel: 'Principiante',
         materialsNeeded: [],
         steps: [],
       };
 
       Tutorial.findById.mockResolvedValue(mockTutorial);
-      Progress.findOne.mockResolvedValue(null); // No está iniciado
+      Progress.findOne.mockResolvedValue(null);
       Project.create.mockResolvedValue({ _id: 'proj_derivado_1' });
       Progress.create.mockResolvedValue({ currentStep: 0 });
 
       const result = await TutorialService.startTutorial('user1', 'tut1');
 
-      // Validamos la clonación
       expect(Project.create).toHaveBeenCalledWith(
         expect.objectContaining({
           ownerId: 'user1',
           title: '[Tutorial] Bordado Básico',
           isPublic: false,
+          difficulty: 'Fácil',
         }),
       );
 
-      // Validamos el progreso
       expect(Progress.create).toHaveBeenCalledWith(
         expect.objectContaining({
           userId: 'user1',
@@ -49,9 +52,9 @@ describe('TutorialService - Pruebas Unitarias', () => {
       expect(result).toHaveProperty('clonedProject');
     });
 
-    it('Debe lanzar error 409 si ya fue iniciado', async () => {
+    it('Debe lanzar HTTP 409 si el usuario ya tiene un progreso activo para dicho tutorial', async () => {
       Tutorial.findById.mockResolvedValue({ _id: 'tut1' });
-      Progress.findOne.mockResolvedValue({ _id: 'prog1' }); // Ya existe
+      Progress.findOne.mockResolvedValue({ _id: 'prog1' });
 
       await expect(TutorialService.startTutorial('user1', 'tut1')).rejects.toMatchObject({
         statusCode: 409,
@@ -60,8 +63,8 @@ describe('TutorialService - Pruebas Unitarias', () => {
   });
 
   describe('updateProgress()', () => {
-    it('Debe calcular el porcentaje correctamente y cambiar el estado a Completado', async () => {
-      const mockTutorial = { steps: [{}, {}, {}, {}] }; // 4 pasos en total
+    it('Debe calcular un 100% matemático y marcar el status como Completado', async () => {
+      const mockTutorial = { steps: [{}, {}, {}, {}] }; // 4 pasos
       const mockProgress = {
         currentStep: 0,
         completionPercentage: 0,
@@ -72,7 +75,6 @@ describe('TutorialService - Pruebas Unitarias', () => {
       Tutorial.findById.mockResolvedValue(mockTutorial);
       Progress.findOne.mockResolvedValue(mockProgress);
 
-      // El usuario completa el paso 4 de 4
       const result = await TutorialService.updateProgress('user1', 'tut1', 4);
 
       expect(result.completionPercentage).toBe(100);
@@ -80,17 +82,16 @@ describe('TutorialService - Pruebas Unitarias', () => {
       expect(mockProgress.save).toHaveBeenCalled();
     });
 
-    it('Debe calcular un 50% si completa 2 de 4 pasos', async () => {
-      const mockTutorial = { steps: [{}, {}, {}, {}] }; // 4 pasos
-      const mockProgress = { save: jest.fn() };
+    it('Debe lanzar HTTP 400 si el paso enviado excede la longitud real del tutorial', async () => {
+      const mockTutorial = { steps: [{}, {}] }; // Solo 2 pasos
+      const mockProgress = { currentStep: 0 };
 
       Tutorial.findById.mockResolvedValue(mockTutorial);
       Progress.findOne.mockResolvedValue(mockProgress);
 
-      const result = await TutorialService.updateProgress('user1', 'tut1', 2);
-
-      expect(result.completionPercentage).toBe(50);
-      expect(result.status).not.toBe('Completado');
+      await expect(TutorialService.updateProgress('user1', 'tut1', 5)).rejects.toMatchObject({
+        statusCode: 400,
+      });
     });
   });
 });

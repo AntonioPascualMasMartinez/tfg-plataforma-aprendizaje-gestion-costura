@@ -1,8 +1,10 @@
+/**
+ * @fileoverview Pruebas unitarias para el servicio criptográfico de subidas a la nube.
+ */
 const UploadService = require('../../src/modules/uploads/upload.service');
-const cloudinary = require('../../config/cloudinary');
+const cloudinary = require('../../src/config/cloudinary');
 
-// Mockear el SDK de Cloudinary
-jest.mock('../../config/cloudinary', () => ({
+jest.mock('../../src/config/cloudinary', () => ({
   utils: {
     api_sign_request: jest.fn(),
   },
@@ -20,8 +22,7 @@ describe('UploadService - Pruebas Unitarias', () => {
   });
 
   describe('generateSignature()', () => {
-    it('Debe generar una firma válida y devolver los metadatos correctos', () => {
-      // Simular que Cloudinary genera un hash SHA ficticio
+    it('Debe generar la firma SHA válida y encapsular los metadatos de autorización', () => {
       cloudinary.utils.api_sign_request.mockReturnValue('hash_sha_12345');
 
       const result = UploadService.generateSignature('test_folder');
@@ -37,7 +38,7 @@ describe('UploadService - Pruebas Unitarias', () => {
       expect(result).toHaveProperty('apiKey', 'key_falsa');
     });
 
-    it('Debe usar "costura_projects" como carpeta por defecto si no se proporciona una', () => {
+    it('Debe inyectar "costura_projects" como carpeta de destino por defecto', () => {
       cloudinary.utils.api_sign_request.mockReturnValue('hash_default');
 
       const result = UploadService.generateSignature();

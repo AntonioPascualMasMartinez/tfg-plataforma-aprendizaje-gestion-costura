@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Pruebas unitarias para la lógica de gestión y administración de usuarios.
+ */
 const UserService = require('../../src/modules/users/user.service');
 const User = require('../../src/modules/users/user.model');
 
@@ -9,7 +12,7 @@ describe('UserService - Pruebas Unitarias', () => {
   });
 
   describe('getUserById()', () => {
-    it('Debe devolver el usuario si el ID existe', async () => {
+    it('Debe retornar el documento del usuario si el ID existe', async () => {
       const mockUser = { _id: '123', displayName: 'Costura Lover' };
       User.findById.mockResolvedValue(mockUser);
 
@@ -18,18 +21,18 @@ describe('UserService - Pruebas Unitarias', () => {
       expect(User.findById).toHaveBeenCalledWith('123');
     });
 
-    it('Debe lanzar error 404 si el usuario no existe', async () => {
+    it('Debe lanzar una excepción HTTP 404 si el usuario no existe', async () => {
       User.findById.mockResolvedValue(null);
 
       await expect(UserService.getUserById('999')).rejects.toMatchObject({
         statusCode: 404,
-        message: 'Usuario no encontrado en el sistema.'
+        message: 'Usuario no encontrado en el sistema.',
       });
     });
   });
 
   describe('updateUserProfile()', () => {
-    it('Debe actualizar el perfil correctamente', async () => {
+    it('Debe actualizar y retornar el perfil correctamente', async () => {
       const mockUpdatedUser = { _id: '123', displayName: 'Nuevo Nombre' };
       User.findByIdAndUpdate.mockResolvedValue(mockUpdatedUser);
 
@@ -38,9 +41,19 @@ describe('UserService - Pruebas Unitarias', () => {
       expect(User.findByIdAndUpdate).toHaveBeenCalledWith(
         '123',
         { $set: { displayName: 'Nuevo Nombre' } },
-        { new: true, runValidators: true }
+        { new: true, runValidators: true },
       );
       expect(result.displayName).toBe('Nuevo Nombre');
+    });
+  });
+
+  describe('changeUserRole()', () => {
+    it('Debe prevenir que un administrador se cambie el rol a sí mismo (Prevenir autodeclive)', async () => {
+      await expect(UserService.changeUserRole('admin_1', 'admin_1', 'User')).rejects.toMatchObject({
+        statusCode: 400,
+      });
+
+      expect(User.findByIdAndUpdate).not.toHaveBeenCalled();
     });
   });
 });

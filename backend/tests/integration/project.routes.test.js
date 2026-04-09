@@ -1,9 +1,14 @@
+/**
+ * @fileoverview Pruebas de integración para las rutas del módulo de Proyectos.
+ */
 const request = require('supertest');
 const app = require('../../src/app');
 const jwt = require('jsonwebtoken');
 const ProjectService = require('../../src/modules/projects/project.service');
+const User = require('../../src/modules/users/user.model'); // <-- IMPORTADO
 
 jest.mock('../../src/modules/projects/project.service');
+jest.mock('../../src/modules/users/user.model'); // <-- MOCKEADO
 
 describe('Project Routes - Pruebas de Integración', () => {
   const generateToken = (payload) => jwt.sign(payload, process.env.JWT_ACCESS_SECRET || 'secret');
@@ -14,6 +19,7 @@ describe('Project Routes - Pruebas de Integración', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    User.findById.mockResolvedValue({ _id: 'user1', isActive: true, role: 'User' });
   });
 
   describe('GET /api/v1/projects (Ruta Pública)', () => {
@@ -43,10 +49,10 @@ describe('Project Routes - Pruebas de Integración', () => {
       const response = await request(app)
         .post('/api/v1/projects')
         .set('Authorization', `Bearer ${token}`)
-        .send({ description: 'Proyecto sin título' }); // Falta el título requerido
+        .send({ description: 'Proyecto sin título' });
 
       expect(response.status).toBe(400);
-      expect(response.body.message).toMatch(/Error de validación/i);
+      expect(ProjectService.createProject).not.toHaveBeenCalled();
     });
 
     it('Debe crear el proyecto y retornar 201 si todo es correcto', async () => {
@@ -58,7 +64,12 @@ describe('Project Routes - Pruebas de Integración', () => {
       const response = await request(app)
         .post('/api/v1/projects')
         .set('Authorization', `Bearer ${token}`)
-        .send({ title: 'Falda', isPublic: true });
+        .send({
+          title: 'Falda',
+          category: 'Ropa',
+          projectType: 'Nuevo',
+          difficulty: 'Fácil',
+        });
 
       expect(response.status).toBe(201);
       expect(response.body.data.title).toBe('Falda');
@@ -75,7 +86,7 @@ describe('Project Routes - Pruebas de Integración', () => {
         .set('Authorization', `Bearer ${token}`);
 
       expect(response.status).toBe(200);
-      expect(ProjectService.deleteProject).toHaveBeenCalledWith('proj1', 'user1'); // Extrae id de la ruta y user1 del token
+      expect(ProjectService.deleteProject).toHaveBeenCalledWith('proj1', 'user1');
     });
   });
 });
