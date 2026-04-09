@@ -1,3 +1,10 @@
+/**
+ * @file upload.service.ts
+ * @description Servicio especializado en la gestión y transmisión de activos multimedia.
+ * Implementa una arquitectura de subida de dos fases mediante firmas criptográficas
+ * para garantizar la seguridad de las claves de la API de Cloudinary, evitando su
+ * exposición en el código fuente del cliente.
+ */
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, switchMap } from 'rxjs';
@@ -19,6 +26,15 @@ export class UploadService {
   private http = inject(HttpClient);
   private apiUrl = `${environment.apiUrl}/uploads`;
 
+  /**
+   * Transmite un archivo de imagen al servidor de almacenamiento en la nube.
+   * Ejecuta secuencialmente la solicitud de la firma de autorización al backend
+   * y la posterior carga directa del binario a la infraestructura de Cloudinary.
+   *
+   * @param {File} file - El archivo binario a cargar.
+   * @param {string} [folder='costura_projects'] - Directorio de destino en la nube.
+   * @returns {Observable<any>} Observable con la respuesta del proveedor de almacenamiento.
+   */
   uploadImage(file: File, folder: string = 'costura_projects'): Observable<any> {
     return this.http
       .get<ApiResponse<CloudinarySignature>>(`${this.apiUrl}/signature?folder=${folder}`)

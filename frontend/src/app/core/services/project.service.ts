@@ -1,3 +1,9 @@
+/**
+ * @file project.service.ts
+ * @description Servicio central para la lógica de negocio de los proyectos generados por usuarios.
+ * Facilita operaciones CRUD (Creación, Lectura, Actualización, Borrado) e integra
+ * parámetros de búsqueda, filtrado y ordenación para los repositorios públicos y privados.
+ */
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -19,11 +25,21 @@ export class ProjectService {
 
   constructor(private http: HttpClient) {}
 
-  // ==========================================
-  // Rutas Públicas
-  // ==========================================
+  /* ==========================================================================
+     CONSULTAS PÚBLICAS
+     ========================================================================== */
 
-  // GET /api/v1/projects (Feed Público paginado y con búsqueda)
+  /**
+   * Recupera el repositorio global de proyectos públicos (Feed principal).
+   * Soporta indexación dinámica mediante filtros y términos de búsqueda.
+   *
+   * @param {number} [page=1] - Índice de la página solicitada.
+   * @param {number} [limit=10] - Cantidad máxima de resultados.
+   * @param {string} [search=''] - Cadena de texto para la búsqueda por título o descripción.
+   * @param {string} [projectType] - Categoría estructural del proyecto.
+   * @param {string} [sortBy] - Criterio de ordenación algorítmica.
+   * @returns {Observable<ApiResponse<PaginatedResult<Project>>>} Listado de proyectos evaluados.
+   */
   getPublicFeed(
     page: number = 1,
     limit: number = 10,
@@ -40,37 +56,70 @@ export class ProjectService {
     return this.http.get<ApiResponse<PaginatedResult<Project>>>(this.apiUrl, { params });
   }
 
-  // GET /api/v1/projects/:id (Detalles del proyecto)
+  /**
+   * Solicita la información detallada de un proyecto individual, incluyendo sus metadatos.
+   * @param {string} id - Identificador único del proyecto.
+   * @returns {Observable<ApiResponse<Project>>} Entidad de proyecto solicitada.
+   */
   getProjectById(id: string): Observable<ApiResponse<Project>> {
     return this.http.get<ApiResponse<Project>>(`${this.apiUrl}/${id}`);
   }
 
-  // ==========================================
-  // Rutas Privadas (Requieren Autenticación)
-  // Nota: Asumo que usas un HttpInterceptor para adjuntar el JWT en las cabeceras
-  // ==========================================
+  /* ==========================================================================
+     OPERACIONES DE AUTORÍA (Requieren Autenticación)
+     ========================================================================== */
 
-  // POST /api/v1/projects (Crear proyecto)
+  /**
+   * Inicializa y persiste un nuevo proyecto en la plataforma.
+   * @param {CreateProjectPayload} data - Especificaciones iniciales del proyecto.
+   * @returns {Observable<ApiResponse<Project>>} Proyecto generado.
+   */
   createProject(data: CreateProjectPayload): Observable<ApiResponse<Project>> {
     return this.http.post<ApiResponse<Project>>(this.apiUrl, data);
   }
 
-  // PUT /api/v1/projects/:id (Actualizar proyecto)
+  /**
+   * Modifica los atributos de un proyecto existente propiedad del usuario activo.
+   * @param {string} id - Identificador del proyecto.
+   * @param {UpdateProjectPayload} data - Nuevos valores a aplicar.
+   * @returns {Observable<ApiResponse<Project>>} Proyecto actualizado.
+   */
   updateProject(id: string, data: UpdateProjectPayload): Observable<ApiResponse<Project>> {
     return this.http.put<ApiResponse<Project>>(`${this.apiUrl}/${id}`, data);
   }
 
-  // DELETE /api/v1/projects/:id (Borrado lógico)
+  /**
+   * Ejecuta el borrado lógico de un proyecto (Soft Delete) de la base de datos.
+   * @param {string} id - Identificador del proyecto a eliminar.
+   * @returns {Observable<ApiResponse<null>>} Confirmación de eliminación.
+   */
   deleteProject(id: string): Observable<ApiResponse<null>> {
     return this.http.delete<ApiResponse<null>>(`${this.apiUrl}/${id}`);
   }
 
-  // POST /api/v1/projects/:id/steps (Añadir paso a un proyecto)
+  /**
+   * Añade una nueva instrucción o fase de desarrollo al pipeline de un proyecto.
+   * @param {string} id - Identificador del proyecto matriz.
+   * @param {AddStepPayload} stepData - Contenido y recursos multimedia del paso.
+   * @returns {Observable<ApiResponse<Project>>} Proyecto actualizado con el nuevo paso.
+   */
   addStepToProject(id: string, stepData: AddStepPayload): Observable<ApiResponse<Project>> {
     return this.http.post<ApiResponse<Project>>(`${this.apiUrl}/${id}/steps`, stepData);
   }
 
-  // GET /api/v1/projects/me
+  /**
+   * Recupera el catálogo personal de proyectos del usuario autenticado (Dashboard).
+   * Incluye soporte para filtrado por estado de visibilidad y progreso.
+   *
+   * @param {number} [page=1] - Página actual.
+   * @param {number} [limit=20] - Elementos por página.
+   * @param {string} [status='Todos'] - Estado del proyecto (ej. Borrador, Publicado).
+   * @param {string} [sortBy='nuevo'] - Orientación cronológica.
+   * @param {string} [search=''] - Término de búsqueda interno.
+   * @param {string} [projectType] - Clasificación del proyecto.
+   * @param {boolean} [isPublic] - Filtro estricto por visibilidad pública/privada.
+   * @returns {Observable<ApiResponse<PaginatedResult<Project>>>} Listado filtrado del usuario.
+   */
   getMyProjects(
     page: number = 1,
     limit: number = 20,
