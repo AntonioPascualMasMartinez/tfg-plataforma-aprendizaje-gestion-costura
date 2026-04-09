@@ -1,3 +1,7 @@
+/**
+ * @fileoverview Definición del esquema de Mongoose para el sistema de reportes y moderación.
+ * Emplea relaciones polimórficas (refPath) para apuntar a diferentes tipos de entidades.
+ */
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 
@@ -9,8 +13,11 @@ const reportSchema = new mongoose.Schema(
       enum: ['Project', 'Comment'],
       required: true,
     },
-    // targetId no tiene un 'ref' estático. Su referencia se determina dinámicamente por targetType
-    targetId: { type: mongoose.Schema.Types.ObjectId, required: true, refPath: 'targetType' },
+    targetId: {
+      type: mongoose.Schema.Types.ObjectId,
+      required: true,
+      refPath: 'targetType',
+    },
     reason: { type: String, required: true, trim: true, maxlength: 500 },
     status: {
       type: String,
@@ -21,7 +28,6 @@ const reportSchema = new mongoose.Schema(
   { timestamps: true, versionKey: false },
 );
 
-// Índice para que los administradores puedan filtrar rápidamente los reportes pendientes
 reportSchema.index({ status: 1, createdAt: 1 });
 
 reportSchema.plugin(mongoosePaginate);

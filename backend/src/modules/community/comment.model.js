@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Definición del esquema de Mongoose para los comentarios de la comunidad.
+ */
 const mongoose = require('mongoose');
 const mongoosePaginate = require('mongoose-paginate-v2');
 
@@ -16,7 +19,6 @@ const commentSchema = new mongoose.Schema(
   { timestamps: true, versionKey: false },
 );
 
-// Índice compuesto para optimizar la paginación cronológica (Proyecto + Fecha)
 commentSchema.index({ projectId: 1, createdAt: -1 });
 
 commentSchema.plugin(mongoosePaginate);

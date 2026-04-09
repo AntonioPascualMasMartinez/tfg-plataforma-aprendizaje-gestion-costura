@@ -1,3 +1,6 @@
+/**
+ * @fileoverview Esquemas de validación (Joi) para las peticiones del módulo comunitario.
+ */
 const Joi = require('joi');
 
 const communityValidator = {
@@ -11,7 +14,7 @@ const communityValidator = {
   createReport: Joi.object({
     targetType: Joi.string().valid('Project', 'Comment').required(),
     targetId: Joi.string().hex().length(24).required().messages({
-      'string.length': 'El ID del objetivo debe ser un ObjectId válido.',
+      'string.length': 'El identificador del objetivo debe ser válido.',
     }),
     reason: Joi.string().max(500).required(),
   }),

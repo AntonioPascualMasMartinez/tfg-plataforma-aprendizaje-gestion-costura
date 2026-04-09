@@ -1,29 +1,42 @@
+/**
+ * @fileoverview Servicio que gestiona la lógica de las interacciones sociales, valoraciones y el flujo de reportes/moderación.
+ */
 const Comment = require('./comment.model');
 const Report = require('./report.model');
-const Project = require('../projects/project.model'); // Para verificar si el proyecto existe
+const Project = require('../projects/project.model');
 const ApiError = require('../../utils/apiError');
 
 class CommunityService {
   /**
-   * Añade un comentario a un proyecto específico.
+   * Registra un nuevo comentario asociado a un proyecto en la plataforma.
+   * @param {string} projectId - Identificador del proyecto.
+   * @param {string} authorId - Identificador del autor del comentario.
+   * @param {string} content - Contenido en texto del comentario.
+   * @returns {Promise<Object>} Documento del comentario generado.
+   * @throws {ApiError} Si el proyecto especificado no existe.
    */
   static async addComment(projectId, authorId, content) {
     const project = await Project.findById(projectId);
-    if (!project) throw new ApiError(404, 'El proyecto al que intentas comentar no existe.');
+    if (!project) {
+      throw new ApiError(404, 'El proyecto no existe o ha sido eliminado.');
+    }
 
-    const comment = await Comment.create({ projectId, authorId, content });
-    return comment;
+    return await Comment.create({ projectId, authorId, content });
   }
 
   /**
-   * Obtiene comentarios paginados de un proyecto.
+   * Obtiene la colección paginada de comentarios de un proyecto, ordenada cronológicamente de forma inversa.
+   * @param {string} projectId - Identificador del proyecto.
+   * @param {number} [page=1] - Página actual.
+   * @param {number} [limit=10] - Resultados por página.
+   * @returns {Promise<Object>} Paginación de comentarios.
    */
   static async getProjectComments(projectId, page = 1, limit = 10) {
     return await Comment.paginate(
       { projectId },
       {
-        page,
-        limit,
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10),
         sort: { createdAt: -1 },
         populate: { path: 'authorId', select: 'displayName avatar' },
       },
@@ -31,34 +44,32 @@ class CommunityService {
   }
 
   /**
-   * Alterna (Toggle) el "Me gusta" de un usuario en un proyecto.
-   * Si el usuario ya le dio like, se lo quita. Si no, se lo añade.
+   * Modifica el estado de valoración ('Me gusta') de un usuario sobre un proyecto específico.
+   * @param {string} projectId - Identificador del proyecto.
+   * @param {string} userId - Identificador del usuario solicitante.
+   * @returns {Promise<Object>} Objeto con el recuento total de 'likes' actualizado y el estado booleano para el usuario.
+   * @throws {ApiError} Si el proyecto no existe.
    */
   static async toggleProjectLike(projectId, userId) {
     const project = await Project.findById(projectId);
 
     if (!project) {
-      throw new ApiError(404, 'Proyecto no encontrado.');
+      throw new ApiError(404, 'El proyecto no existe.');
     }
 
-    // Comprobamos si el ID del usuario ya existe en el array de likes
     const likeIndex = project.likes.indexOf(userId);
     let isLiked = false;
 
     if (likeIndex === -1) {
-      // No le ha dado like: lo añadimos
       project.likes.push(userId);
       isLiked = true;
     } else {
-      // Ya le dio like: lo quitamos
       project.likes.splice(likeIndex, 1);
       isLiked = false;
     }
 
-    // Guardamos el documento actualizado
     await project.save();
 
-    // Devolvemos el conteo exacto y el nuevo estado
     return {
       likesCount: project.likes.length,
       isLikedByMe: isLiked,
@@ -66,54 +77,62 @@ class CommunityService {
   }
 
   /**
-   * Crea un reporte polimórfico en la cola de moderación.
+   * Emite un reporte polimórfico dirigido a la cola de moderación.
+   * @param {string} reporterId - Identificador del usuario que realiza el reporte.
+   * @param {string} targetType - Tipo de entidad reportada ('Project' o 'Comment').
+   * @param {string} targetId - Identificador de la entidad reportada.
+   * @param {string} reason - Motivo descriptivo del reporte.
+   * @returns {Promise<Object>} Documento de reporte creado.
+   * @throws {ApiError} Si existe un reporte pendiente idéntico emitido por el mismo usuario.
    */
   static async createReport(reporterId, targetType, targetId, reason) {
-    // Verificamos que no exista ya un reporte idéntico del mismo usuario (prevención de spam)
     const existingReport = await Report.findOne({
       reporterId,
       targetType,
       targetId,
       status: 'Pending',
     });
+
     if (existingReport) {
-      throw new ApiError(409, 'Ya has reportado este contenido. Nuestro equipo lo está revisando.');
+      throw new ApiError(
+        409,
+        'Ya ha reportado este contenido anteriormente. El equipo lo está evaluando.',
+      );
     }
 
-    const report = await Report.create({ reporterId, targetType, targetId, reason });
-    return report;
+    return await Report.create({ reporterId, targetType, targetId, reason });
   }
 
   /**
-   * (Admin) Obtiene la cola de moderación filtrada por estado.
+   * Recupera la cola de moderación resolviendo las referencias polimórficas para facilitar su visualización administrativa.
+   * @param {number} [page=1] - Página actual.
+   * @param {number} [limit=20] - Resultados por página.
+   * @param {string} [status='Pending'] - Filtro de estado del reporte ('Pending', 'Reviewed', 'Dismissed').
+   * @returns {Promise<Object>} Cola de moderación paginada y enriquecida con metadatos del objetivo.
    */
   static async getModerationQueue(page = 1, limit = 20, status = 'Pending') {
-    // 1. Buscamos y paginamos. Hacemos populate dinámico de targetId
     const result = await Report.paginate(
       { status },
       {
         page: parseInt(page, 10),
         limit: parseInt(limit, 10),
-        sort: { createdAt: -1 }, // Ordenamos por más recientes primero
+        sort: { createdAt: -1 },
         populate: [
           { path: 'reporterId', select: 'displayName avatar email' },
-          { path: 'targetId' }, // Como configuraste refPath en el modelo, Mongoose sabe si traer un Project o Comment
+          { path: 'targetId' },
         ],
       },
     );
 
-    // 2. Mapeamos los resultados para inyectar los datos unificados que necesita el frontend
     const docs = result.docs.map((report) => {
       const doc = report.toObject();
 
-      // Si el objetivo ya fue borrado de la base de datos, lo manejamos de forma segura
       if (!doc.targetId) {
-        doc.targetContent = '[Contenido eliminado previamente]';
+        doc.targetContent = '[El contenido reportado ha sido eliminado del sistema]';
         doc.reportedUserId = null;
         return doc;
       }
 
-      // Extraemos el contenido y el autor dependiendo de si es Comentario o Proyecto
       if (doc.targetType === 'Comment') {
         doc.reportedUserId = doc.targetId.authorId;
         doc.targetContent = doc.targetId.content;
@@ -129,21 +148,31 @@ class CommunityService {
   }
 
   /**
-   * (Admin) Resuelve un reporte actualizando su estado.
+   * Actualiza el estado de resolución de un reporte.
+   * @param {string} reportId - Identificador del reporte.
+   * @param {string} action - Acción correctiva aplicada ('Dismissed' o 'Reviewed').
+   * @returns {Promise<Object>} Documento de reporte actualizado.
+   * @throws {ApiError} Si el reporte no existe en la base de datos.
    */
   static async resolveReport(reportId, action) {
-    // action puede ser 'Dismissed' (ignorar) o 'Reviewed' (penalizar)
     const report = await Report.findByIdAndUpdate(reportId, { status: action }, { new: true });
-    if (!report) throw new ApiError(404, 'Reporte no encontrado');
+    if (!report) {
+      throw new ApiError(404, 'Reporte de moderación no encontrado.');
+    }
     return report;
   }
 
   /**
-   * (Admin) Borrado forzado de un comentario (Moderación)
+   * Ejecuta la eliminación administrativa (moderación severa) de un comentario.
+   * @param {string} commentId - Identificador del comentario a purgar.
+   * @returns {Promise<boolean>} Confirmación de eliminación.
+   * @throws {ApiError} Si el comentario ya no existe.
    */
   static async deleteCommentAsAdmin(commentId) {
     const deleted = await Comment.findByIdAndDelete(commentId);
-    if (!deleted) throw new ApiError(404, 'Comentario no encontrado');
+    if (!deleted) {
+      throw new ApiError(404, 'Comentario no encontrado.');
+    }
     return true;
   }
 }
