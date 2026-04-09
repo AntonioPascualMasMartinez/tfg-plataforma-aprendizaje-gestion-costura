@@ -1,39 +1,36 @@
-require('dotenv').config(); // Carga las variables de entorno inmediatamente
+/**
+ * @fileoverview Punto de entrada de la aplicación. Inicializa conexiones y levanta el servidor.
+ */
+require('dotenv').config();
 const mongoose = require('mongoose');
 const app = require('./app');
 
-// Obtenemos variables críticas del entorno
 const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI;
 
 /**
- * Función autoejecutable para inicializar los servicios
+ * Inicializa los servicios requeridos y arranca el servidor HTTP.
+ * @returns {Promise<void>}
  */
 const startServer = async () => {
   try {
-    // 1. Validación de variables críticas
     if (!MONGO_URI) {
-      throw new Error('FATAL ERROR: MONGO_URI no está definido en el archivo .env');
+      throw new Error('Variables de entorno incompletas: MONGO_URI no definido.');
     }
 
-    // 2. Conexión a la Base de Datos
-    console.log('⏳ Conectando a MongoDB Atlas...');
+    console.info('Estableciendo conexión con MongoDB Atlas...');
     await mongoose.connect(MONGO_URI);
-    console.log('✅ Conexión a la base de datos establecida con éxito.');
+    console.info('Conexión a la base de datos establecida exitosamente.');
 
-    // 3. Inicialización de la red (Escucha de peticiones HTTP)
     app.listen(PORT, () => {
-      console.log(`🚀 Servidor backend inicializado y escuchando en el puerto ${PORT}`);
-      console.log(`🛠️  Entorno de ejecución: ${process.env.NODE_ENV || 'development'}`);
+      console.info(`Servidor backend inicializado en el puerto ${PORT}`);
+      console.info(`Entorno de ejecución: ${process.env.NODE_ENV || 'development'}`);
     });
-
   } catch (error) {
-    // Captura de errores de arranque (ej. credenciales de DB incorrectas)
-    console.error('❌ Error crítico durante la inicialización del servidor:');
+    console.error('Fallo crítico durante la inicialización del sistema:');
     console.error(error.message);
-    process.exit(1); // Aborta el proceso con código de error
+    process.exit(1);
   }
 };
 
-// Disparador de la inicialización
 startServer();

@@ -1,23 +1,25 @@
 /**
- * Clase personalizada para la gestión estructurada de errores en la API.
- * Extiende la clase Error nativa de JavaScript.
+ * @fileoverview Clase personalizada para la gestión estructurada de errores en la API.
+ */
+
+/**
+ * Extensión de la clase Error nativa para incluir códigos de estado HTTP y trazabilidad operativa.
+ * @extends Error
  */
 class ApiError extends Error {
   /**
-   * Construye un nuevo ApiError.
-   * * @param {number} statusCode - Código de estado HTTP (ej. 400, 404, 500).
+   * Construye una nueva instancia de ApiError.
+   * @param {number} statusCode - Código de estado HTTP (ej. 400, 404, 500).
    * @param {string} message - Mensaje descriptivo del error.
-   * @param {boolean} isOperational - True para errores previstos (lógica de negocio). False para bugs o fallos de infraestructura.
-   * @param {string} stack - Traza de ejecución (opcional).
+   * @param {boolean} [isOperational=true] - Distingue entre errores de lógica de negocio (true) y fallos no previstos (false).
+   * @param {string} [stack=''] - Traza de ejecución opcional.
    */
   constructor(statusCode, message, isOperational = true, stack = '') {
     super(message);
-    
+
     this.statusCode = statusCode;
     this.isOperational = isOperational;
 
-    // Si se proporciona un stack trace específico, se asigna.
-    // De lo contrario, se captura el stack trace actual omitiendo el constructor de esta clase.
     if (stack) {
       this.stack = stack;
     } else {
