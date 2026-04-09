@@ -6,6 +6,51 @@ const router = express.Router();
 const ProjectController = require('./project.controller');
 const authenticate = require('../../middlewares/auth.middleware');
 
+
+/**
+ * @swagger
+ * /projects/me:
+ *   get:
+ *     summary: Obtiene el taller personal del usuario
+ *     description: Devuelve el listado paginado de los proyectos (públicos y privados) pertenecientes al usuario autenticado.
+ *     tags:
+ *       - Proyectos
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - in: query
+ *         name: status
+ *         schema:
+ *           type: string
+ *           enum:
+ *             - Todos
+ *             - Planificado
+ *             - En curso
+ *             - Pausado
+ *             - Finalizado
+ *           default: Todos
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           enum:
+ *             - nuevo
+ *             - nombre
+ *           default: nuevo
+ *     responses:
+ *       200:
+ *         description: Taller personal recuperado.
+ *       401:
+ *         description: No autorizado.
+ */
+
+router.get('/me',authenticate, ProjectController.getMyProjects);
+
 // ==========================================
 // Rutas de Lectura y Navegación
 // ==========================================
@@ -62,6 +107,8 @@ const authenticate = require('../../middlewares/auth.middleware');
 
 router.get('/', ProjectController.getPublicFeed);
 
+router.use(authenticate);
+
 /**
  * @swagger
  * /projects/{id}:
@@ -90,51 +137,6 @@ router.get('/:id', ProjectController.getDetails);
 // ==========================================
 // Rutas Privadas (Requieren Autenticación)
 // ==========================================
-router.use(authenticate);
-
-/**
- * @swagger
- * /projects/user/me:
- *   get:
- *     summary: Obtiene el taller personal del usuario
- *     description: Devuelve el listado paginado de los proyectos (públicos y privados) pertenecientes al usuario autenticado.
- *     tags:
- *       - Proyectos
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: query
- *         name: page
- *         schema:
- *           type: integer
- *           default: 1
- *       - in: query
- *         name: status
- *         schema:
- *           type: string
- *           enum:
- *             - Todos
- *             - Planificado
- *             - En curso
- *             - Pausado
- *             - Finalizado
- *           default: Todos
- *       - in: query
- *         name: sortBy
- *         schema:
- *           type: string
- *           enum:
- *             - nuevo
- *             - nombre
- *           default: nuevo
- *     responses:
- *       200:
- *         description: Taller personal recuperado.
- *       401:
- *         description: No autorizado.
- */
-
-router.get('/user/me', ProjectController.getMyProjects);
 
 /**
  * @swagger
