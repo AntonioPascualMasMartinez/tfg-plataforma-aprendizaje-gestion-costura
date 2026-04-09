@@ -30,10 +30,3 @@ En fase de desarrollo y planificación
 ## Estructura del repositorio
 - `/frontend`: Aplicación cliente
 - `/backend`: API REST
-- `/docs`: Documentación técnica y diagramas
-- `/scripts`: Pruebas en desarrollo
-
-## Convención en commits
-- `init`: estructura inicial del proyecto
-- `docs`: añadir esquemas, diagramas de arquitectura y  documentación del proyecto
-- `feat`: Añadir funcionalidad o elemento al proyecto
