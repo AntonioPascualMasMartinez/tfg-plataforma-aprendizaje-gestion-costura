@@ -170,13 +170,13 @@
             />
           </svg>
           <span class="text-[12px] font-semibold"
-            >{{ completedSteps }}/{{ project.steps?.length || 0 }}</span
+            >{{ completedSteps }}/{{ project.steps.length || 0 }}</span
           >
         </div>
 
         @if (activeView === 'taller') {
           <div
-            class="flex items-center gap-1 text-muted group-hover:text-text-main transition-colors hidden sm:flex"
+            class="flex items-center gap-1 text-muted group-hover:text-text-main transition-colors sm:flex"
             title="Materiales adquiridos"
           >
             <svg
@@ -193,7 +193,7 @@
               />
             </svg>
             <span class="text-[12px] font-semibold"
-              >{{ acquiredMaterials }}/{{ project.materials?.length || 0 }}</span
+              >{{ acquiredMaterials }}/{{ project.materials.length || 0 }}</span
             >
           </div>
         }

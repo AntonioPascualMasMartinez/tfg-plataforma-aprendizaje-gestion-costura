@@ -1,11 +1,21 @@
+/**
+ * @file sidebar.ts
+ * @description Componente estructural de navegación lateral (Layout Privado).
+ * Implementa la integración con los servicios de autenticación y usuario, evaluando de
+ * forma dinámica los privilegios (RBAC) para el renderizado condicional de opciones administrativas.
+ * Gestiona el ciclo de vida de la sesión (Logout) y el estado global del esquema de color (Theme).
+ */
 import { Component, inject, OnInit, PLATFORM_ID } from '@angular/core';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { NgClass, isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
-import { UserService } from '../../../core/services/user.service'; // <-- 1. Importar UserService
+import { UserService } from '../../../core/services/user.service';
 import { ConfirmModalComponent } from '../../modals/confirm-modal/confirm-modal.component';
 
+/**
+ * Contrato de tipado para los nodos de navegación del menú lateral.
+ */
 interface NavItem {
   label: string;
   path: string;
@@ -38,7 +48,7 @@ interface NavItem {
 })
 export class Sidebar implements OnInit {
   private authService = inject(AuthService);
-  private userService = inject(UserService); // <-- 2. Inyectar el servicio
+  private userService = inject(UserService);
   private router = inject(Router);
   private sanitizer = inject(DomSanitizer);
   private platformId = inject(PLATFORM_ID);
@@ -46,8 +56,11 @@ export class Sidebar implements OnInit {
   isLoadingLogout = false;
   showLogoutModal = false;
   isDarkMode = false;
-  isAdmin = false; // <-- 3. Bandera de estado para el rol
 
+  /** Bandera de autorización (RBAC) para revelar funciones exclusivas de administrador. */
+  isAdmin = false;
+
+  /** Colección estática de enlaces con sus respectivos elementos vectoriales (SVG). */
   navItems: NavItem[] = [
     {
       label: 'Inicio',
@@ -76,7 +89,8 @@ export class Sidebar implements OnInit {
     },
   ];
 
-  ngOnInit() {
+  ngOnInit(): void {
+    /* Sanitización del código SVG en crudo para prevenir ataques de Cross-Site Scripting (XSS) */
     this.navItems = this.navItems.map((item) => ({
       ...item,
       safeIcon: this.sanitizer.bypassSecurityTrustHtml(item.icon),
@@ -92,12 +106,14 @@ export class Sidebar implements OnInit {
       }
     }
 
-    // 4. Llamar a la validación del rol al iniciar el componente
     this.checkUserRole();
   }
 
-  // --- NUEVO MÉTODO PARA VALIDAR EL ROL ---
-  private checkUserRole() {
+  /**
+   * Consulta al servicio de telemetría personal para obtener los atributos
+   * del usuario en sesión y establecer los niveles de autorización en la vista.
+   */
+  private checkUserRole(): void {
     this.userService.getMe().subscribe({
       next: (res) => {
         if (res.data && res.data.role === 'Admin') {
@@ -105,13 +121,12 @@ export class Sidebar implements OnInit {
         }
       },
       error: (err) => {
-        console.error('Error al verificar el rol de usuario:', err);
+        console.error('Anomalía durante la verificación del nivel de autorización:', err);
       },
     });
   }
-  // ----------------------------------------
 
-  toggleTheme() {
+  toggleTheme(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.isDarkMode = !this.isDarkMode;
       if (this.isDarkMode) {
@@ -124,7 +139,11 @@ export class Sidebar implements OnInit {
     }
   }
 
-  confirmLogout() {
+  /**
+   * Ejecuta el protocolo de cierre de sesión, revocando el token de acceso local
+   * y delegando la invalidación de cookies al servidor de autenticación.
+   */
+  confirmLogout(): void {
     this.isLoadingLogout = true;
     this.authService.logout().subscribe({
       next: () => {
@@ -133,7 +152,7 @@ export class Sidebar implements OnInit {
         this.router.navigate(['/auth/login']);
       },
       error: (err) => {
-        console.error('Error al cerrar sesión', err);
+        console.error('Fallo en la resolución del cierre de sesión HTTP:', err);
         this.showLogoutModal = false;
         this.router.navigate(['/auth/login']);
       },
@@ -143,11 +162,11 @@ export class Sidebar implements OnInit {
     });
   }
 
-  requestLogout() {
+  requestLogout(): void {
     this.showLogoutModal = true;
   }
 
-  cancelLogout() {
+  cancelLogout(): void {
     this.showLogoutModal = false;
   }
 }

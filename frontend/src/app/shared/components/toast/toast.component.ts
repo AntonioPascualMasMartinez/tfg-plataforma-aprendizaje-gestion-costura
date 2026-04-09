@@ -1,3 +1,9 @@
+/**
+ * @file toast.component.ts
+ * @description Componente visual global para el sistema de notificaciones asíncronas.
+ * Actúa en sincronía con el estado reactivo provisto por el ToastService.
+ * Suscribe su estilo de presentación a los tokens semánticos definidos en el sistema de diseño (Tailwind).
+ */
 import { Component, inject } from '@angular/core';
 import { ToastService } from '../../../core/services/toast.service';
 import { NgClass } from '@angular/common';
@@ -9,9 +15,14 @@ import { NgClass } from '@angular/common';
   templateUrl: './toast.component.html',
 })
 export class ToastComponent {
+  /** Servicio centralizado inyectado responsable del flujo de los mensajes. */
   toastService = inject(ToastService);
 
-  // Asignamos colores de Tailwind en base al tipo (basado en tu styles.css)
+  /**
+   * Resuelve dinámicamente las clases utilitarias de Tailwind CSS según el nivel de severidad.
+   * @param {string} type - Clasificación de la notificación (success, error, warning, info).
+   * @returns {string} Cadena de clases CSS aplicables.
+   */
   getToastClasses(type: string): string {
     switch (type) {
       case 'success':

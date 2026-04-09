@@ -1,3 +1,10 @@
+/**
+ * @file project-card.ts
+ * @description Componente presentacional (Dumb Component) para la visualización resumida de un proyecto.
+ * Emplea propiedades computadas (Getters) para resolver estados visuales, métricas de progreso
+ * y clases de diseño (Tailwind CSS) basándose en las especificaciones de la entidad de dominio.
+ * Delega cualquier mutación de estado al componente contenedor mediante eventos de salida (@Output).
+ */
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Project } from '../../models/project.model';
@@ -7,23 +14,31 @@ import { ConfirmModalComponent } from '../../modals/confirm-modal/confirm-modal.
 @Component({
   selector: 'app-project-card',
   standalone: true,
-  imports: [RouterLink, NgClass, NgIf, ConfirmModalComponent, DatePipe],
+  imports: [RouterLink, NgClass, ConfirmModalComponent, DatePipe],
   templateUrl: './project-card.html',
 })
 export class ProjectCardComponent {
+  /** Entidad del proyecto a renderizar. */
   @Input({ required: true }) project!: Project;
 
-  // NUEVOS INPUTS para controlar la vista y la validación
+  /** Determina el contexto de renderizado para adaptar la interfaz visual. */
   @Input() activeView: 'taller' | 'portafolio' = 'taller';
+
+  /** Bandera booleana que indica la completitud estructural del proyecto. */
   @Input() isComplete: boolean = false;
 
+  /* Emisores de eventos para la delegación de operaciones críticas */
   @Output() delete = new EventEmitter<string>();
-
-  // NUEVO OUTPUT para la acción de publicar/ocultar
   @Output() toggleVisibility = new EventEmitter<void>();
 
+  /** Estado local para el control de renderizado del modal de confirmación destructiva. */
   showDeleteModal = false;
 
+  /**
+   * Resuelve el activo multimedia principal del proyecto.
+   * Prioriza la imagen de inspiración general; de no existir, itera sobre los pasos de construcción.
+   * @returns {string | null} URL absoluta de la imagen o valor nulo.
+   */
   get coverImage(): string | null {
     if (this.project.inspirationImageUrl) {
       return this.project.inspirationImageUrl;
@@ -49,6 +64,9 @@ export class ProjectCardComponent {
     return this.project.materials.filter((mat) => mat.isAcquired).length;
   }
 
+  /**
+   * Mapea semánticamente la dificultad del proyecto a variables del sistema de diseño.
+   */
   get difficultyTextColorClass(): string {
     switch (this.project.difficulty) {
       case 'Fácil':
@@ -62,6 +80,9 @@ export class ProjectCardComponent {
     }
   }
 
+  /**
+   * Genera el diccionario de configuración de estilos según la máquina de estados del proyecto.
+   */
   get statusConfig() {
     switch (this.project.status) {
       case 'En curso':
@@ -76,28 +97,38 @@ export class ProjectCardComponent {
     }
   }
 
-  // NUEVO MÉTODO para manejar el clic en publicar/ocultar
-  onToggleVisibility(event: Event) {
-    event.preventDefault(); // Previene la navegación al proyecto
+  /**
+   * Intercepta la acción de alteración de visibilidad y previene la propagación del evento de enrutamiento.
+   * @param {Event} event - Interacción original del DOM.
+   */
+  onToggleVisibility(event: Event): void {
+    event.preventDefault();
     event.stopPropagation();
     this.toggleVisibility.emit();
   }
 
-  onDeleteRequest(event: Event) {
-    event.preventDefault(); // Previene la navegación al proyecto
+  /**
+   * Despliega la interfaz de confirmación de borrado previniendo la apertura accidental del proyecto.
+   */
+  onDeleteRequest(event: Event): void {
+    event.preventDefault();
     event.stopPropagation();
     this.showDeleteModal = true;
   }
 
-  confirmDelete() {
+  confirmDelete(): void {
     this.delete.emit(this.project._id);
     this.showDeleteModal = false;
   }
 
-  cancelDelete() {
+  cancelDelete(): void {
     this.showDeleteModal = false;
   }
 
+  /**
+   * Calcula dinámicamente la ruta de destino (Workshop vs. Editor base)
+   * según la tipología del proyecto y su estado de publicación.
+   */
   get projectRoute(): string[] {
     if (this.isFromTutorial || this.isAdaptedFromCommunity) {
       return ['/home/proyectos', this.project._id];
