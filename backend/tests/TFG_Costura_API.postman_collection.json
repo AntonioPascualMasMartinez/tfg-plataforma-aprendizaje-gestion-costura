@@ -16,7 +16,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"costurero@ejemplo.com\",\n  \"password\": \"secreta123\",\n  \"displayName\": \"Antonio Costura\"\n}",
+              "raw": "{\n  \"email\": \"costurero@ejemplo.com\",\n  \"password\": \"secreta123\",\n  \"displayName\": \"Antonio Costura\",\n  \"sewingLevel\": \"Principiante\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -28,8 +28,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["auth", "register"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Inicio de Sesión (Auto-Token)",
@@ -65,8 +64,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["auth", "login"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Refrescar Sesión",
@@ -78,8 +76,70 @@
               "host": ["{{baseUrl}}"],
               "path": ["auth", "refresh"]
             }
-          },
-          "response": []
+          }
+        },
+        {
+          "name": "Autenticación Google",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idToken\": \"pegar_id_token_aqui\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/google",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "google"]
+            }
+          }
+        },
+        {
+          "name": "Solicitar Recuperación de Contraseña",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"costurero@ejemplo.com\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/recover-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "recover-password"]
+            }
+          }
+        },
+        {
+          "name": "Restablecer Contraseña",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"token\": \"pegar_token_de_email_aqui\",\n  \"newPassword\": \"nuevaClaveSegura123\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/reset-password",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "reset-password"]
+            }
+          }
         },
         {
           "name": "Cerrar Sesión",
@@ -91,8 +151,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["auth", "logout"]
             }
-          },
-          "response": []
+          }
         }
       ]
     },
@@ -109,8 +168,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["users", "me"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Actualizar mi perfil",
@@ -119,7 +177,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"displayName\": \"Antonio Experto en Hilos\"\n}",
+              "raw": "{\n  \"displayName\": \"Antonio Experto en Hilos\",\n  \"sewingLevel\": \"Intermedio\"\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -131,8 +189,52 @@
               "host": ["{{baseUrl}}"],
               "path": ["users", "me"]
             }
-          },
-          "response": []
+          }
+        },
+        {
+          "name": "Actualizar contraseña",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"currentPassword\": \"secreta123\",\n  \"newPassword\": \"secreta456\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/me/password",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me", "password"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar mi cuenta",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "me"]
+            }
+          }
+        },
+        {
+          "name": "Admin - Estadísticas Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/users/admin/dashboard-stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "admin", "dashboard-stats"]
+            }
+          }
         },
         {
           "name": "Admin - Listar Usuarios",
@@ -140,12 +242,75 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/users/admin",
+              "raw": "{{baseUrl}}/users/admin?page=1&limit=10",
               "host": ["{{baseUrl}}"],
-              "path": ["users", "admin"]
+              "path": ["users", "admin"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
             }
-          },
-          "response": []
+          }
+        },
+        {
+          "name": "Admin - Cambiar Rol de Usuario",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"role\": \"Admin\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/admin/:id/role",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "admin", ":id", "role"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "pegar_id_aqui"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Admin - Activar/Banear Usuario",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"isActive\": false\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/users/admin/:id/status",
+              "host": ["{{baseUrl}}"],
+              "path": ["users", "admin", ":id", "status"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "pegar_id_aqui"
+                }
+              ]
+            }
+          }
         }
       ]
     },
@@ -162,8 +327,19 @@
               "host": ["{{baseUrl}}"],
               "path": ["projects"]
             }
-          },
-          "response": []
+          }
+        },
+        {
+          "name": "Taller Personal (Mis Proyectos)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/projects/user/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", "user", "me"]
+            }
+          }
         },
         {
           "name": "Crear Proyecto",
@@ -172,7 +348,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Camisa de Verano\",\n  \"description\": \"Proyecto de camisa manga corta con lino\",\n  \"status\": \"Planificado\",\n  \"isPublic\": true,\n  \"materials\": [\n    { \"name\": \"Tela de Lino\", \"quantity\": \"2 metros\" },\n    { \"name\": \"Botones madera\", \"quantity\": \"6 unidades\" }\n  ]\n}",
+              "raw": "{\n  \"title\": \"Camisa de Verano\",\n  \"projectType\": \"Nuevo\",\n  \"category\": \"Ropa de Verano\",\n  \"difficulty\": \"Intermedio\",\n  \"description\": \"Proyecto de camisa manga corta con lino\",\n  \"status\": \"Planificado\",\n  \"isPublic\": true,\n  \"materials\": [\n    { \"name\": \"Tela de Lino\", \"quantity\": \"2 metros\" },\n    { \"name\": \"Botones madera\", \"quantity\": \"6 unidades\" }\n  ]\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -184,8 +360,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["projects"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Detalle del Proyecto",
@@ -203,8 +378,34 @@
                 }
               ]
             }
-          },
-          "response": []
+          }
+        },
+        {
+          "name": "Actualizar Proyecto",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Camisa de Verano (Editada)\",\n  \"status\": \"En curso\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/projects/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["projects", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "pegar_id_aqui"
+                }
+              ]
+            }
+          }
         },
         {
           "name": "Añadir Paso a Proyecto",
@@ -231,8 +432,7 @@
                 }
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Eliminar Proyecto (Soft Delete)",
@@ -250,8 +450,7 @@
                 }
               ]
             }
-          },
-          "response": []
+          }
         }
       ]
     },
@@ -268,8 +467,25 @@
               "host": ["{{baseUrl}}"],
               "path": ["tutorials"]
             }
-          },
-          "response": []
+          }
+        },
+        {
+          "name": "Detalles del Tutorial",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tutorials/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["tutorials", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "pegar_id_aqui"
+                }
+              ]
+            }
+          }
         },
         {
           "name": "Iniciar Tutorial (Clonar)",
@@ -287,8 +503,7 @@
                 }
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Actualizar Progreso",
@@ -315,8 +530,73 @@
                 }
               ]
             }
-          },
-          "response": []
+          }
+        },
+        {
+          "name": "Admin - Crear Tutorial",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Aprende a hacer dobladillos\",\n  \"description\": \"Guía paso a paso para dominar los dobladillos.\",\n  \"difficultyLevel\": \"Principiante\",\n  \"category\": \"Técnicas Básicas\",\n  \"estimatedTime\": 45,\n  \"materialsNeeded\": [\n    { \"name\": \"Hilo de algodón\", \"quantity\": \"1 bobina\" }\n  ],\n  \"steps\": [\n    { \"order\": 1, \"title\": \"Preparación\", \"description\": \"Enhebra la aguja.\" }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tutorials",
+              "host": ["{{baseUrl}}"],
+              "path": ["tutorials"]
+            }
+          }
+        },
+        {
+          "name": "Admin - Actualizar Tutorial",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Aprende a hacer dobladillos (Actualizado)\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/tutorials/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["tutorials", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "pegar_id_aqui"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Admin - Eliminar Tutorial",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/tutorials/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["tutorials", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "pegar_id_aqui"
+                }
+              ]
+            }
+          }
         }
       ]
     },
@@ -339,8 +619,7 @@
                 }
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Añadir Comentario",
@@ -367,8 +646,7 @@
                 }
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Dar Me Gusta a Proyecto (Atómico)",
@@ -386,8 +664,7 @@
                 }
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Crear Reporte de Moderación",
@@ -408,8 +685,7 @@
               "host": ["{{baseUrl}}"],
               "path": ["community", "reports"]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Admin - Cola de Moderación",
@@ -421,8 +697,52 @@
               "host": ["{{baseUrl}}"],
               "path": ["community", "admin", "moderation"]
             }
-          },
-          "response": []
+          }
+        },
+        {
+          "name": "Admin - Resolver Reporte",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"action\": \"Reviewed\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/community/admin/moderation/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["community", "admin", "moderation", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "pegar_id_aqui"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Admin - Eliminar Comentario (Severo)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/community/admin/comments/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["community", "admin", "comments", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "pegar_id_aqui"
+                }
+              ]
+            }
+          }
         }
       ]
     },
@@ -445,8 +765,7 @@
                 }
               ]
             }
-          },
-          "response": []
+          }
         }
       ]
     }
