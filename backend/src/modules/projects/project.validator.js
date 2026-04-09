@@ -1,9 +1,14 @@
+/**
+ * @fileoverview Esquemas de validación (Joi) para las operaciones de proyectos.
+ */
 const Joi = require('joi');
 
 const projectValidator = {
   createProject: Joi.object({
     title: Joi.string().max(100).required(),
-    projectType: Joi.string().valid('Nuevo', 'Comenzado desde Tutorial', 'Adaptado de la Comunidad').required(),
+    projectType: Joi.string()
+      .valid('Nuevo', 'Comenzado desde Tutorial', 'Adaptado de la Comunidad')
+      .required(),
     originalProjectId: Joi.string().allow('', null).optional(),
     clonesCount: Joi.number().min(0).optional(),
     category: Joi.string().required(),
@@ -15,7 +20,7 @@ const projectValidator = {
     materials: Joi.array()
       .items(
         Joi.object({
-          _id: Joi.any().optional(), // <-- NUEVO: Permitir el _id si viene
+          _id: Joi.any().optional(),
           name: Joi.string().required(),
           quantity: Joi.string().required(),
           notes: Joi.string().allow('', null).optional(),
@@ -30,7 +35,9 @@ const projectValidator = {
 
   updateProject: Joi.object({
     title: Joi.string().max(100).optional(),
-    projectType: Joi.string().valid('Nuevo', 'Comenzado desde Tutorial', 'Adaptado de la Comunidad').optional(),
+    projectType: Joi.string()
+      .valid('Nuevo', 'Comenzado desde Tutorial', 'Adaptado de la Comunidad')
+      .optional(),
     originalProjectId: Joi.string().allow('', null).optional(),
     clonesCount: Joi.number().min(0).optional(),
     category: Joi.string().optional(),
