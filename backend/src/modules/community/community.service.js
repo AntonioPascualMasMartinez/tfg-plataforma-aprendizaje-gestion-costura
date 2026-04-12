@@ -5,6 +5,7 @@ const Comment = require('./comment.model');
 const Report = require('./report.model');
 const Project = require('../projects/project.model');
 const ApiError = require('../../utils/apiError');
+const logger = require('../../config/logger');
 
 class CommunityService {
   /**
@@ -159,6 +160,7 @@ class CommunityService {
     if (!report) {
       throw new ApiError(404, 'Reporte de moderación no encontrado.');
     }
+    logger.info(`Reporte ${reportId} actualizado a estado ${action}`);
     return report;
   }
 
@@ -173,6 +175,7 @@ class CommunityService {
     if (!deleted) {
       throw new ApiError(404, 'Comentario no encontrado.');
     }
+    logger.info(`Acción Administrativa: Comentario ${commentId} eliminado por administrador ${adminId}`);
     return true;
   }
 }

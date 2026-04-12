@@ -1,32 +1,30 @@
+<div
+  class="scroll-progress-bar"
+  [style.width.%]="scrollProgress"
+  role="presentation"
+  aria-hidden="true"
+></div>
+
 <app-navbar></app-navbar>
 
-<!-- Scroll Progress Bar -->
-<div class="scroll-progress-bar" [style.width.%]="scrollProgress"></div>
+<main id="main-content">
+  <app-hero></app-hero>
 
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- HERO SECTION                                               -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<app-hero></app-hero>
+  <section aria-labelledby="features-title">
+    <app-features></app-features>
+  </section>
 
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- FEATURES – "Todo lo que puedes encontrar"                  -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<app-features></app-features>
+  <section aria-labelledby="works-title">
+    <app-works></app-works>
+  </section>
 
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- HOW IT WORKS – "Cómo funciona Needly"                      -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<app-works></app-works>
+  <section aria-labelledby="tutorials-title">
+    <app-tutorials></app-tutorials>
+  </section>
 
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- TUTORIALS – Carousel                                       -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<app-tutorials></app-tutorials>
-
-<!-- ═══════════════════════════════════════════════════════════ -->
-<!-- COMMUNITY SECTION                                          -->
-<!-- ═══════════════════════════════════════════════════════════ -->
-<app-community></app-community>
-
+  <section aria-labelledby="comunidad-title">
+    <app-community></app-community>
+  </section>
+</main>
 
 <app-footer></app-footer>

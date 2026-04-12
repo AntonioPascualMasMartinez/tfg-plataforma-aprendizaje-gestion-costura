@@ -9,12 +9,13 @@
   <div class="max-w-7xl mx-auto px-6 md:px-12 flex justify-between items-center">
     <a
       routerLink="/"
-      aria-label="Ir al inicio"
+      aria-label="Needly - Ir a la página de inicio"
       class="flex items-center gap-2 focus-visible:outline-focus rounded-xl px-1 group outline-offset-4"
     >
       <img
-        src="/logo/logo.png"
-        alt="Logo de Needly"
+        src="/logo/logo.webp"
+        alt=""
+        aria-hidden="true"
         class="w-12 h-12 md:w-14 md:h-14 object-contain transition-all duration-500 ease-out group-hover:scale-110 group-hover:rotate-[-5deg]"
         [class.invert]="isDarkMode()"
       />
@@ -28,24 +29,28 @@
         href="/#encontrar"
         class="nav-link cursor-pointer"
         [class.active]="activeSection() === 'encontrar'"
+        [attr.aria-current]="activeSection() === 'encontrar' ? 'page' : null"
         >Encontrar</a
       >
       <a
         href="/#funcionamiento"
         class="nav-link cursor-pointer"
         [class.active]="activeSection() === 'funcionamiento'"
+        [attr.aria-current]="activeSection() === 'funcionamiento' ? 'page' : null"
         >Funcionamiento</a
       >
       <a
         href="/#tutoriales"
         class="nav-link cursor-pointer"
         [class.active]="activeSection() === 'tutoriales'"
+        [attr.aria-current]="activeSection() === 'tutoriales' ? 'page' : null"
         >Biblioteca</a
       >
       <a
         href="/#comunidad"
         class="nav-link cursor-pointer"
         [class.active]="activeSection() === 'comunidad'"
+        [attr.aria-current]="activeSection() === 'comunidad' ? 'page' : null"
         >Comunidad</a
       >
     </nav>
@@ -54,9 +59,10 @@
       <button
         (click)="toggleTheme()"
         class="relative flex items-center justify-center w-10 h-10 rounded-full text-text-main hover:bg-black/10 dark:hover:bg-white/20 transition-all duration-300 hover:scale-105 cursor-pointer focus-visible:outline-focus"
-        [attr.aria-label]="isDarkMode() ? 'Activar modo claro' : 'Activar modo oscuro'"
+        [attr.aria-label]="isDarkMode() ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'"
       >
         <svg
+          aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -75,6 +81,7 @@
         </svg>
 
         <svg
+          aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -102,10 +109,11 @@
         </a>
         <a
           routerLink="/auth/register"
-          class="btn btn-primary relative overflow-hidden group shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300"
+          class="btn btn-primary relative overflow-hidden group shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-300 focus-visible:outline-focus"
         >
           <span class="relative z-10">Regístrate gratis</span>
           <div
+            aria-hidden="true"
             class="absolute inset-0 h-full w-full bg-linear-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:animate-shimmer z-0"
           ></div>
         </a>
@@ -115,10 +123,11 @@
         class="md:hidden flex items-center justify-center p-2 text-text-main hover:text-primary transition-colors focus-visible:outline-focus rounded-lg cursor-pointer"
         (click)="toggleMobileMenu($event)"
         [attr.aria-expanded]="isMobileMenuOpen()"
-        aria-controls="mobile-menu"
-        aria-label="Alternar menú de navegación"
+        aria-controls="mobile-navigation"
+        aria-label="Menú principal"
       >
         <svg
+          aria-hidden="true"
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
           viewBox="0 0 24 24"
@@ -151,23 +160,31 @@
     aria-hidden="true"
   ></div>
 
-  <div
-    id="mobile-menu"
+  <nav
+    id="mobile-navigation"
     class="md:hidden absolute top-[110%] left-4 right-4 bg-surface/95 backdrop-blur-2xl border border-border-main/10 shadow-2xl rounded-3xl overflow-hidden transition-all duration-500 ease-spring origin-top"
     [ngClass]="{
       'scale-100 opacity-100 visible translate-y-0': isMobileMenuOpen(),
       'scale-95 opacity-0 invisible -translate-y-4 pointer-events-none': !isMobileMenuOpen(),
     }"
+    aria-label="Menú móvil"
   >
-    <nav class="flex flex-col p-6 gap-2">
+    <div class="flex flex-col p-6 gap-2">
       <a
         href="/#encontrar"
         (click)="closeMobileMenu()"
         class="mobile-nav-link cursor-pointer"
         [class.active]="activeSection() === 'encontrar'"
+        [attr.aria-current]="activeSection() === 'encontrar' ? 'page' : null"
       >
         <span class="text-xl">Encontrar</span>
-        <svg class="w-5 h-5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg
+          aria-hidden="true"
+          class="w-5 h-5 text-muted"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
         </svg>
       </a>
@@ -176,6 +193,7 @@
         (click)="closeMobileMenu()"
         class="mobile-nav-link cursor-pointer"
         [class.active]="activeSection() === 'funcionamiento'"
+        [attr.aria-current]="activeSection() === 'funcionamiento' ? 'page' : null"
       >
         <span class="text-xl">Funcionamiento</span>
       </a>
@@ -184,6 +202,7 @@
         (click)="closeMobileMenu()"
         class="mobile-nav-link cursor-pointer"
         [class.active]="activeSection() === 'tutoriales'"
+        [attr.aria-current]="activeSection() === 'tutoriales' ? 'page' : null"
       >
         <span class="text-xl">Biblioteca</span>
       </a>
@@ -192,11 +211,12 @@
         (click)="closeMobileMenu()"
         class="mobile-nav-link cursor-pointer"
         [class.active]="activeSection() === 'comunidad'"
+        [attr.aria-current]="activeSection() === 'comunidad' ? 'page' : null"
       >
         <span class="text-xl">Comunidad</span>
       </a>
 
-      <div class="h-px bg-border-main/10 my-4"></div>
+      <div class="h-px bg-border-main/10 my-4" aria-hidden="true"></div>
 
       <div class="flex flex-col gap-3">
         <a
@@ -214,6 +234,6 @@
           Regístrate gratis
         </a>
       </div>
-    </nav>
-  </div>
+    </div>
+  </nav>
 </header>

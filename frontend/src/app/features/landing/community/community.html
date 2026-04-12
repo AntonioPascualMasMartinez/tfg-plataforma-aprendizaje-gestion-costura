@@ -2,31 +2,25 @@
   appScrollAnimate
   id="comunidad"
   class="w-full bg-bg py-24 px-6 md:px-12 relative overflow-hidden"
+  aria-labelledby="comunidad-title"
 >
-  <div class="absolute inset-0 z-0">
+  <div class="absolute inset-0 z-0" aria-hidden="true">
     <div class="absolute top-10 left-10 w-64 h-64 bg-like/5 rounded-2xl rotate-3"></div>
     <div class="absolute bottom-20 right-20 w-80 h-80 bg-warning/5 rounded-3xl -rotate-6"></div>
     <div class="absolute top-40 right-1/4 w-48 h-48 bg-info/5 rounded-xl rotate-12"></div>
   </div>
-  <div
-    class="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-size-[24px_24px]"
-  ></div>
-  <div
-    class="absolute right-0 top-0 -translate-y-1/4 translate-x-1/4 w-125 h-125 bg-like/5 rounded-full blur-[120px] pointer-events-none"
-  ></div>
-  <div
-    class="absolute left-0 bottom-0 translate-y-1/4 -translate-x-1/4 w-100 h-100 bg-info/5 rounded-full blur-[100px] pointer-events-none"
-  ></div>
 
   <div class="max-w-7xl mx-auto relative z-10">
     <header class="mb-16 max-w-3xl flex flex-col md:flex-row md:items-end justify-between gap-8">
       <div>
         <h2
+          id="comunidad-title"
           class="text-[44px] md:text-[64px] font-display font-bold tracking-tight text-text-main leading-[1.05]"
         >
           Hecho por la <br class="hidden md:block" />
           <span
             class="text-shimmer text-transparent bg-clip-text bg-[linear-gradient(90deg,#fe386a,#FF8C42,#fe386a)] bg-size-[200%_auto]"
+            aria-label="comunidad"
             >comunidad</span
           >
         </h2>
@@ -37,10 +31,12 @@
     </header>
 
     <div
+      role="list"
       class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 md:gap-4 lg:gap-10 items-center pt-8 pb-12"
     >
       @for (post of communityPosts; track post._id; let i = $index) {
         <div
+          role="listitem"
           class="polaroid-card relative hover:z-50 group/polaroid cursor-pointer"
           [ngClass]="{
             '-rotate-3 md:-rotate-6 hover:rotate-0 hover:scale-105 origin-bottom-right': i === 0,
@@ -50,16 +46,12 @@
           }"
         >
           <div
+            aria-hidden="true"
             class="absolute -inset-1 bg-linear-to-br from-like/0 to-primary/0 group-hover/polaroid:from-like/25 group-hover/polaroid:to-primary/25 rounded-4xl blur-md opacity-0 group-hover/polaroid:opacity-100 transition-all duration-500 z-0"
           ></div>
 
           <div
-            class="relative z-10 w-full h-full bg-surface rounded-2xl overflow-hidden isolate"
-            style="
-              transform: translateZ(0);
-              mask-image: radial-gradient(white, black);
-              -webkit-mask-image: -webkit-radial-gradient(white, black);
-            "
+            class="relative z-10 w-full h-full bg-surface rounded-2xl overflow-hidden isolate focus-within:ring-4 focus-within:ring-primary/40"
           >
             <app-community-card
               [project]="post"
