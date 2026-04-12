@@ -15,7 +15,7 @@
     <asl-google-signin-button type="standard" size="large" [width]="400"></asl-google-signin-button>
   </div>
 
-  <div class="relative flex items-center mb-8">
+  <div class="relative flex items-center mb-8" aria-hidden="true">
     <div class="grow border-t border-border-main/15"></div>
     <span class="shrink-0 mx-4 text-muted/70 text-[12px] font-bold uppercase tracking-widest">
       O usa tu correo
@@ -23,7 +23,7 @@
     <div class="grow border-t border-border-main/15"></div>
   </div>
 
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6">
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-6" novalidate>
     <div class="flex flex-col gap-2">
       <label for="email" class="text-[14px] font-semibold text-text-main ml-1">
         Correo electrónico
@@ -33,6 +33,7 @@
           class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-muted group-focus-within:text-primary transition-colors"
         >
           <svg
+            aria-hidden="true"
             class="w-5 h-5"
             fill="none"
             viewBox="0 0 24 24"
@@ -50,7 +51,16 @@
           type="email"
           id="email"
           formControlName="email"
+          autocomplete="email"
           placeholder="tu@email.com"
+          [attr.aria-invalid]="
+            loginForm.get('email')?.invalid && loginForm.get('email')?.touched ? 'true' : 'false'
+          "
+          [attr.aria-describedby]="
+            loginForm.get('email')?.invalid && loginForm.get('email')?.touched
+              ? 'email-error'
+              : null
+          "
           class="w-full h-13 pl-11 pr-4 rounded-2xl border border-border-main/15 bg-surface-hover/30 text-text-main outline-none focus:bg-surface focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all duration-300"
           [class.border-danger]="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
           [class.focus:ring-danger/20]="
@@ -58,6 +68,11 @@
           "
         />
       </div>
+      @if (loginForm.get('email')?.invalid && loginForm.get('email')?.touched) {
+        <span id="email-error" class="text-danger text-[13px] font-medium" aria-live="polite">
+          Ingresa un correo electrónico válido.
+        </span>
+      }
     </div>
 
     <div class="flex flex-col gap-2">
@@ -75,6 +90,7 @@
           class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-muted group-focus-within:text-primary transition-colors"
         >
           <svg
+            aria-hidden="true"
             class="w-5 h-5"
             fill="none"
             viewBox="0 0 24 24"
@@ -92,7 +108,18 @@
           [type]="showPassword ? 'text' : 'password'"
           id="password"
           formControlName="password"
+          autocomplete="current-password"
           placeholder="••••••••"
+          [attr.aria-invalid]="
+            loginForm.get('password')?.invalid && loginForm.get('password')?.touched
+              ? 'true'
+              : 'false'
+          "
+          [attr.aria-describedby]="
+            loginForm.get('password')?.invalid && loginForm.get('password')?.touched
+              ? 'password-error'
+              : null
+          "
           class="w-full h-13 pl-11 pr-11 rounded-2xl border border-border-main/15 bg-surface-hover/30 text-text-main outline-none focus:bg-surface focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all duration-300"
           [class.border-danger]="
             loginForm.get('password')?.invalid && loginForm.get('password')?.touched
@@ -105,12 +132,13 @@
         <button
           type="button"
           (click)="togglePasswordVisibility()"
-          class="absolute inset-y-0 right-0 pr-4 flex items-center text-muted hover:text-primary transition-colors focus:outline-none"
-          tabindex="-1"
-          aria-label="Alternar visibilidad de la contraseña"
+          [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+          [attr.aria-pressed]="showPassword"
+          class="absolute inset-y-0 right-0 pr-4 flex items-center text-muted hover:text-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-r-2xl"
         >
           @if (showPassword) {
             <svg
+              aria-hidden="true"
               class="w-5 h-5"
               fill="none"
               viewBox="0 0 24 24"
@@ -125,6 +153,7 @@
             </svg>
           } @else {
             <svg
+              aria-hidden="true"
               class="w-5 h-5"
               fill="none"
               viewBox="0 0 24 24"
@@ -145,13 +174,21 @@
           }
         </button>
       </div>
+      @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+        <span id="password-error" class="text-danger text-[13px] font-medium" aria-live="polite">
+          La contraseña es obligatoria.
+        </span>
+      }
     </div>
 
     @if (errorMessage) {
       <div
+        role="alert"
+        aria-live="assertive"
         class="flex items-center gap-3 text-[14px] text-danger bg-danger/5 p-4 rounded-2xl border border-danger/20 font-medium animate-fadeIn"
       >
         <svg
+          aria-hidden="true"
           class="w-5 h-5 shrink-0"
           fill="none"
           viewBox="0 0 24 24"
@@ -171,11 +208,13 @@
     <button
       type="submit"
       [disabled]="loginForm.invalid || isLoading"
-      class="btn btn-primary relative w-full h-13 mt-2 rounded-2xl shadow-[0_8px_20px_-6px_rgba(255,89,0,0.3)] hover:shadow-[0_12px_24px_-8px_rgba(255,89,0,0.45)] hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none text-[16px] overflow-hidden"
+      [attr.aria-busy]="isLoading"
+      class="btn btn-primary relative w-full h-13 mt-2 rounded-2xl shadow-[0_8px_20px_-6px_rgba(255,89,0,0.3)] hover:shadow-[0_12px_24px_-8px_rgba(255,89,0,0.45)] hover:-translate-y-0.5 transition-all duration-300 disabled:opacity-60 disabled:hover:translate-y-0 disabled:hover:shadow-none text-[16px] overflow-hidden focus-visible:outline-focus"
     >
       @if (isLoading) {
         <span class="flex items-center justify-center gap-2">
           <svg
+            aria-hidden="true"
             class="animate-spin h-5 w-5 text-white"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"

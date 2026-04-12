@@ -16,7 +16,11 @@
       </p>
     </div>
 
-    <div class="flex items-center gap-2 mb-8">
+    <div
+      class="flex items-center gap-2 mb-8"
+      role="img"
+      [attr.aria-label]="'Paso ' + currentStep + ' de 2'"
+    >
       <div
         class="h-2 flex-1 rounded-full transition-colors duration-300"
         [class]="currentStep >= 1 ? 'bg-primary' : 'bg-primary/20'"
@@ -27,7 +31,7 @@
       ></div>
     </div>
 
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-5">
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-5" novalidate>
       @if (currentStep === 1) {
         <div class="w-full flex justify-center mb-2">
           <asl-google-signin-button
@@ -37,50 +41,88 @@
           ></asl-google-signin-button>
         </div>
 
-        <div class="relative flex items-center mb-2">
+        <div class="relative flex items-center mb-2" aria-hidden="true">
           <div class="grow border-t border-border-main/20"></div>
           <span class="shrink-0 mx-4 text-muted text-[14px] font-medium">O con tu correo</span>
           <div class="grow border-t border-border-main/20"></div>
         </div>
 
         <div class="flex flex-col gap-2">
-          <label for="displayName">Nombre completo</label>
+          <label for="displayName" class="font-semibold text-text-main">Nombre completo</label>
           <input
             type="text"
             id="displayName"
             formControlName="displayName"
+            autocomplete="name"
             placeholder="Ana Costurera"
             class="h-12 px-4 rounded-xl border border-border-main/20 bg-surface text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
             [class.border-danger]="
               registerForm.get('displayName')?.invalid && registerForm.get('displayName')?.touched
             "
+            [attr.aria-invalid]="
+              registerForm.get('displayName')?.invalid && registerForm.get('displayName')?.touched
+            "
+            [attr.aria-describedby]="
+              registerForm.get('displayName')?.invalid && registerForm.get('displayName')?.touched
+                ? 'displayName-error'
+                : null
+            "
           />
+          @if (
+            registerForm.get('displayName')?.invalid && registerForm.get('displayName')?.touched
+          ) {
+            <span
+              id="displayName-error"
+              class="text-danger text-[13px] font-medium"
+              aria-live="polite"
+            >
+              El nombre debe tener al menos 3 caracteres.
+            </span>
+          }
         </div>
 
         <div class="flex flex-col gap-2">
-          <label for="email">Correo electrónico</label>
+          <label for="email" class="font-semibold text-text-main">Correo electrónico</label>
           <input
             type="email"
             id="email"
             formControlName="email"
+            autocomplete="email"
             placeholder="tu@email.com"
             class="h-12 px-4 rounded-xl border border-border-main/20 bg-surface text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
             [class.border-danger]="
               registerForm.get('email')?.invalid && registerForm.get('email')?.touched
             "
+            [attr.aria-invalid]="
+              registerForm.get('email')?.invalid && registerForm.get('email')?.touched
+            "
+            [attr.aria-describedby]="
+              registerForm.get('email')?.invalid && registerForm.get('email')?.touched
+                ? 'email-error'
+                : null
+            "
           />
+          @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+            <span id="email-error" class="text-danger text-[13px] font-medium" aria-live="polite">
+              Introduce un correo electrónico válido.
+            </span>
+          }
         </div>
 
         <div class="flex flex-col gap-2">
-          <label for="password">Contraseña</label>
+          <label for="password" class="font-semibold text-text-main">Contraseña</label>
           <div class="relative">
             <input
               [type]="showPassword ? 'text' : 'password'"
               id="password"
               formControlName="password"
+              autocomplete="new-password"
               placeholder="Mínimo 8 caracteres"
               class="w-full h-12 pl-4 pr-11 rounded-xl border border-border-main/20 bg-surface text-text-main outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all"
               [class.border-danger]="
+                registerForm.get('password')?.invalid && registerForm.get('password')?.touched
+              "
+              [attr.aria-invalid]="
                 registerForm.get('password')?.invalid && registerForm.get('password')?.touched
               "
             />
@@ -88,12 +130,13 @@
             <button
               type="button"
               (click)="togglePasswordVisibility()"
-              class="absolute inset-y-0 right-0 pr-3 flex items-center text-muted hover:text-primary transition-colors focus:outline-none"
-              tabindex="-1"
-              aria-label="Alternar visibilidad de la contraseña"
+              [attr.aria-label]="showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'"
+              [attr.aria-pressed]="showPassword"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center text-muted hover:text-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary rounded-r-xl"
             >
               @if (showPassword) {
                 <svg
+                  aria-hidden="true"
                   class="w-5 h-5"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -108,6 +151,7 @@
                 </svg>
               } @else {
                 <svg
+                  aria-hidden="true"
                   class="w-5 h-5"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -134,7 +178,7 @@
           type="button"
           (click)="nextStep()"
           [disabled]="!isStep1Valid"
-          class="btn btn-primary w-full mt-4 shadow-lg shadow-primary/20 transition-all disabled:opacity-70 disabled:hover:translate-y-0 hover:-translate-y-0.5"
+          class="btn btn-primary w-full mt-4 shadow-lg shadow-primary/20 transition-all disabled:opacity-70 disabled:hover:translate-y-0 hover:-translate-y-0.5 focus-visible:outline-focus"
         >
           Continuar
         </button>
@@ -142,7 +186,7 @@
 
       @if (currentStep === 2) {
         <div class="flex flex-col gap-2">
-          <label for="sewingLevel">
+          <label for="sewingLevel" class="font-semibold text-text-main">
             Nivel de costura <span class="text-muted text-[13px] font-normal">(Opcional)</span>
           </label>
           <select
@@ -156,20 +200,20 @@
           </select>
         </div>
 
-        <div class="flex flex-col gap-2">
-          <label>
+        <fieldset class="flex flex-col gap-2 border-none p-0 m-0">
+          <legend class="font-semibold text-text-main mb-2">
             ¿Qué te interesa? <span class="text-muted text-[13px] font-normal">(Opcional)</span>
-          </label>
+          </legend>
           <div class="flex flex-wrap gap-2 mt-1">
             @for (interest of interestsList; track interest) {
               <label
-                class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-border-main/20 bg-surface cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-colors has-checked:border-primary has-checked:bg-primary/10"
+                class="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-border-main/20 bg-surface cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-colors focus-within:ring-2 focus-within:ring-primary"
               >
                 <input
                   type="checkbox"
                   [value]="interest"
                   (change)="onInterestChange($event)"
-                  class="accent-primary w-4 h-4 cursor-pointer"
+                  class="accent-primary w-4 h-4 cursor-pointer outline-none"
                 />
                 <span class="text-[14px] font-medium text-text-main select-none">{{
                   interest
@@ -177,10 +221,11 @@
               </label>
             }
           </div>
-        </div>
+        </fieldset>
 
         @if (errorMessage) {
           <div
+            role="alert"
             class="text-[14px] text-danger bg-danger/10 p-3 rounded-lg border border-danger/20 font-medium mt-2"
           >
             {{ errorMessage }}
@@ -191,7 +236,7 @@
           <button
             type="button"
             (click)="prevStep()"
-            class="btn btn-secondary w-1/3 hover:bg-surface"
+            class="btn btn-secondary w-1/3 hover:bg-surface focus-visible:outline-focus"
           >
             Atrás
           </button>
@@ -199,10 +244,33 @@
           <button
             type="submit"
             [disabled]="registerForm.invalid || isLoading"
-            class="btn btn-primary w-2/3 shadow-lg shadow-primary/20 hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:hover:translate-y-0"
+            [attr.aria-busy]="isLoading"
+            class="btn btn-primary w-2/3 shadow-lg shadow-primary/20 hover:-translate-y-0.5 transition-all disabled:opacity-70 disabled:hover:translate-y-0 focus-visible:outline-focus"
           >
             @if (isLoading) {
-              Creando...
+              <span class="flex items-center justify-center gap-2">
+                <svg
+                  aria-hidden="true"
+                  class="animate-spin h-4 w-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    class="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    stroke-width="4"
+                  ></circle>
+                  <path
+                    class="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                  ></path>
+                </svg>
+                Creando...
+              </span>
             } @else {
               Crear cuenta
             }
@@ -215,15 +283,18 @@
       ¿Ya tienes una cuenta?
       <a
         routerLink="/auth/login"
-        class="font-bold text-text-main hover:text-primary transition-colors focus-visible:outline-focus rounded-sm"
+        class="font-bold text-text-main hover:text-primary transition-colors focus-visible:outline-focus rounded-sm underline decoration-primary/30 underline-offset-4"
         >Inicia sesión</a
       >
     </p>
   }
 
   @if (currentStep === 3) {
-    <div class="flex flex-col items-center text-center py-8">
-      <div class="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mb-6">
+    <div class="flex flex-col items-center text-center py-8" role="status" aria-live="polite">
+      <div
+        class="w-16 h-16 bg-success/10 rounded-full flex items-center justify-center mb-6"
+        aria-hidden="true"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           fill="none"
@@ -247,7 +318,7 @@
 
       <a
         routerLink="/auth/login"
-        class="btn btn-primary w-full shadow-lg shadow-primary/20 hover:-translate-y-0.5 transition-all"
+        class="btn btn-primary w-full shadow-lg shadow-primary/20 hover:-translate-y-0.5 transition-all focus-visible:outline-focus"
       >
         Ir a iniciar sesión
       </a>

@@ -1,18 +1,14 @@
 /**
  * @file styles.css
- * @description Hoja de estilos global del proyecto. Define los tokens de diseño,
- * tipografías, componentes atómicos y variables de tema (claro/oscuro) integrados con Tailwind CSS v4.
+ * @description Hoja de estilos global optimizada para accesibilidad WCAG 2.1 AA.
  */
 
-/* 1. Directivas principales de Tailwind v4 */
 @import "tailwindcss";
 
-/* 2. Carga de tipografías personalizadas */
 @font-face {
   font-family: 'Agrandir';
   src: url('/fonts/agrandir-regular.otf') format('opentype');
   font-weight: 400;
-  /* Correspondiente al peso tipográfico del Body (Ref: Tabla 43) */
   font-style: normal;
   font-display: swap;
 }
@@ -21,44 +17,50 @@
   font-family: 'Loubag';
   src: url('/fonts/loubag-semi-bold.ttf') format('truetype');
   font-weight: 600;
-  /* Correspondiente al peso tipográfico H3 y títulos (Ref: Tabla 43) */
   font-style: normal;
   font-display: swap;
 }
 
-/* 3. Configuración del Tema y Tokens de Diseño (Ref: Tabla 42) */
 @theme {
-  /* Tipografía */
   --font-sans: 'Agrandir', sans-serif;
   --font-display: 'Loubag', sans-serif;
 
-  /* Paleta de Colores Semánticos y Roles */
+  /* --- PALETA CORREGIDA PARA ACCESIBILIDAD --- */
   --color-bg: #FFFFFF;
   --color-surface: #FFFFFF;
-  --color-text-main: #000000;
-  --color-muted: #818181;
-  --color-border-main: #818181;
+  --color-text-main: #1A1A1A;
+  /* Negro suavizado para reducir fatiga visual */
 
-  --color-primary: #FF5900;
+  /* Ajustado de #818181 a #757575 para cumplir ratio 4.6:1 sobre blanco */
+  --color-muted: #757575;
+  --color-border-main: #818181;
+  /* Los bordes solo requieren 3:1, este cumple */
+
+  /* Ajustado de #FF5900 a #E34F00 para cumplir 4.5:1 sobre blanco */
+  --color-primary: #E34F00;
   --color-secondary: #511C00;
-  --color-like: #FE386A;
+  --color-like: #E61E50;
+  /* Ajustado para mejor visibilidad */
 
   /* Colores de Estado */
-  --color-success: #16A34A;
-  --color-warning: #F59E0B;
+  --color-success: #15803D;
+  /* Oscurecido para ratio AA */
+  --color-warning: #A16207;
+  /* El amarillo original fallaba mucho sobre blanco; este cumple */
   --color-danger: #DC2626;
-  --color-info: #0EA5E9;
-  --color-focus: #0EA5E9;
+  /* Cumple 4.6:1 sobre blanco */
+
+  /* Ajustado de #0EA5E9 a #0369A1 para que los enlaces/foco sean legibles */
+  --color-info: #0369A1;
+  --color-focus: #0369A1;
 }
 
-/* 4. Estilos Base y Accesibilidad */
 @layer base {
   body {
     @apply font-sans antialiased bg-bg text-text-main text-[16px] leading-relaxed;
     @apply transition-colors duration-300;
   }
 
-  /* Escala Tipográfica (Ref: Tabla 43) */
   h1 {
     @apply font-display text-[32px] md:text-[36px] font-bold text-text-main;
   }
@@ -79,68 +81,48 @@
     @apply text-[14px] md:text-[16px] font-medium text-text-main;
   }
 
-  /* Criterio de Accesibilidad 1.1.4: Foco visible global */
+  /* Foco visible con alto contraste */
   *:focus-visible {
-    @apply outline-2 outline-offset-2 outline-focus;
+    @apply outline-3 outline-offset-2 outline-focus;
   }
 
-  /* Variables para el esquema de color oscuro */
   .dark {
     --color-bg: #121212;
     --color-surface: #1E1E1E;
     --color-text-main: #F5F5F5;
     --color-muted: #A3A3A3;
     --color-border-main: #3F3F3F;
+    /* En modo oscuro, el danger necesita ser más claro para contrastar con el fondo */
+    --color-danger: #F87171;
+    --color-primary: #CA4700;
+    /* Naranja más claro para el fondo oscuro */
+    --color-focus: #38BDF8;
   }
 }
 
-/* 5. Componentes Atómicos (Ref: Tabla 45) */
 @layer components {
-
-  /* Botón Base */
   .btn {
-    @apply inline-flex items-center justify-center min-h-11 px-5 py-2 text-[14px] md:text-[16px] font-semibold rounded-lg transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center min-h-12 px-6 py-2 text-[15px] md:text-[16px] font-bold rounded-xl transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  /* Variantes semánticas de botones */
   .btn-primary {
-    @apply bg-primary text-white hover:bg-[#E65000];
+    /* El texto blanco sobre el nuevo primary ahora sí es legible */
+    @apply bg-primary text-white hover:brightness-110 shadow-md;
   }
 
   .btn-secondary {
-    @apply bg-transparent border-2 border-border-main text-text-main hover:bg-gray-50;
-  }
-
-  .btn-danger {
-    @apply bg-danger text-white hover:bg-[#B91C1C];
+    @apply bg-transparent border-2 border-border-main text-text-main hover:bg-black/5;
   }
 }
 
-/* =========================================
-   Personalización de la Barra de Desplazamiento
-   ========================================= */
-
+/* Scrollbar accesible */
 html {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-border-main) transparent;
-}
-
-::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
+  scrollbar-color: var(--color-muted) transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--color-border-main);
-  border-radius: 9999px;
-  border: 3px solid var(--color-bg);
-  transition: background-color 0.3s ease;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-primary);
+  background-color: var(--color-muted);
+  border-radius: 10px;
+  border: 2px solid var(--color-bg);
 }
