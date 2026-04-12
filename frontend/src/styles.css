@@ -37,7 +37,7 @@
   /* Los bordes solo requieren 3:1, este cumple */
 
   /* Ajustado de #FF5900 a #E34F00 para cumplir 4.5:1 sobre blanco */
-  --color-primary: #E34F00;
+  --color-primary: #CA4700;
   --color-secondary: #511C00;
   --color-like: #E61E50;
   /* Ajustado para mejor visibilidad */
@@ -106,8 +106,17 @@
   }
 
   .btn-primary {
-    /* El texto blanco sobre el nuevo primary ahora sí es legible */
-    @apply bg-primary text-white hover:brightness-110 shadow-md;
+    /* Fondo con el nuevo primary accesible y texto blanco puro */
+    @apply bg-primary text-white font-bold transition-all duration-300;
+
+    /* Hover oscurecido para mantener contraste AA (Ratio > 4.5:1) */
+    &:hover {
+      background-color: #A63A00;
+      @apply -translate-y-1 shadow-xl;
+    }
+
+    /* Mejora de la visibilidad de la sombra (Criterio 1.4.11) */
+    @apply shadow-md shadow-primary/20;
   }
 
   .btn-secondary {
