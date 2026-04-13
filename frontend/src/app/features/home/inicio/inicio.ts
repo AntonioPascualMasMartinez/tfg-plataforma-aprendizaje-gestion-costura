@@ -25,6 +25,8 @@ import { QuickActionsComponent } from './components/quick-actions/quick-actions.
 import { ProjectCollectionComponent } from './components/project-collection/project-collection.component';
 import { RecommendedTutorialComponent } from './components/recommended-tutorial/recommended-tutorial.component';
 
+import { AuthService } from '../../../core/services/auth.service';
+
 @Component({
   selector: 'app-inicio',
   standalone: true,
@@ -47,6 +49,7 @@ export class Inicio implements OnInit {
   private tutorialService = inject(TutorialService);
   private cdr = inject(ChangeDetectorRef);
   private router = inject(Router);
+  private authService = inject(AuthService);
 
   /* --- ESTADO DE LA APLICACIÓN --- */
 
@@ -65,6 +68,7 @@ export class Inicio implements OnInit {
   isLoadingUser = true;
   isLoadingProjects = true;
   isLoadingTutorial = true;
+  isLoadingLogout = false;
 
   /* --- CONTROLADORES DE ESTADO PARA COMPONENTES FLOTANTES (MODALES) --- */
   isCreateModalOpen = false;
@@ -176,6 +180,29 @@ export class Inicio implements OnInit {
   handleProjectPublished(project: Project): void {
     this.isPublishModalOpen = false;
     this.loadMyProjects();
+  }
+
+  handleLogout(): void {
+    this.isLoadingLogout = true;
+    this.cdr.detectChanges();
+
+    this.authService.logout().subscribe({
+      next: () => {
+        // Elimina el token y redirige al login
+        localStorage.removeItem('accessToken');
+        this.router.navigate(['/auth/login']);
+      },
+      error: (err) => {
+        console.error('Error al cerrar sesión:', err);
+        // Estrategia de degradación segura: forzar salida local
+        localStorage.removeItem('accessToken');
+        this.router.navigate(['/auth/login']);
+      },
+      complete: () => {
+        this.isLoadingLogout = false;
+        this.cdr.detectChanges();
+      },
+    });
   }
 
   openTutorialModal(tutorial: Tutorial): void {
