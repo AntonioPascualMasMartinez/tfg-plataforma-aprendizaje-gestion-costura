@@ -19,7 +19,7 @@ import { CreateProjectModal } from '../../../shared/modals/create-project/create
 import { ToastService } from '../../../core/services/toast.service';
 
 /** Definición tipada de los contextos de visualización disponibles en el área de trabajo. */
-type ViewMode = 'taller' | 'portafolio' | 'tutoriales' | 'comunidad';
+type ViewMode = 'todo' | 'borradores' | 'publicados' | 'tutoriales' | 'comunidad';
 
 @Component({
   selector: 'app-proyectos',
@@ -44,7 +44,7 @@ export class Proyectos implements OnInit, OnDestroy {
   projects: Project[] = [];
   isLoading = true;
   /** Contexto de navegación inicial establecido en el área de desarrollo privado */
-  activeView: ViewMode = 'taller';
+  activeView: ViewMode = 'todo';
 
   /* Controles reactivos para el motor de filtrado y ordenación */
   searchTerm = new FormControl('');
@@ -142,37 +142,47 @@ export class Proyectos implements OnInit, OnDestroy {
     let projectType: string | undefined = undefined;
     let isPublic: boolean | undefined = undefined;
 
-    /* Resolución paramétrica en función del contexto de negocio seleccionado */
+    // 3. Actualiza el switch con las nuevas reglas de negocio
     switch (this.activeView) {
-      case 'taller':
-        projectType = 'Nuevo';
-        isPublic = false;
+      case 'todo':
+        projectType = undefined;
+        isPublic = undefined;
         break;
-      case 'portafolio':
+      case 'publicados':
         projectType = 'Nuevo';
         isPublic = true;
         break;
+      case 'borradores':
+        projectType = 'Nuevo';
+        isPublic = false;
+        break;
       case 'tutoriales':
         projectType = 'Comenzado desde Tutorial';
-        isPublic = false;
+        isPublic = undefined;
         break;
       case 'comunidad':
         projectType = 'Adaptado de la Comunidad';
-        isPublic = false;
+        isPublic = undefined;
         break;
     }
-
     this.projectService
       .getMyProjects(this.currentPage, 9, status, sortBy, search, projectType, isPublic)
       .subscribe({
         next: (response) => {
           if (response.data) {
             let fetchedDocs = response.data.docs;
-
+            console.log('Proyectos recuperados del servidor:', fetchedDocs);
             /* Procesamiento local complementario para el filtrado por dificultad */
             const difficulty = this.difficultyFilter.value || 'Todas';
             if (difficulty !== 'Todas') {
               fetchedDocs = fetchedDocs.filter((p: Project) => p.difficulty === difficulty);
+            }
+
+            /* -------------------------------------------------------------
+               NUEVO: Procesamiento local de seguridad para isPublic 
+               ------------------------------------------------------------- */
+            if (isPublic !== undefined) {
+              fetchedDocs = fetchedDocs.filter((p: Project) => p.isPublic === isPublic);
             }
 
             this.projects = fetchedDocs;
