@@ -57,9 +57,10 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
   isLoadingComments = false;
 
   /* --- CONTROL DE LA INTERFAZ DE USUARIO --- */
-  activeTab: WorkshopTab = 'pasos';
+  activeTab: WorkshopTab = 'materiales';
   activeStepIndex = 0;
-
+  showFinishModal = true;
+  
   /* --- SISTEMA DE BITÁCORA PRIVADA (Gestión Reactiva) --- */
   notesControl = new FormControl('');
   isSavingNotes = false;
@@ -121,6 +122,13 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
           this.loadOriginalData(this.project.originalProjectId);
         }
 
+        if (this.project.steps && this.project.steps.length > 0) {
+          const firstPendingIndex = this.project.steps.findIndex((s) => s.status !== 'Completado');
+          // Si todos están completados, ir al último; si no, al primero pendiente
+          this.activeStepIndex =
+            firstPendingIndex === -1 ? this.project.steps.length - 1 : firstPendingIndex;
+        }
+
         this.isLoading = false;
         this.cdr.detectChanges();
       },
@@ -129,6 +137,18 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
         this.router.navigate(['/home/proyectos']);
       },
     });
+  }
+
+  /**
+   * Formatea el tiempo transcurrido (actualTime) de minutos a un formato legible.
+   * El campo actualTime debe venir en el objeto project.
+   */
+  get formattedActualTime(): string {
+    const mins = this.project?.actualTime || 0;
+    if (mins < 60) return `${mins}m`;
+    const h = Math.floor(mins / 60);
+    const m = mins % 60;
+    return m > 0 ? `${h}h ${m}m` : `${h}h`;
   }
 
   /**
@@ -169,22 +189,28 @@ export class ProjectWorkshop implements OnInit, OnDestroy {
   toggleStepStatus(index: number): void {
     if (!this.project) return;
     const step = this.project.steps[index];
-    step.status = step.status === 'Completado' ? 'Pendiente' : 'Completado';
+    const isCompleting = step.status !== 'Completado';
+
+    step.status = isCompleting ? 'Completado' : 'Pendiente';
 
     this.projectService
       .updateProject(this.project._id, { steps: this.project.steps } as any)
       .subscribe({
         next: () => {
-          if (
-            step.status === 'Completado' &&
-            this.activeStepIndex < this.project!.steps.length - 1
-          ) {
-            setTimeout(() => this.nextStep(), 600);
+          // Solo avanzamos automáticamente si estamos completando (no deshaciendo)
+          // y si todavía hay pasos por delante
+          if (isCompleting && index < this.project!.steps.length - 1) {
+            setTimeout(() => {
+              // Verificación de seguridad: solo avanzar si el usuario no cambió de paso manualmente
+              if (this.activeStepIndex === index) {
+                this.nextStep();
+              }
+            }, 800); // Retardo sutil para feedback visual
           }
         },
         error: () => {
-          step.status = step.status === 'Completado' ? 'Pendiente' : 'Completado';
-          this.toastService.error('Error al actualizar el paso.');
+          step.status = isCompleting ? 'Pendiente' : 'Completado';
+          this.toastService.error('Error al guardar el progreso.');
         },
       });
   }
