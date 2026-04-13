@@ -1,16 +1,21 @@
-<app-mobile-header (openCreate)="openCreateModal()"></app-mobile-header>
+<app-mobile-header
+  (openCreate)="openCreateModal()"
+  (shareRequest)="openPublishModal()"
+  (logoutRequest)="handleLogout()"
+>
+</app-mobile-header>
 
 <div class="w-full max-w-350 mx-auto pb-6 pt-2">
   <h1 class="sr-only">Panel de control de mis proyectos</h1>
 
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6 mb-5 md:mb-6">
-    <section class="lg:col-span-2" aria-labelledby="recent-project-title">
+  <div class="flex flex-col lg:grid lg:grid-cols-3 gap-5 md:gap-6 mb-5 md:mb-6">
+    <section class="lg:col-span-2 w-full" aria-labelledby="recent-project-title">
       <h2 id="recent-project-title" class="sr-only">Proyecto reciente</h2>
       <app-recent-project [project]="recentProject" (createClicked)="openCreateModal()">
       </app-recent-project>
     </section>
 
-    <section class="h-fit hidden md:block" aria-labelledby="quick-actions-title">
+    <section class="h-fit hidden md:block w-full" aria-labelledby="quick-actions-title">
       <h2 id="quick-actions-title" class="sr-only">Acciones rápidas</h2>
       <app-quick-actions (createClicked)="openCreateModal()" (shareClicked)="openPublishModal()">
       </app-quick-actions>
@@ -18,13 +23,13 @@
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 md:gap-6">
-    <section class="lg:col-span-2" aria-labelledby="my-collection-title">
+    <section class="hidden md:block lg:col-span-2 w-full" aria-labelledby="my-collection-title">
       <h2 id="my-collection-title" class="sr-only">Mi colección de proyectos</h2>
       <app-project-collection [projects]="myProjects" [isLoading]="isLoadingProjects">
       </app-project-collection>
     </section>
 
-    <section class="flex flex-col h-full" aria-labelledby="recommended-title">
+    <section class="flex flex-col h-full w-full" aria-labelledby="recommended-title">
       <app-recommended-tutorial
         id="recommended-title"
         [tutorial]="recommendedTutorial"

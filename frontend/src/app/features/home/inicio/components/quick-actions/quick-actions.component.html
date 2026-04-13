@@ -22,20 +22,20 @@
     <h2
       class="text-[17px] md:text-[19px] font-display font-bold text-text-main tracking-tight leading-tight"
     >
-      Acciones rápidas
+      ¿Qué quieres hacer hoy?
     </h2>
   </div>
 
-  <div class="space-y-3.5 flex-1 flex flex-col justify-center">
+  <div class="flex flex-col sm:flex-row lg:flex-col gap-3.5 flex-1 justify-center">
     <button
       (click)="onCreateClick()"
-      class="w-full flex items-center gap-4 p-4 rounded-[1.25rem] bg-bg border border-border-main/10 shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group text-left cursor-pointer outline-none hover:border-primary/30 hover:shadow-[0_8px_25px_-5px_rgba(255,89,0,0.15)] hover:-translate-y-1 hover:bg-linear-to-r hover:from-surface hover:to-primary/5 active:scale-[0.98]"
+      class="w-full flex items-center gap-4 p-4 rounded-[1.25rem] bg-bg border border-border-main/10 shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-500 group text-left cursor-pointer outline-none hover:border-primary/30 hover:shadow-[0_8px_25px_-5px_rgba(255,89,0,0.15)] hover:-translate-y-1 hover:bg-linear-to-r hover:from-surface hover:to-primary/5 active:scale-[0.98]"
     >
       <div
-        class="w-11 h-11 md:w-12 md:h-12 rounded-xl bg-primary text-white flex items-center justify-center shadow-[0_4px_12px_rgba(255,89,0,0.3)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110 group-hover:rotate-90 group-hover:shadow-[0_6px_15px_rgba(255,89,0,0.4)] shrink-0"
+        class="w-11 h-11 rounded-xl bg-primary text-white flex items-center justify-center shadow-[0_4px_12px_rgba(255,89,0,0.3)] transition-all duration-500 group-hover:scale-110 group-hover:rotate-90 group-hover:shadow-[0_6px_15px_rgba(255,89,0,0.4)] shrink-0"
       >
         <svg
-          class="w-5 h-5 md:w-5.5 md:h-5.5"
+          class="w-5 h-5"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -46,41 +46,24 @@
       </div>
       <div class="flex-1">
         <p
-          class="font-display font-bold text-text-main text-[15px] md:text-[16px] group-hover:text-primary transition-colors duration-300"
+          class="font-display font-bold text-text-main text-[14px] md:text-[15px] group-hover:text-primary transition-colors"
         >
-          Nuevo Proyecto
+          Crear desde cero
         </p>
-        <p
-          class="text-[13px] md:text-[14px] text-muted mt-0.5 opacity-80 group-hover:opacity-100 transition-opacity"
-        >
-          Sube un nuevo diseño
+        <p class="text-[12px] md:text-[13px] text-muted mt-0.5 leading-snug">
+          Empieza un proyecto nuevo vacío.
         </p>
       </div>
-      <svg
-        class="w-4.5 h-4.5 text-muted/30 group-hover:text-primary/60 group-hover:translate-x-1 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] shrink-0"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        stroke-width="2.5"
-      >
-        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-      </svg>
     </button>
 
     <button
       (click)="onShareClick()"
-      class="w-full flex items-center gap-4 p-4 rounded-[1.25rem] bg-bg border border-border-main/10 shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group text-left cursor-pointer outline-none hover:border-text-main/20 hover:shadow-[0_8px_25px_-5px_rgba(0,0,0,0.08)] hover:-translate-y-1 hover:bg-linear-to-r hover:from-surface hover:to-surface-hover active:scale-[0.98]"
+      class="w-full flex items-center gap-4 p-4 rounded-[1.25rem] bg-bg border border-border-main/10 shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)] transition-all duration-500 group text-left cursor-pointer outline-none hover:border-text-main/20 hover:shadow-[0_8px_25px_-5px_rgba(0,0,0,0.08)] hover:-translate-y-1 hover:bg-linear-to-r hover:from-surface hover:to-surface-hover active:scale-[0.98]"
     >
       <div
-        class="w-11 h-11 md:w-12 md:h-12 rounded-xl bg-surface border border-border-main/15 text-text-main flex items-center justify-center shadow-[0_2px_5px_rgba(0,0,0,0.05)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-110 group-hover:border-text-main/30 shrink-0"
+        class="w-11 h-11 rounded-xl bg-surface border border-border-main/15 text-text-main flex items-center justify-center shadow-[0_2px_5px_rgba(0,0,0,0.05)] transition-all duration-500 group-hover:scale-110 group-hover:border-text-main/30 shrink-0"
       >
-        <svg
-          class="w-5 h-5 md:w-5.5 md:h-5.5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          stroke-width="2"
-        >
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -90,25 +73,14 @@
       </div>
       <div class="flex-1">
         <p
-          class="font-display font-bold text-text-main text-[15px] md:text-[16px] transition-colors duration-300"
+          class="font-display font-bold text-text-main text-[14px] md:text-[15px] transition-colors"
         >
-          Compartir proyecto
+          Publicar diseño
         </p>
-        <p
-          class="text-[13px] md:text-[14px] text-muted mt-0.5 opacity-80 group-hover:opacity-100 transition-opacity"
-        >
-          Comparte una de tus creaciones
+        <p class="text-[12px] md:text-[13px] text-muted mt-0.5 leading-snug">
+          Haz público un diseño tuyo para la comunidad.
         </p>
       </div>
-      <svg
-        class="w-4.5 h-4.5 text-muted/30 group-hover:text-text-main/60 group-hover:translate-x-1 transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] shrink-0"
-        fill="none"
-        viewBox="0 0 24 24"
-        stroke="currentColor"
-        stroke-width="2.5"
-      >
-        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-      </svg>
     </button>
   </div>
 </section>
