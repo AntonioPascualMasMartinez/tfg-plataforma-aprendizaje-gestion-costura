@@ -34,66 +34,79 @@
       </div>
     }
 
-    <div class="absolute top-3 left-3 z-10 flex flex-col gap-2">
-      <div
-        class="flex items-center gap-1.5 px-2.5 py-1 bg-surface rounded-full shadow-sm border border-border-main/5"
-      >
-        <span class="w-1.5 h-1.5 rounded-full" [ngClass]="statusConfig.dot"></span>
-        <span class="text-[10px] font-bold uppercase tracking-wide text-text-main">
-          {{ project.status || 'Planificado' }}
-        </span>
+    <div
+      class="absolute top-3.5 left-3.5 right-3.5 z-10 flex flex-wrap items-start justify-between gap-2 pointer-events-none"
+    >
+      <div class="flex flex-wrap items-center gap-2">
+        <div
+          class="flex items-center gap-2 px-3 py-1.5 bg-surface/90 backdrop-blur-md text-text-main text-[10px] md:text-[11px] font-bold rounded-2xl border border-border-main/10 shadow-sm transition-all"
+        >
+          <span
+            class="w-2 h-2 rounded-full shadow-[0_0_8px_rgba(0,0,0,0.2)]"
+            [ngClass]="statusConfig.dot"
+          ></span>
+          <span class="tracking-tight">{{ project.status || 'Planificado' }}</span>
+        </div>
+
+        @if (isFromTutorial) {
+          <div
+            class="flex items-center gap-2 px-3 py-1.5 bg-primary/90 backdrop-blur-md text-white text-[10px] md:text-[11px] font-bold rounded-2xl shadow-sm transition-all border border-primary/20"
+          >
+            <div class="flex items-center justify-center w-5 h-5 rounded-full bg-white/20">
+              <svg
+                class="w-3.5 h-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
+                />
+              </svg>
+            </div>
+            <span class="tracking-tight">Tutorial</span>
+          </div>
+        } @else if (isAdaptedFromCommunity) {
+          <div
+            class="flex items-center gap-2 px-3 py-1.5 bg-indigo-600/90 backdrop-blur-md text-white text-[10px] md:text-[11px] font-bold rounded-2xl shadow-sm transition-all border border-indigo-500/20"
+          >
+            <div class="flex items-center justify-center w-5 h-5 rounded-full bg-white/20">
+              <svg
+                class="w-3.5 h-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a5.946 5.946 0 00-.942 3.197M12 10.5a3.375 3.375 0 100-6.75 3.375 3.375 0 000 6.75z"
+                />
+              </svg>
+            </div>
+            <span class="tracking-tight">Comunidad</span>
+          </div>
+        }
       </div>
 
-      @if (isFromTutorial) {
-        <div
-          class="flex items-center gap-1 px-2.5 py-1 bg-primary/90 text-white rounded-full shadow-sm w-fit"
-          title="Creado desde un tutorial"
-        >
-          <svg
-            class="w-3 h-3"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"
-            />
-          </svg>
-          <span class="text-[9px] font-bold uppercase tracking-wide">Tutorial</span>
-        </div>
-      } @else if (isAdaptedFromCommunity) {
-        <div
-          class="flex items-center gap-1 px-2.5 py-1 bg-indigo-600/90 text-white rounded-full shadow-sm w-fit"
-          title="Adaptado de la comunidad"
-        >
-          <svg
-            class="w-3.5 h-3.5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2.5"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a5.946 5.946 0 00-.942 3.197M12 10.5a3.375 3.375 0 100-6.75 3.375 3.375 0 000 6.75z"
-            />
-          </svg>
-          <span class="text-[9px] font-bold uppercase tracking-wide">Comunidad</span>
-        </div>
-      }
-    </div>
-
-    <div class="absolute top-3 right-3 z-10">
-      <span
-        class="bg-white px-2.5 py-1 text-[10px] font-bold rounded-full shadow-sm uppercase tracking-wide border flex items-center justify-center"
+      <div
+        class="flex items-center gap-2 px-3 py-1.5 text-[10px] md:text-[11px] font-bold rounded-2xl border backdrop-blur-md shadow-sm transition-all bg-surface/90"
         [ngClass]="difficultyTextColorClass"
       >
-        {{ project.difficulty || 'N/A' }}
-      </span>
+        <svg class="w-3.5 h-3.5 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2.5"
+            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+          />
+        </svg>
+        <span class="tracking-tight">Nivel {{ project.difficulty || 'N/A' }}</span>
+      </div>
     </div>
   </a>
 

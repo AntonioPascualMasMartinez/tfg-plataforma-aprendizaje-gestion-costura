@@ -47,81 +47,135 @@
     </button>
   </header>
 
-  <div
-    class="flex items-center gap-2 border-b border-border-main/10 px-1 overflow-x-auto hide-scrollbar whitespace-nowrap"
-  >
-    <button
-      (click)="switchView('taller')"
-      class="relative px-5 py-3 text-[15px] font-bold transition-colors outline-none flex items-center gap-2 shrink-0"
-      [ngClass]="activeView === 'taller' ? 'text-primary' : 'text-muted hover:text-text-main'"
+  <div class="relative w-full -mx-4 px-4 md:mx-0 md:px-1 border-b border-border-main/10 mb-4">
+    <div
+      class="flex items-center gap-1 md:gap-2 overflow-x-auto hide-scrollbar whitespace-nowrap snap-x snap-mandatory pb-[1px]"
     >
-      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.824M11.42 15.17l-3.96 3.96a2.653 2.653 0 01-3.75-3.75l3.96-3.96m8.167-3.96l-3.96-3.96a2.653 2.653 0 00-3.75 3.75l3.96 3.96m8.167-3.96l-8.167 8.167"
-        />
-      </svg>
-      Mis Borradores
-      @if (activeView === 'taller') {
-        <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full"></div>
-      }
-    </button>
+      <button
+        (click)="switchView('todo')"
+        class="relative px-3 py-3 md:px-5 md:py-3 text-[14px] md:text-[15px] font-bold transition-colors outline-none flex items-center gap-1.5 md:gap-2 shrink-0 snap-start"
+        [ngClass]="activeView === 'todo' ? 'text-primary' : 'text-muted hover:text-text-main'"
+      >
+        <svg
+          class="w-4 h-4 md:w-5 md:h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 0120.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z"
+          />
+        </svg>
+        Todo
+        @if (activeView === 'todo') {
+          <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full"></div>
+        }
+      </button>
 
-    <button
-      (click)="switchView('portafolio')"
-      class="relative px-5 py-3 text-[15px] font-bold transition-colors outline-none flex items-center gap-2 shrink-0"
-      [ngClass]="activeView === 'portafolio' ? 'text-primary' : 'text-muted hover:text-text-main'"
-    >
-      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
-        />
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-      </svg>
-      Mi Portafolio
-      @if (activeView === 'portafolio') {
-        <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full"></div>
-      }
-    </button>
+      <button
+        (click)="switchView('borradores')"
+        class="relative px-3 py-3 md:px-5 md:py-3 text-[14px] md:text-[15px] font-bold transition-colors outline-none flex items-center gap-1.5 md:gap-2 shrink-0 snap-start"
+        [ngClass]="activeView === 'borradores' ? 'text-primary' : 'text-muted hover:text-text-main'"
+      >
+        <svg
+          class="w-4 h-4 md:w-5 md:h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M11.42 15.17L17.25 21A2.652 2.652 0 0021 17.25l-5.877-5.824M11.42 15.17l-3.96 3.96a2.653 2.653 0 01-3.75-3.75l3.96-3.96m8.167-3.96l-3.96-3.96a2.653 2.653 0 00-3.75 3.75l3.96 3.96m8.167-3.96l-8.167 8.167"
+          />
+        </svg>
+        Borradores
+        @if (activeView === 'borradores') {
+          <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full"></div>
+        }
+      </button>
 
-    <button
-      (click)="switchView('tutoriales')"
-      class="relative px-5 py-3 text-[15px] font-bold transition-colors outline-none flex items-center gap-2 shrink-0"
-      [ngClass]="activeView === 'tutoriales' ? 'text-primary' : 'text-muted hover:text-text-main'"
-    >
-      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"
-        />
-      </svg>
-      Mis Tutoriales
-      @if (activeView === 'tutoriales') {
-        <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full"></div>
-      }
-    </button>
+      <button
+        (click)="switchView('publicados')"
+        class="relative px-3 py-3 md:px-5 md:py-3 text-[14px] md:text-[15px] font-bold transition-colors outline-none flex items-center gap-1.5 md:gap-2 shrink-0 snap-start"
+        [ngClass]="activeView === 'publicados' ? 'text-primary' : 'text-muted hover:text-text-main'"
+      >
+        <svg
+          class="w-4 h-4 md:w-5 md:h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
+          />
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+          />
+        </svg>
+        Publicados
+        @if (activeView === 'publicados') {
+          <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full"></div>
+        }
+      </button>
 
-    <button
-      (click)="switchView('comunidad')"
-      class="relative px-5 py-3 text-[15px] font-bold transition-colors outline-none flex items-center gap-2 shrink-0"
-      [ngClass]="activeView === 'comunidad' ? 'text-primary' : 'text-muted hover:text-text-main'"
-    >
-      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z"
-        />
-      </svg>
-      Guardados
-      @if (activeView === 'comunidad') {
-        <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full"></div>
-      }
-    </button>
+      <button
+        (click)="switchView('tutoriales')"
+        class="relative px-3 py-3 md:px-5 md:py-3 text-[14px] md:text-[15px] font-bold transition-colors outline-none flex items-center gap-1.5 md:gap-2 shrink-0 snap-start"
+        [ngClass]="activeView === 'tutoriales' ? 'text-primary' : 'text-muted hover:text-text-main'"
+      >
+        <svg
+          class="w-4 h-4 md:w-5 md:h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5"
+          />
+        </svg>
+        Tutoriales
+        @if (activeView === 'tutoriales') {
+          <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full"></div>
+        }
+      </button>
+
+      <button
+        (click)="switchView('comunidad')"
+        class="relative px-3 py-3 md:px-5 md:py-3 text-[14px] md:text-[15px] font-bold transition-colors outline-none flex items-center gap-1.5 md:gap-2 shrink-0 snap-start"
+        [ngClass]="activeView === 'comunidad' ? 'text-primary' : 'text-muted hover:text-text-main'"
+      >
+        <svg
+          class="w-4 h-4 md:w-5 md:h-5"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z"
+          />
+        </svg>
+        Comunidad
+        @if (activeView === 'comunidad') {
+          <div class="absolute bottom-0 left-0 w-full h-0.5 bg-primary rounded-t-full"></div>
+        }
+      </button>
+    </div>
   </div>
 
   <div
@@ -149,13 +203,15 @@
         [formControl]="searchTerm"
         type="text"
         [placeholder]="
-          activeView === 'taller'
-            ? 'Buscar en mis borradores...'
-            : activeView === 'portafolio'
-              ? 'Buscar en mi portafolio...'
-              : activeView === 'tutoriales'
-                ? 'Buscar en mis tutoriales...'
-                : 'Buscar en mis guardados...'
+          activeView === 'todo'
+            ? 'Buscar en todos mis proyectos...'
+            : activeView === 'borradores'
+              ? 'Buscar en mis borradores...'
+              : activeView === 'publicados'
+                ? 'Buscar en publicados...'
+                : activeView === 'tutoriales'
+                  ? 'Buscar en tutoriales...'
+                  : 'Buscar en comunidad...'
         "
         class="w-full pl-11 pr-10 py-3 bg-bg border border-border-main/15 shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)] rounded-[1.25rem] focus:ring-2 focus:ring-primary/20 focus:border-primary/50 outline-none transition-all duration-300 text-[14px] font-semibold text-text-main placeholder:text-muted/60 placeholder:font-medium"
       />
@@ -349,7 +405,7 @@
         @for (project of projects; track project._id) {
           <app-project-card
             [project]="project"
-            [activeView]="activeView === 'portafolio' ? 'portafolio' : 'taller'"
+            [activeView]="project.isPublic ? 'portafolio' : 'taller'"
             [isComplete]="isProjectComplete(project)"
             (delete)="deleteProject($event)"
             (toggleVisibility)="toggleProjectVisibility(project)"
@@ -422,57 +478,37 @@
         </div>
 
         @if (searchTerm.value) {
+        } @else if (activeView === 'todo') {
           <h2
             class="text-[22px] md:text-[26px] font-display font-bold text-text-main mb-3 tracking-tight"
           >
-            Sin resultados de búsqueda
+            Aún no tienes proyectos
           </h2>
           <p class="text-[15px] md:text-[16px] text-muted max-w-[320px] mb-8 leading-relaxed px-4">
-            Prueba con otras palabras, cambia los filtros o limpia la búsqueda actual.
+            Tu espacio de trabajo está vacío. ¡Empieza creando tu primer diseño de costura!
           </p>
-          <button
-            (click)="searchTerm.setValue('')"
-            class="btn bg-bg text-text-main border border-border-main/15 shadow-sm hover:shadow-md hover:border-border-main/30 px-6 py-3 rounded-xl transition-all cursor-pointer font-bold outline-none focus:ring-2 focus:ring-primary/20"
-          >
-            Limpiar filtros
-          </button>
-        } @else if (activeView === 'taller') {
+          <button (click)="openCreateModal()" class="..."></button>
+        } @else if (activeView === 'borradores') {
           <h2
             class="text-[22px] md:text-[26px] font-display font-bold text-text-main mb-3 tracking-tight"
           >
-            Tu taller está vacío
+            No tienes borradores
           </h2>
           <p class="text-[15px] md:text-[16px] text-muted max-w-[320px] mb-8 leading-relaxed px-4">
-            No tienes borradores pendientes. ¡Es un buen momento para empezar un nuevo diseño de
-            costura!
+            No tienes proyectos en curso. ¡Es un buen momento para empezar un nuevo diseño!
           </p>
-          <button
-            (click)="openCreateModal()"
-            class="group flex items-center justify-center gap-2.5 bg-primary text-white px-7 py-3.5 rounded-2xl shadow-[0_8px_20px_-6px_rgba(255,89,0,0.4)] hover:shadow-[0_12px_25px_-8px_rgba(255,89,0,0.5)] transition-all duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] hover:-translate-y-1 active:scale-95 cursor-pointer outline-none"
-          >
-            <svg
-              class="w-5 h-5 group-hover:rotate-90 transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              stroke-width="2.5"
-            >
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-            <span class="font-bold text-[15px]">Crear mi primer patrón</span>
-          </button>
-        } @else if (activeView === 'portafolio') {
+        } @else if (activeView === 'publicados') {
           <h2
             class="text-[22px] md:text-[26px] font-display font-bold text-text-main mb-3 tracking-tight"
           >
             Aún no hay publicaciones
           </h2>
           <p class="text-[15px] md:text-[16px] text-muted max-w-[320px] mb-8 leading-relaxed px-4">
-            Tu portafolio público está vacío. Termina un proyecto en tu taller y publícalo para
-            inspirar a la comunidad.
+            No tienes proyectos visibles para otros. Termina un diseño y publícalo para inspirar a
+            la comunidad.
           </p>
           <button
-            (click)="switchView('taller')"
+            (click)="switchView('borradores')"
             class="btn bg-bg text-text-main border border-border-main/15 shadow-sm hover:shadow-md hover:border-border-main/30 px-6 py-3 rounded-xl transition-all cursor-pointer font-bold outline-none focus:ring-2 focus:ring-primary/20"
           >
             Ir a mis Borradores
