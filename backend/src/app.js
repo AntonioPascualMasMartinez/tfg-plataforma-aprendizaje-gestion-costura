@@ -24,7 +24,7 @@ app.use(
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
+  max: 10000,
   message: {
     code: 429,
     message: 'Límite de peticiones excedido. Intente de nuevo más tarde.',

@@ -31,7 +31,7 @@
       </div>
       <button
         (click)="closeModal()"
-        class="text-muted hover:text-text-main p-1 rounded-full transition-colors"
+        class="text-muted hover:text-text-main p-1 rounded-full transition-colors cursor-pointer"
       >
         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path
@@ -60,7 +60,7 @@
       @for (reason of predefinedReasons; track reason) {
         <button
           (click)="selectReason(reason)"
-          class="w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left group"
+          class="w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left group cursor-pointer"
           [class.border-danger]="selectedReason === reason"
           [class.bg-danger/5]="selectedReason === reason"
           [class.border-border-main/10]="selectedReason !== reason"
@@ -90,7 +90,7 @@
 
       <button
         (click)="selectReason('Otro')"
-        class="w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left group"
+        class="w-full flex items-center justify-between p-4 rounded-xl border transition-all text-left group cursor-pointer"
         [class.border-danger]="isOtherSelected"
         [class.bg-danger/5]="isOtherSelected"
         [class.border-border-main/10]="!isOtherSelected"
@@ -141,7 +141,7 @@
       <button
         (click)="closeModal()"
         [disabled]="isSubmitting"
-        class="px-6 py-2.5 rounded-xl text-[14px] font-semibold text-text-main hover:bg-surface-hover transition disabled:opacity-50"
+        class="px-6 py-2.5 rounded-xl text-[14px] font-semibold text-text-main hover:bg-surface-hover transition disabled:opacity-50 cursor-pointer"
       >
         Cancelar
       </button>
@@ -150,7 +150,7 @@
         [disabled]="
           !canSubmit || isSubmitting || (isOtherSelected && otherReason.trim().length < 10)
         "
-        class="flex items-center gap-2 px-6 py-2.5 rounded-xl text-[14px] font-semibold bg-danger text-white hover:bg-danger/90 transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed relative"
+        class="flex items-center gap-2 px-6 py-2.5 rounded-xl text-[14px] font-semibold bg-danger text-white hover:bg-danger/90 transition shadow-sm disabled:opacity-50 disabled:cursor-not-allowed relative cursor-pointer"
       >
         @if (isSubmitting) {
           <svg

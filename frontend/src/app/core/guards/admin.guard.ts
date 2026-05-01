@@ -14,24 +14,23 @@ export const adminGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const platformId = inject(PLATFORM_ID);
 
-  /* Verificación exclusiva en el entorno del cliente (navegador) para acceder al almacenamiento local */
-  if (isPlatformBrowser(platformId)) {
-    const token = localStorage.getItem('accessToken');
+  if (!isPlatformBrowser(platformId)) {
+    return true;
+  }
 
-    if (token) {
-      try {
-        const decodedToken: any = jwtDecode(token);
-        if (decodedToken.role === 'Admin') {
-          return true;
-        }
-      } catch (error) {
-        console.error('Error durante la decodificación del token de acceso:', error);
+  const token = localStorage.getItem('accessToken');
+
+  if (token) {
+    try {
+      const decodedToken: any = jwtDecode(token);
+      if (decodedToken.role === 'Admin') {
+        return true;
       }
+    } catch (error) {
+      console.error('Error durante la decodificación del token de acceso:', error);
     }
   }
 
-  /* Redirección al formulario de autenticación si la validación falla o se ejecuta en el servidor,
-     preservando la URL de origen para asegurar una experiencia de usuario ininterrumpida. */
   return router.createUrlTree(['/auth/login'], {
     queryParams: { returnUrl: state.url },
   });

@@ -351,7 +351,7 @@
               <button
                 type="submit"
                 [disabled]="passwordForm.invalid || isSavingPassword"
-                class="w-full h-9 bg-text-main text-bg rounded-lg text-[13px] font-semibold hover:bg-text-main/90 transition-colors flex items-center justify-center gap-2"
+                class="w-full h-9 bg-text-main text-bg rounded-lg text-[13px] font-semibold hover:bg-text-main/90 transition-colors flex items-center justify-center gap-2 cursor-pointer"
               >
                 @if (isSavingPassword) {
                   Actualizando...
@@ -366,7 +366,7 @@
             <button
               type="button"
               (click)="onRecoverPassword()"
-              class="text-[12px] font-medium text-primary hover:underline"
+              class="text-[12px] font-medium text-primary hover:underline cursor-pointer"
             >
               ¿Olvidaste tu contraseña?
             </button>
@@ -400,7 +400,7 @@
           </div>
           <button
             (click)="openDeleteModal()"
-            class="shrink-0 w-full sm:w-auto h-9 px-4 border border-danger/50 text-danger rounded-lg text-[12px] font-semibold hover:bg-danger hover:text-white transition-colors"
+            class="shrink-0 w-full sm:w-auto h-9 px-4 border border-danger/50 text-danger rounded-lg text-[12px] font-semibold hover:bg-danger hover:text-white transition-colors cursor-pointer"
           >
             Eliminar cuenta
           </button>

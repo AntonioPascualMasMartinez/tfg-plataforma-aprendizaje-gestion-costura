@@ -12,6 +12,7 @@ import { NgClass, isPlatformBrowser } from '@angular/common';
 import { AuthService } from '../../../core/services/auth.service';
 import { UserService } from '../../../core/services/user.service';
 import { ConfirmModalComponent } from '../../modals/confirm-modal/confirm-modal.component';
+import { ChangeDetectorRef } from '@angular/core';
 
 /**
  * Contrato de tipado para los nodos de navegación del menú lateral.
@@ -52,6 +53,7 @@ export class Sidebar implements OnInit {
   private router = inject(Router);
   private sanitizer = inject(DomSanitizer);
   private platformId = inject(PLATFORM_ID);
+  private cdr = inject(ChangeDetectorRef);
 
   isLoadingLogout = false;
   showLogoutModal = false;
@@ -118,6 +120,7 @@ export class Sidebar implements OnInit {
       next: (res) => {
         if (res.data && res.data.role === 'Admin') {
           this.isAdmin = true;
+          this.cdr.detectChanges();
         }
       },
       error: (err) => {

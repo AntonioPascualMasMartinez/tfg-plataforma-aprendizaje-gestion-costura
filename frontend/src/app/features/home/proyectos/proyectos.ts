@@ -171,7 +171,6 @@ export class Proyectos implements OnInit, OnDestroy {
         next: (response) => {
           if (response.data) {
             let fetchedDocs = response.data.docs;
-            console.log('Proyectos recuperados del servidor:', fetchedDocs);
             /* Procesamiento local complementario para el filtrado por dificultad */
             const difficulty = this.difficultyFilter.value || 'Todas';
             if (difficulty !== 'Todas') {

@@ -12,15 +12,15 @@ export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
   const platformId = inject(PLATFORM_ID);
 
-  /* Autorización concedida si la plataforma es el navegador web y existe un token vigente */
-  if (isPlatformBrowser(platformId)) {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      return true;
-    }
+  if (!isPlatformBrowser(platformId)) {
+    return true;
   }
 
-  /* Denegación de acceso y redirección a la pasarela de identificación, almacenando la ruta interceptada */
+  const token = localStorage.getItem('accessToken');
+  if (token) {
+    return true;
+  }
+
   return router.createUrlTree(['/auth/login'], {
     queryParams: { returnUrl: state.url },
   });
