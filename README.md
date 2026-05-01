@@ -6,6 +6,7 @@ Antonio Pascual Mas Martínez
 
 ## Tutor
 José Vicente Berná Martínez
+Lucía Arnau Muñoz
 
 ## Curso Académico
 2025-2026
@@ -25,7 +26,7 @@ Este repositorio contiene el desarrollo del Trabajo de Fin de Grado consistente 
 - Base de Datos: MongoDB
 
 ## Estado del proyecto
-En fase de desarrollo y planificación
+Completado
 
 ## Estructura del repositorio
 - `/frontend`: Aplicación cliente

@@ -1,6 +1,6 @@
 /**
  * @file server.ts
- * @description Servidor web basado en Express configurado para gestionar el 
+ * @description Servidor web basado en Express configurado para gestionar el
  * Server-Side Rendering (SSR) de la aplicación Angular.
  */
 
@@ -32,15 +32,13 @@ app.use(
 
 /**
  * Interceptor principal de peticiones.
- * Todas las rutas no gestionadas por los recursos estáticos son delegadas 
+ * Todas las rutas no gestionadas por los recursos estáticos son delegadas
  * al motor de Angular para su renderizado en el servidor.
  */
 app.use((req, res, next) => {
   angularApp
     .handle(req)
-    .then((response) =>
-      response ? writeResponseToNodeResponse(response, res) : next(),
-    )
+    .then((response) => (response ? writeResponseToNodeResponse(response, res) : next()))
     .catch(next);
 });
 
@@ -55,12 +53,11 @@ if (isMainModule(import.meta.url) || process.env['pm_id']) {
     if (error) {
       throw error;
     }
-    console.log(`Servidor Node Express en ejecución: http://localhost:${port}`);
   });
 }
 
 /**
- * Exportación del manejador de peticiones para su uso interno por Angular CLI 
+ * Exportación del manejador de peticiones para su uso interno por Angular CLI
  * durante el desarrollo o compilación, así como en despliegues serverless.
  */
 export const reqHandler = createNodeRequestHandler(app);

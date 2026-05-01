@@ -5,7 +5,15 @@
  * Implementa un rastreador de progreso de desplazamiento (Scroll Progress) optimizado
  * mediante el estrangulamiento de eventos (Throttling) con `requestAnimationFrame`.
  */
-import { Component, OnInit, OnDestroy, HostListener, ElementRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  HostListener,
+  ElementRef,
+  ChangeDetectorRef,
+  inject,
+} from '@angular/core';
 
 import { Navbar } from '../../shared/components/navbar/navbar';
 import { Footer } from '../../shared/components/footer/footer';
@@ -33,6 +41,7 @@ export class Landing implements OnInit, OnDestroy {
 
   /** Bandera de control (Mutex) para prevenir el apilamiento de llamadas al motor de renderizado. */
   private ticking = false;
+  private cdr = inject(ChangeDetectorRef);
 
   constructor(private el: ElementRef) {}
 
@@ -61,6 +70,7 @@ export class Landing implements OnInit, OnDestroy {
         }
 
         this.ticking = false;
+        this.cdr.detectChanges();
       });
       this.ticking = true;
     }

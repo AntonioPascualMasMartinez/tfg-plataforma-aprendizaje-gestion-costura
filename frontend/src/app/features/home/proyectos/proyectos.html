@@ -49,11 +49,11 @@
 
   <div class="relative w-full -mx-4 px-4 md:mx-0 md:px-1 border-b border-border-main/10 mb-4">
     <div
-      class="flex items-center gap-1 md:gap-2 overflow-x-auto hide-scrollbar whitespace-nowrap snap-x snap-mandatory pb-[1px]"
+      class="flex items-center gap-1 md:gap-2 overflow-x-auto hide-scrollbar whitespace-nowrap snap-x snap-mandatory pb-px"
     >
       <button
         (click)="switchView('todo')"
-        class="relative px-3 py-3 md:px-5 md:py-3 text-[14px] md:text-[15px] font-bold transition-colors outline-none flex items-center gap-1.5 md:gap-2 shrink-0 snap-start"
+        class="relative px-3 py-3 md:px-5 md:py-3 text-[14px] md:text-[15px] font-bold transition-colors outline-none flex items-center gap-1.5 md:gap-2 shrink-0 snap-start cursor-pointer"
         [ngClass]="activeView === 'todo' ? 'text-primary' : 'text-muted hover:text-text-main'"
       >
         <svg
@@ -77,7 +77,7 @@
 
       <button
         (click)="switchView('borradores')"
-        class="relative px-3 py-3 md:px-5 md:py-3 text-[14px] md:text-[15px] font-bold transition-colors outline-none flex items-center gap-1.5 md:gap-2 shrink-0 snap-start"
+        class="relative px-3 py-3 md:px-5 md:py-3 text-[14px] md:text-[15px] font-bold transition-colors outline-none flex items-center gap-1.5 md:gap-2 shrink-0 snap-start cursor-pointer"
         [ngClass]="activeView === 'borradores' ? 'text-primary' : 'text-muted hover:text-text-main'"
       >
         <svg
@@ -101,7 +101,7 @@
 
       <button
         (click)="switchView('publicados')"
-        class="relative px-3 py-3 md:px-5 md:py-3 text-[14px] md:text-[15px] font-bold transition-colors outline-none flex items-center gap-1.5 md:gap-2 shrink-0 snap-start"
+        class="relative px-3 py-3 md:px-5 md:py-3 text-[14px] md:text-[15px] font-bold transition-colors outline-none flex items-center gap-1.5 md:gap-2 shrink-0 snap-start cursor-pointer"
         [ngClass]="activeView === 'publicados' ? 'text-primary' : 'text-muted hover:text-text-main'"
       >
         <svg
@@ -130,7 +130,7 @@
 
       <button
         (click)="switchView('tutoriales')"
-        class="relative px-3 py-3 md:px-5 md:py-3 text-[14px] md:text-[15px] font-bold transition-colors outline-none flex items-center gap-1.5 md:gap-2 shrink-0 snap-start"
+        class="relative px-3 py-3 md:px-5 md:py-3 text-[14px] md:text-[15px] font-bold transition-colors outline-none flex items-center gap-1.5 md:gap-2 shrink-0 snap-start cursor-pointer"
         [ngClass]="activeView === 'tutoriales' ? 'text-primary' : 'text-muted hover:text-text-main'"
       >
         <svg
@@ -154,7 +154,7 @@
 
       <button
         (click)="switchView('comunidad')"
-        class="relative px-3 py-3 md:px-5 md:py-3 text-[14px] md:text-[15px] font-bold transition-colors outline-none flex items-center gap-1.5 md:gap-2 shrink-0 snap-start"
+        class="relative px-3 py-3 md:px-5 md:py-3 text-[14px] md:text-[15px] font-bold transition-colors outline-none flex items-center gap-1.5 md:gap-2 shrink-0 snap-start cursor-pointer"
         [ngClass]="activeView === 'comunidad' ? 'text-primary' : 'text-muted hover:text-text-main'"
       >
         <svg
@@ -259,11 +259,11 @@
           [formControl]="statusFilter"
           class="w-full h-11 pl-10 pr-9 rounded-[1.25rem] border border-border-main/15 bg-bg shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)] text-text-main text-[13.5px] font-bold outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 appearance-none cursor-pointer transition-all duration-300 group-hover:shadow-[inner_0_2px_8px_rgba(0,0,0,0.04)] hover:bg-surface-hover/50"
         >
-          <option value="Todos">Todos los estados</option>
-          <option value="Planificado">Planificados</option>
-          <option value="En curso">En curso</option>
-          <option value="Pausado">Pausados</option>
-          <option value="Finalizado">Finalizados</option>
+          <option label="Todos" value="Todos">Todos los estados</option>
+          <option label="Planificado" value="Planificado">Planificados</option>
+          <option label="En curso" value="En curso">En curso</option>
+          <option label="Pausado" value="Pausado">Pausados</option>
+          <option label="Finalizado" value="Finalizado">Finalizados</option>
         </select>
         <div
           class="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-muted group-hover:text-primary transition-colors"
@@ -306,10 +306,10 @@
           [formControl]="difficultyFilter"
           class="w-full h-11 pl-10 pr-9 rounded-[1.25rem] border border-border-main/15 bg-bg shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)] text-text-main text-[13.5px] font-bold outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 appearance-none cursor-pointer transition-all duration-300 group-hover:shadow-[inner_0_2px_8px_rgba(0,0,0,0.04)] hover:bg-surface-hover/50"
         >
-          <option value="Todas">Cualquier nivel</option>
-          <option value="Fácil">Fácil</option>
-          <option value="Intermedio">Intermedio</option>
-          <option value="Avanzado">Avanzado</option>
+          <option label="Todas" value="Todas">Cualquier nivel</option>
+          <option label="Fácil" value="Fácil">Fácil</option>
+          <option label="Intermedio" value="Intermedio">Intermedio</option>
+          <option label="Avanzado" value="Avanzado">Avanzado</option>
         </select>
         <div
           class="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-muted group-hover:text-primary transition-colors"
@@ -352,10 +352,10 @@
           [formControl]="sortByFilter"
           class="w-full h-11 pl-10 pr-9 rounded-[1.25rem] border border-border-main/15 bg-bg shadow-[inner_0_2px_4px_rgba(0,0,0,0.02)] text-text-main text-[13.5px] font-bold outline-none focus:border-primary/40 focus:ring-2 focus:ring-primary/10 appearance-none cursor-pointer transition-all duration-300 group-hover:shadow-[inner_0_2px_8px_rgba(0,0,0,0.04)] hover:bg-surface-hover/50"
         >
-          <option value="nuevo">Más recientes primero</option>
-          <option value="antiguo">Más antiguos primero</option>
-          <option value="nombre_asc">Nombre (A-Z)</option>
-          <option value="nombre_desc">Nombre (Z-A)</option>
+          <option label="Nuevo" value="nuevo">Más recientes primero</option>
+          <option label="Antiguo" value="antiguo">Más antiguos primero</option>
+          <option label="Nombre (A-Z)" value="nombre_asc">Nombre (A-Z)</option>
+          <option label="Nombre (Z-A)" value="nombre_desc">Nombre (Z-A)</option>
         </select>
         <div
           class="absolute inset-y-0 right-3.5 flex items-center pointer-events-none text-muted group-hover:text-primary transition-colors"

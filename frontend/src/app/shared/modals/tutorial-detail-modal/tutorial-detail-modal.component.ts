@@ -64,13 +64,16 @@ export class TutorialDetailModalComponent {
   get difficultyColorClass(): string {
     switch (this.tutorial.difficultyLevel) {
       case 'Principiante':
-        return 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50';
+        // Fondo verde súper claro, texto verde súper oscuro
+        return 'bg-emerald-50 text-emerald-800 border-emerald-200';
       case 'Intermedio':
-        return 'bg-amber-100 text-amber-800 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50';
+        // Fondo amarillo/naranja súper claro, texto naranja súper oscuro
+        return 'bg-amber-50 text-amber-800 border-amber-200';
       case 'Avanzado':
-        return 'bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800/50';
+        // Fondo rojo súper claro, texto rojo súper oscuro
+        return 'bg-rose-50 text-rose-800 border-rose-200';
       default:
-        return 'bg-surface-hover text-muted border-border-main/20';
+        return 'bg-surface text-text-main border-border-main/20';
     }
   }
 
